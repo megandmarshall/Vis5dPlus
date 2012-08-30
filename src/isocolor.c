@@ -440,6 +440,7 @@ static int colorbar_callback( LUI_COLORBAR *cb, int action )
          vis5d_get_color_table_address( current_dindex, VIS5D_ISOSURF,
                                         cvowner, cvar, &ctable );
          vis5d_get_color_table_params( current_dindex, VIS5D_ISOSURF, cvowner, cvar, &p);
+ 	 vis5d_other_table_init_params( current_dindex, VIS5D_ISOSURF, cvowner, cvar, p);
          if (action==LUI_RGB_RESET) {
             vis5d_color_table_init_params( p, 1, 0 );
             vis5d_color_table_recompute( ctable, 256, p, 1, 0 );
@@ -465,6 +466,7 @@ static int colorbar_callback( LUI_COLORBAR *cb, int action )
          vis5d_get_color_table_address( current_dindex, VIS5D_TRAJ,
                                         cvowner, cvar, &ctable );
          vis5d_get_color_table_params( current_dindex, VIS5D_TRAJ, cvowner, cvar, &p);
+ 	 vis5d_other_table_init_params( current_dindex, VIS5D_TRAJ, cvowner, cvar, p);
          if (action==LUI_RGB_RESET) {
             vis5d_color_table_init_params( p, 1, 0 );
             vis5d_color_table_recompute( ctable, 256, p, 1, 0);
@@ -492,6 +494,7 @@ static int colorbar_callback( LUI_COLORBAR *cb, int action )
             vis5d_get_color_table_address( current_dindex, VIS5D_TOPO,
                                            cvowner, cvar, &ctable );
             vis5d_get_color_table_params( current_dindex, VIS5D_TOPO, cvowner, cvar, &p);
+	    vis5d_other_table_init_params( current_dindex, VIS5D_TOPO, cvowner, cvar, p);
          }
          if (action==LUI_RGB_RESET) {
             if (cvar<0) {

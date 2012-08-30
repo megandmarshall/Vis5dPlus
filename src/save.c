@@ -72,6 +72,8 @@
 #define UINT_1_SIZE sizeof(uint_1)
 #define INT_2_SIZE  sizeof(int_2)
 #define UINT_2_SIZE sizeof(uint_2)
+#define INT_VERT2_SIZE  sizeof(int_vert2)
+#define UINT_VERT2_SIZE sizeof(uint_vert2)
 #define UINT_4_SIZE sizeof(uint_4)
 #define INT_SIZE    sizeof(int)
 #define UINT_SIZE   sizeof(unsigned int)
@@ -231,12 +233,12 @@ static int save_isosurfaces( Context ctx, FILE *f )
             FWRITE( &ctx->Variable[iv]->SurfTable[it]->isolevel, FLOAT_SIZE, 1, f );
             FWRITE( &numverts, INT_SIZE, 1, f );  /* number of vertices */
             FWRITE( &numindex, INT_SIZE, 1, f );
-            FWRITE( ctx->Variable[iv]->SurfTable[it]->verts, INT_2_SIZE, 3*numverts, f );
+            FWRITE( ctx->Variable[iv]->SurfTable[it]->verts, INT_VERT2_SIZE, 3*numverts, f );
             FWRITE( ctx->Variable[iv]->SurfTable[it]->norms, INT_1_SIZE, 3*numverts, f );
 #ifdef BIG_GFX
             FWRITE( ctx->Variable[iv]->SurfTable[it]->index, UINT_4_SIZE, numindex, f );
 #else
-            FWRITE( ctx->Variable[iv]->SurfTable[it]->index, UINT_2_SIZE, numindex, f );
+            FWRITE( ctx->Variable[iv]->SurfTable[it]->index, UINT_VERT2_SIZE, numindex, f );
 #endif
             if (ctx->Variable[iv]->SurfTable[it]->colors) {
                FWRITE( &ctx->Variable[iv]->SurfTable[it]->colorvar, INT_SIZE, 1, f );
@@ -314,11 +316,11 @@ static int save_hslices( Context ctx, FILE *f )
             FWRITE( &ctx->Variable[iv]->HSliceTable[it]->highlimit, FLOAT_SIZE, 1, f );
             FWRITE( &ctx->Variable[iv]->HSliceTable[it]->level, FLOAT_SIZE, 1, f );
             FWRITE( &num1, INT_SIZE, 1, f );
-            FWRITE( ctx->Variable[iv]->HSliceTable[it]->verts1, INT_2_SIZE, 3*num1, f );
+            FWRITE( ctx->Variable[iv]->HSliceTable[it]->verts1, INT_VERT2_SIZE, 3*num1, f );
             FWRITE( &num2, INT_SIZE, 1, f );
-            FWRITE( ctx->Variable[iv]->HSliceTable[it]->verts2, INT_2_SIZE, 3*num2, f );
+            FWRITE( ctx->Variable[iv]->HSliceTable[it]->verts2, INT_VERT2_SIZE, 3*num2, f );
             FWRITE( &num3, INT_SIZE, 1, f );
-            FWRITE( ctx->Variable[iv]->HSliceTable[it]->verts3, INT_2_SIZE, 3*num3, f );
+            FWRITE( ctx->Variable[iv]->HSliceTable[it]->verts3, INT_VERT2_SIZE, 3*num3, f );
             FWRITE( &num4, INT_SIZE, 1, f );
             FWRITE( ctx->Variable[iv]->HSliceTable[it]->boxverts, 3*FLOAT_SIZE, num4, f );
             end_block(f);
@@ -384,11 +386,11 @@ static int save_vslices( Context ctx, FILE *f )
             FWRITE( &ctx->Variable[iv]->VSliceTable[it]->r2, FLOAT_SIZE, 1, f );
             FWRITE( &ctx->Variable[iv]->VSliceTable[it]->c2, FLOAT_SIZE, 1, f );
             FWRITE( &num1, INT_SIZE, 1, f );
-            FWRITE( ctx->Variable[iv]->VSliceTable[it]->verts1, INT_2_SIZE, 3*num1, f );
+            FWRITE( ctx->Variable[iv]->VSliceTable[it]->verts1, INT_VERT2_SIZE, 3*num1, f );
             FWRITE( &num2, INT_SIZE, 1, f );
-            FWRITE( ctx->Variable[iv]->VSliceTable[it]->verts2, INT_2_SIZE, 3*num2, f );
+            FWRITE( ctx->Variable[iv]->VSliceTable[it]->verts2, INT_VERT2_SIZE, 3*num2, f );
             FWRITE( &num3, INT_SIZE, 1, f );
-            FWRITE( ctx->Variable[iv]->VSliceTable[it]->verts3, INT_2_SIZE, 3*num3, f );
+            FWRITE( ctx->Variable[iv]->VSliceTable[it]->verts3, INT_VERT2_SIZE, 3*num3, f );
             FWRITE( &num4, INT_SIZE, 1, f );
             FWRITE( ctx->Variable[iv]->VSliceTable[it]->boxverts, 3*FLOAT_SIZE, num4, f );
             end_block(f);
@@ -452,7 +454,7 @@ static int save_chslices( Context ctx, FILE *f )
             FWRITE( &ctx->Variable[iv]->CHSliceTable[it]->level, FLOAT_SIZE, 1, f );
             FWRITE( &ctx->Variable[iv]->CHSliceTable[it]->rows, INT_SIZE, 1, f );
             FWRITE( &ctx->Variable[iv]->CHSliceTable[it]->columns, INT_SIZE, 1, f );
-            FWRITE( ctx->Variable[iv]->CHSliceTable[it]->verts, INT_2_SIZE, 3*num, f );
+            FWRITE( ctx->Variable[iv]->CHSliceTable[it]->verts, INT_VERT2_SIZE, 3*num, f );
             FWRITE( ctx->Variable[iv]->CHSliceTable[it]->color_indexes, UINT_1_SIZE, num, f );
             end_block(f);
          }
@@ -518,7 +520,7 @@ static int save_cvslices( Context ctx, FILE *f )
             FWRITE( &ctx->Variable[iv]->CVSliceTable[it]->c2, FLOAT_SIZE, 1, f );
             FWRITE( &ctx->Variable[iv]->CVSliceTable[it]->rows, INT_SIZE, 1, f );
             FWRITE( &ctx->Variable[iv]->CVSliceTable[it]->columns, INT_SIZE, 1, f );
-            FWRITE( ctx->Variable[iv]->CVSliceTable[it]->verts, INT_2_SIZE, 3*num, f );
+            FWRITE( ctx->Variable[iv]->CVSliceTable[it]->verts, INT_VERT2_SIZE, 3*num, f );
             FWRITE( ctx->Variable[iv]->CVSliceTable[it]->color_indexes, UINT_1_SIZE, num, f );
             end_block(f);
          }
@@ -580,12 +582,12 @@ static int save_trajectories( Context ctx, FILE *f )
       FWRITE( &ctx->TrajTable[i].group, INT_SIZE, 1, f );
       FWRITE( &ctx->TrajTable[i].kind, INT_SIZE, 1, f );
       FWRITE( &ctx->NumTimes, INT_SIZE, 1, f );
-      FWRITE( ctx->TrajTable[i].verts, INT_2_SIZE, 3*length, f );
+      FWRITE( ctx->TrajTable[i].verts, INT_VERT2_SIZE, 3*length, f );
       if (ctx->TrajTable[i].kind==1) {
          FWRITE( ctx->TrajTable[i].norms, INT_1_SIZE, 3*length, f );
       }
-      FWRITE( ctx->TrajTable[i].start, UINT_2_SIZE, ctx->NumTimes, f );
-      FWRITE( ctx->TrajTable[i].len, UINT_2_SIZE, ctx->NumTimes, f );
+      FWRITE( ctx->TrajTable[i].start, UINT_VERT2_SIZE, ctx->NumTimes, f );
+      FWRITE( ctx->TrajTable[i].len, UINT_VERT2_SIZE, ctx->NumTimes, f );
       end_block(f);
    }
 #endif
@@ -631,7 +633,7 @@ static int save_hwind( Context ctx, FILE *f )
             FWRITE( &ctx->HWindTable[ws][it].density, FLOAT_SIZE, 1, f );
             FWRITE( &ctx->HWindTable[ws][it].scale, FLOAT_SIZE, 1, f );
             FWRITE( &nvect, INT_SIZE, 1, f );
-            FWRITE( ctx->HWindTable[ws][it].verts, INT_2_SIZE, 3*4*nvect, f );
+            FWRITE( ctx->HWindTable[ws][it].verts, INT_VERT2_SIZE, 3*4*nvect, f );
             FWRITE( &nb, INT_SIZE, 1, f );
             FWRITE( ctx->HWindTable[ws][it].boxverts, 3*FLOAT_SIZE, nb, f );
             end_block(f);
@@ -699,7 +701,7 @@ static int save_vwind( Context ctx, FILE *f )
             FWRITE( &ctx->VWindTable[ws][it].density, FLOAT_SIZE, 1, f );
             FWRITE( &ctx->VWindTable[ws][it].scale, FLOAT_SIZE, 1, f );
             FWRITE( &nvect, INT_SIZE, 1, f );
-            FWRITE( ctx->VWindTable[ws][it].verts, INT_2_SIZE, 3*4*nvect, f );
+            FWRITE( ctx->VWindTable[ws][it].verts, INT_VERT2_SIZE, 3*4*nvect, f );
             FWRITE( &nb, INT_SIZE, 1, f );
             FWRITE( ctx->VWindTable[ws][it].boxverts, 3*FLOAT_SIZE, nb, f );
             end_block(f);
@@ -761,7 +763,7 @@ static int save_hstream( Context ctx, FILE *f )
             FWRITE( &ctx->HStreamTable[ws][it].level, FLOAT_SIZE, 1, f );
             FWRITE( &ctx->HStreamTable[ws][it].density, FLOAT_SIZE, 1, f );
             FWRITE( &nline, INT_SIZE, 1, f );
-            FWRITE( ctx->HStreamTable[ws][it].verts, INT_2_SIZE, 3*nline, f );
+            FWRITE( ctx->HStreamTable[ws][it].verts, INT_VERT2_SIZE, 3*nline, f );
             FWRITE( &nb, INT_SIZE, 1, f );
             FWRITE( ctx->HStreamTable[ws][it].boxverts, 3*FLOAT_SIZE, nb, f );
             end_block(f);
@@ -1042,9 +1044,9 @@ static void restore_isosurf( Context ctx, FILE *f, int maxparm,
    fread( &numindex, INT_SIZE, 1, f );
    if (iv>=ctx->NumVars || it>=ctx->NumTimes) {
 #ifdef BIG_GFX
-      skip(f, numverts*3*(INT_2_SIZE+INT_1_SIZE)+numindex*UINT_4_SIZE);
+      skip(f, numverts*3*(INT_VERT2_SIZE+INT_1_SIZE)+numindex*UINT_4_SIZE);
 #else
-      skip(f, numverts*3*(INT_2_SIZE+INT_1_SIZE)+numindex*UINT_2_SIZE);
+      skip(f, numverts*3*(INT_VERT2_SIZE+INT_1_SIZE)+numindex*UINT_VERT2_SIZE);
 #endif
       return;
    }
@@ -1056,13 +1058,13 @@ static void restore_isosurf( Context ctx, FILE *f, int maxparm,
    free_isosurface( ctx, it, iv );
 
    /* read isosurface */
-   ctx->Variable[iv]->SurfTable[it]->verts = alloc_and_read(ctx,f,3*numverts*INT_2_SIZE);
+   ctx->Variable[iv]->SurfTable[it]->verts = alloc_and_read(ctx,f,3*numverts*INT_VERT2_SIZE);
    ctx->Variable[iv]->SurfTable[it]->norms = alloc_and_read(ctx,f,3*numverts*INT_1_SIZE);
 
 #ifdef BIG_GFX
    ctx->Variable[iv]->SurfTable[it]->index = alloc_and_read(ctx,f,numindex*UINT_4_SIZE);
 #else
-   ctx->Variable[iv]->SurfTable[it]->index = alloc_and_read(ctx,f,numindex*UINT_2_SIZE);
+   ctx->Variable[iv]->SurfTable[it]->index = alloc_and_read(ctx,f,numindex*UINT_VERT2_SIZE);
 #endif
    ctx->Variable[iv]->SurfTable[it]->isolevel = level;
    ctx->Variable[iv]->SurfTable[it]->numverts = numverts;
@@ -1096,9 +1098,9 @@ static void restore_colored_isosurf( Context ctx, FILE *f, int maxparm,
    fread( &numindex, INT_SIZE, 1, f );
    if (iv>=ctx->NumVars || it>=ctx->NumTimes) {
 #ifdef BIG_GFX
-      skip(f, numverts*3*(INT_2_SIZE+INT_1_SIZE)+numindex*UINT_4_SIZE);
+      skip(f, numverts*3*(INT_VERT2_SIZE+INT_1_SIZE)+numindex*UINT_4_SIZE);
 #else
-      skip(f, numverts*3*(INT_2_SIZE+INT_1_SIZE)+numindex*UINT_2_SIZE);
+      skip(f, numverts*3*(INT_VERT2_SIZE+INT_1_SIZE)+numindex*UINT_VERT2_SIZE);
 #endif
       return;
    }
@@ -1110,13 +1112,13 @@ static void restore_colored_isosurf( Context ctx, FILE *f, int maxparm,
    free_isosurface( ctx, it, iv );
 
    /* read isosurface */
-   ctx->Variable[iv]->SurfTable[it]->verts = alloc_and_read(ctx,f,3*numverts*INT_2_SIZE);
+   ctx->Variable[iv]->SurfTable[it]->verts = alloc_and_read(ctx,f,3*numverts*INT_VERT2_SIZE);
    ctx->Variable[iv]->SurfTable[it]->norms = alloc_and_read(ctx,f,3*numverts*INT_1_SIZE);
 
 #ifdef BIG_GFX
    ctx->Variable[iv]->SurfTable[it]->index = alloc_and_read(ctx,f,numindex*UINT_4_SIZE);
 #else
-   ctx->Variable[iv]->SurfTable[it]->index = alloc_and_read(ctx,f,numindex*UINT_2_SIZE);
+   ctx->Variable[iv]->SurfTable[it]->index = alloc_and_read(ctx,f,numindex*UINT_VERT2_SIZE);
 #endif
    fread( &ctx->Variable[iv]->SurfTable[it]->colorvar, INT_SIZE, 1, f );
    if (ctx->Variable[iv]->SurfTable[it]->colorvar>-1) {
@@ -1174,15 +1176,15 @@ static void restore_hslice( Context ctx, FILE *f, int maxparm,
             
    fread( &num1, INT_SIZE, 1, f );
    ctx->Variable[iv]->HSliceTable[it]->num1 = num1;
-   ctx->Variable[iv]->HSliceTable[it]->verts1 = alloc_and_read(ctx,f,3*num1*INT_2_SIZE);
+   ctx->Variable[iv]->HSliceTable[it]->verts1 = alloc_and_read(ctx,f,3*num1*INT_VERT2_SIZE);
 
    fread( &num2, INT_SIZE, 1, f );
    ctx->Variable[iv]->HSliceTable[it]->num2 = num2;
-   ctx->Variable[iv]->HSliceTable[it]->verts2 = alloc_and_read(ctx,f,3*num2*INT_2_SIZE);
+   ctx->Variable[iv]->HSliceTable[it]->verts2 = alloc_and_read(ctx,f,3*num2*INT_VERT2_SIZE);
             
    fread( &num3, INT_SIZE, 1, f );
    ctx->Variable[iv]->HSliceTable[it]->num3 = num3;
-   ctx->Variable[iv]->HSliceTable[it]->verts3 = alloc_and_read(ctx,f,3*num3*INT_2_SIZE);
+   ctx->Variable[iv]->HSliceTable[it]->verts3 = alloc_and_read(ctx,f,3*num3*INT_VERT2_SIZE);
             
    fread( &num4, INT_SIZE, 1, f );
    ctx->Variable[iv]->HSliceTable[it]->numboxverts = num4;
@@ -1234,15 +1236,15 @@ static void restore_vslice( Context ctx, FILE *f, int maxparm,
              
    fread( &num1, INT_SIZE, 1, f );
    ctx->Variable[iv]->VSliceTable[it]->num1 = num1;
-   ctx->Variable[iv]->VSliceTable[it]->verts1 = alloc_and_read(ctx,f,3*num1*INT_2_SIZE);
+   ctx->Variable[iv]->VSliceTable[it]->verts1 = alloc_and_read(ctx,f,3*num1*INT_VERT2_SIZE);
      
    fread( &num2, INT_SIZE, 1, f );
    ctx->Variable[iv]->VSliceTable[it]->num2 = num2;
-   ctx->Variable[iv]->VSliceTable[it]->verts2 = alloc_and_read(ctx,f,3*num2*INT_2_SIZE);
+   ctx->Variable[iv]->VSliceTable[it]->verts2 = alloc_and_read(ctx,f,3*num2*INT_VERT2_SIZE);
              
    fread( &num3, INT_SIZE, 1, f );
    ctx->Variable[iv]->VSliceTable[it]->num3 = num3;
-   ctx->Variable[iv]->VSliceTable[it]->verts3 = alloc_and_read(ctx,f,3*num3*INT_2_SIZE);
+   ctx->Variable[iv]->VSliceTable[it]->verts3 = alloc_and_read(ctx,f,3*num3*INT_VERT2_SIZE);
 
    fread( &num4, INT_SIZE, 1, f );
    ctx->Variable[iv]->VSliceTable[it]->numboxverts = num4;
@@ -1302,7 +1304,7 @@ static void restore_chslice( Context ctx, FILE *f, int maxparm,
    fread( &ctx->Variable[iv]->CHSliceTable[it]->columns, INT_SIZE, 1, f );
 
    num = ctx->Variable[iv]->CHSliceTable[it]->rows * ctx->Variable[iv]->CHSliceTable[it]->columns;
-   ctx->Variable[iv]->CHSliceTable[it]->verts = alloc_and_read(ctx,f,3*num*INT_2_SIZE);
+   ctx->Variable[iv]->CHSliceTable[it]->verts = alloc_and_read(ctx,f,3*num*INT_VERT2_SIZE);
    ctx->Variable[iv]->CHSliceTable[it]->color_indexes =
                                        alloc_and_read(ctx,f,num*UINT_1_SIZE);
 
@@ -1344,7 +1346,7 @@ static void restore_cvslice( Context ctx, FILE *f, int maxparm,
    fread( &ctx->Variable[iv]->CVSliceTable[it]->columns, INT_SIZE, 1, f );
 
    num = ctx->Variable[iv]->CVSliceTable[it]->rows * ctx->Variable[iv]->CVSliceTable[it]->columns;
-   ctx->Variable[iv]->CVSliceTable[it]->verts = alloc_and_read(ctx,f,3*num*INT_2_SIZE);
+   ctx->Variable[iv]->CVSliceTable[it]->verts = alloc_and_read(ctx,f,3*num*INT_VERT2_SIZE);
    ctx->Variable[iv]->CVSliceTable[it]->color_indexes =
                                        alloc_and_read(ctx,f,num*UINT_1_SIZE);
    ctx->Variable[iv]->CVSliceTable[it]->valid = 1;
@@ -1384,12 +1386,12 @@ static void restore_traj( Context ctx, FILE *f, int blocklength )
       t->length = length;
       t->group = group;
       t->kind = kind;
-      t->verts = alloc_and_read(ctx,f,3*length*INT_2_SIZE);
+      t->verts = alloc_and_read(ctx,f,3*length*INT_VERT2_SIZE);
       if (kind==1) {
          /* read ribbon normals */
          t->norms = alloc_and_read(ctx,f,3*length*UINT_1_SIZE);
       }
-      bytes = ctx->NumTimes * UINT_2_SIZE;
+      bytes = ctx->NumTimes * UINT_VERT2_SIZE;
       t->start = alloc_and_read(ctx,f,bytes);
       t->len = alloc_and_read(ctx,f,bytes);
       ctx->dpy_ctx->NumTraj++;
@@ -1423,7 +1425,7 @@ static void restore_hwind( Context ctx, FILE *f, int blocklength )
       fread( &nvect, INT_SIZE, 1, f );
       ctx->HWindTable[ws][it].nvectors = nvect;
 
-      bytes = 3 * 4 * nvect * INT_2_SIZE;
+      bytes = 3 * 4 * nvect * INT_VERT2_SIZE;
       ctx->HWindTable[ws][it].verts = alloc_and_read( ctx, f, bytes );
 
       ctx->HWindTable[ws][it].valid = 1;
@@ -1473,7 +1475,7 @@ static void restore_vwind( Context ctx, FILE *f, int blocklength )
 
       fread( &nvect, INT_SIZE, 1, f );
       ctx->VWindTable[ws][it].nvectors = nvect;
-      bytes = 3 * 4 * nvect * INT_2_SIZE;
+      bytes = 3 * 4 * nvect * INT_VERT2_SIZE;
 
       ctx->VWindTable[ws][it].verts = alloc_and_read(ctx,f,bytes);
 
@@ -1519,7 +1521,7 @@ static void restore_stream( Context ctx, FILE *f, int blocklength )
       fread( &nline, INT_SIZE, 1, f );
       ctx->HStreamTable[ws][it].nlines = nline;
 
-      bytes = 3 * nline * INT_2_SIZE;
+      bytes = 3 * nline * INT_VERT2_SIZE;
       ctx->HStreamTable[ws][it].verts = alloc_and_read( ctx, f, bytes );
 
       ctx->HStreamTable[ws][it].valid = 1;

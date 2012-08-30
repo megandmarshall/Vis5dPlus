@@ -184,7 +184,7 @@ int stream_trace( Context ctx, float ugrid[], float vgrid[], int nr, int nc,
 
     /* terminate stream if too many steps in one end box */
     nend++;
-    if (nend > 100) {
+    if (nend > MAXSTREAMSTEPS) {
       break;
     }
 
@@ -220,7 +220,7 @@ int stream_trace( Context ctx, float ugrid[], float vgrid[], int nr, int nc,
       rv = dir * (row - prevrow);
       cv = dir * (col - prevcol);
       v = sqrt(rv*rv + cv*cv);
-      if (v > 0.000000001) {
+      if (v > MINSTREAMVECTORLENGTH) {
         rv = rv / v;
         cv = cv / v;
       }
@@ -273,15 +273,18 @@ int stream( Context ctx, float ugrid[], float vgrid[], int nr, int nc,
   num = 0;
 
   /* density calculations */
-  if (density < 0.5) density = 0.5;
-  if (density > 2.0) density = 2.0;
+  if (density < MINSTREAMDENSITY) density = MINSTREAMDENSITY;
+  if (density > MAXSTREAMDENSITY) density = MAXSTREAMDENSITY;
 
+  /* JCM: how often to produce arrows */
   nrarrow = 15.0001 * density;
   ncarrow = 15.0001 * density;
   nrstart = 15.0001 * density;
   ncstart = 15.0001 * density;
-  nrend = 4 * nrstart;
-  ncend = 4 * ncstart;
+
+  /* JCM: How often to start stream from box edges */
+  nrend = STREAMEDGENUMBERTRUE * nrstart;
+  ncend = STREAMEDGENUMBERTRUE * ncstart;
 
   rowlength = LENGTH * nr / density;
   collength = LENGTH * nc / density;

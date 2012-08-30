@@ -1,0 +1,546 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Vis5D Documentation</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="NEXT"
+TITLE="Overview of Vis5D"
+HREF="ch01.html"></HEAD
+><BODY
+CLASS="BOOK"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="BOOK"
+><A
+NAME="AEN1"
+></A
+><DIV
+CLASS="TITLEPAGE"
+><H1
+CLASS="TITLE"
+><A
+NAME="AEN2"
+>Vis5D Documentation</A
+></H1
+><HR></DIV
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+><A
+HREF="ch01.html"
+>Overview of Vis5D</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="ch01.html#CH01SEC1"
+>Vis5d+</A
+></DT
+><DT
+><A
+HREF="ch01sec2.html"
+>Vis5D Documentation on the Web</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="ch02.html"
+>System Requirements and Installation</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="ch02.html#CH02SEC1"
+>System Requirements</A
+></DT
+><DT
+><A
+HREF="ch02sec2.html"
+>Installing Vis5D</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="ch02sec2.html#CH02SEC2.1"
+>Mesa</A
+></DT
+><DT
+><A
+HREF="ch02sec2.html#CH02SEC2.2"
+>NetCDF (optional)</A
+></DT
+><DT
+><A
+HREF="ch02sec2.html#CH02SEC2.3"
+>Vis5d+</A
+></DT
+><DT
+><A
+HREF="ch02sec2.html#CH02SEC2.4"
+>Manifest</A
+></DT
+><DT
+><A
+HREF="ch02sec2.html#CH02SEC2.5"
+>Customizing</A
+></DT
+></DL
+></DD
+></DL
+></DD
+><DT
+><A
+HREF="ch03.html"
+>Putting Your Data Into Vis5D</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="ch03.html#CH03SEC1"
+>Converting Your Data to v5d Format</A
+></DT
+><DT
+><A
+HREF="ch03sec2.html"
+>Map Projections and Vertical Coordinate Systems</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="ch03sec2.html#CH03SEC2-MAP"
+>Map projections</A
+></DT
+><DT
+><A
+HREF="ch03sec2.html#CH03SEC2-VERT"
+>Vertical coordinate systems</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="ch03sec3.html"
+>Special Variables and Data Values</A
+></DT
+><DT
+><A
+HREF="ch03sec4.html"
+>User Defined File Formats</A
+></DT
+><DT
+><A
+HREF="ch03sec5.html"
+>Getting Irregular Data into Vis5D</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="ch04.html"
+>McIDAS 3D Grid Data Files</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="ch04.html#CH04SEC1"
+>Putting Your Data into a McIDAS 3D Grid File</A
+></DT
+><DT
+><A
+HREF="ch04sec2.html"
+>Using the McIDAS Utilities</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="ch05.html"
+>Vis5D Utilities</A
+></DT
+><DT
+><A
+HREF="ch06.html"
+>Using Vis5D to Visualize Your Data</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="ch06.html#CH06SEC1"
+>Starting vis5d</A
+></DT
+><DT
+><A
+HREF="ch06sec2.html"
+>The Control Panel</A
+></DT
+><DT
+><A
+HREF="ch06sec3.html"
+>Controlling vis5d</A
+></DT
+><DT
+><A
+HREF="ch06sec4.html"
+>Viewing Modes</A
+></DT
+><DT
+><A
+HREF="ch06sec5.html"
+>Isosurfaces</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="ch06sec5.html#CH06SEC5.1"
+>Isosurface Color</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="ch06sec6.html"
+>Slices</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="ch06sec6.html#CH06SEC6.1"
+>Contour Line Slices</A
+></DT
+><DT
+><A
+HREF="ch06sec6.html#CH06SEC6.2"
+>Colored Slices</A
+></DT
+><DT
+><A
+HREF="ch06sec6.html#CH06SEC6.3"
+>Wind Vector Slices</A
+></DT
+><DT
+><A
+HREF="ch06sec6.html#CH06SEC6.4"
+>Wind Stream Slices</A
+></DT
+><DT
+><A
+HREF="ch06sec6.html#CH06SEC6.5"
+>Slice colors</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="ch06sec7.html"
+>Volume Rendering</A
+></DT
+><DT
+><A
+HREF="ch06sec8.html"
+>Wind Trajectories</A
+></DT
+><DT
+><A
+HREF="ch06sec9.html"
+>Wind Variables</A
+></DT
+><DT
+><A
+HREF="ch06sec10.html"
+>Text Labels</A
+></DT
+><DT
+><A
+HREF="ch06sec11.html"
+>Data Probe</A
+></DT
+><DT
+><A
+HREF="ch06sec12.html"
+>Vertical Sounding and SkewT</A
+></DT
+><DT
+><A
+HREF="ch06sec13.html"
+>Making New Variables</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="ch06sec13.html#CH06SEC13.1"
+>Cloned Variables</A
+></DT
+><DT
+><A
+HREF="ch06sec13.html#CH06SEC13.2"
+>Type-in Formulas</A
+></DT
+><DT
+><A
+HREF="ch06sec13.html#CH06SEC13.3"
+>External Analysis Functions</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="ch06sec14.html"
+>Saving Image Files and Printing</A
+></DT
+><DT
+><A
+HREF="ch06sec15.html"
+>Texture mapping</A
+></DT
+><DT
+><A
+HREF="ch06sec16.html"
+>Tcl scripting</A
+></DT
+><DT
+><A
+HREF="ch06sec17.html"
+>Keyboard Functions</A
+></DT
+><DT
+><A
+HREF="ch06sec18.html"
+>The Clipping Planes</A
+></DT
+><DT
+><A
+HREF="ch06sec19.html"
+>Grouping</A
+></DT
+><DT
+><A
+HREF="ch06sec20.html"
+>The Display Widget Window</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="ch06sec20.html#CH06SEC20.1"
+>Changing the Number of Displays</A
+></DT
+><DT
+><A
+HREF="ch06sec20.html#CH06SEC20.2"
+>Changing the Display Assignment of a Data Set</A
+></DT
+><DT
+><A
+HREF="ch06sec20.html#CH06SEC20.3"
+>Changing the Parameters of a Display</A
+></DT
+><DT
+><A
+HREF="ch06sec20.html#CH06SEC20.4"
+>Changing the 'Options' for a Display</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="ch06sec21.html"
+>Saving the current v5d file</A
+></DT
+><DT
+><A
+HREF="ch06sec22.html"
+>Viewing Text Plots</A
+></DT
+><DT
+><A
+HREF="ch06sec23.html"
+>Final Notes</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="ch07.html"
+>The v5dimport Utility</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="ch07.html#CH07SEC1"
+>Using <B
+CLASS="COMMAND"
+>v5dimport</B
+>'s graphical interface</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="ch07.html#CH07SEC1.1"
+>Reading input grids</A
+></DT
+><DT
+><A
+HREF="ch07.html#CH07SEC1.2"
+>Selecting grids for output</A
+></DT
+><DT
+><A
+HREF="ch07.html#CH07SEC1.3"
+>Defining the output file</A
+></DT
+><DT
+><A
+HREF="ch07.html#CH07SEC1.4"
+>Making the output file</A
+></DT
+><DT
+><A
+HREF="ch07.html#CH07SEC1.5"
+>Miscellaneous</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="ch07sec2.html"
+>The v5dimport User Interface Embedded in Vis5D</A
+></DT
+><DT
+><A
+HREF="ch07sec3.html"
+>Using <B
+CLASS="COMMAND"
+>v5dimport</B
+>'s text interface</A
+></DT
+><DT
+><A
+HREF="ch07sec4.html"
+>Adding support for new file format</A
+></DT
+><DT
+><A
+HREF="ch07sec5.html"
+>Notes on specific file formats</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="ch08.html"
+>Sample Data Sets</A
+></DT
+><DD
+><DL
+><DT
+><A
+HREF="ch08.html#CH08SEC1"
+>Bob Schlesinger's thunderstorm simulation</A
+></DT
+><DT
+><A
+HREF="ch08sec2.html"
+>LAMPS model</A
+></DT
+><DT
+><A
+HREF="ch08sec3.html"
+>Example McIDAS files and utilities</A
+></DT
+></DL
+></DD
+><DT
+><A
+HREF="ch09.html"
+>Version History</A
+></DT
+><DT
+><A
+HREF="acknowledgments.html"
+>Acknowledgments</A
+></DT
+><DT
+><A
+HREF="license.html"
+>License and Copyright</A
+></DT
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch01.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Overview of Vis5D</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

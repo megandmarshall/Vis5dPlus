@@ -1,0 +1,1244 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Map Projections and Vertical Coordinate Systems</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Putting Your Data Into Vis5D "
+HREF="ch03.html"><LINK
+REL="PREVIOUS"
+TITLE="Putting Your Data Into Vis5D "
+HREF="ch03.html"><LINK
+REL="NEXT"
+TITLE="Special Variables and Data Values"
+HREF="ch03sec3.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch03.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Putting Your Data Into Vis5D</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch03sec3.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH03SEC2"
+>Map Projections and Vertical Coordinate Systems</A
+></H1
+><P
+>	Version 4.0 of Vis5D added support for new map projections and
+vertical coordinate systems.  When we use the term map projection,
+we're referring to the relationship between the rows and columns of
+data in the 3-D grid to the latitude/longitude of the earth.  The term
+vertical coordinate system refers to the relationship between the
+vertical levels of data in the 3-D grid to altitude in the atmosphere
+(or depth in the ocean).</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="CH03SEC2-MAP"
+>Map projections</A
+></H2
+><P
+>Vis5D 5.2 supports the following map projections:</P
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="CH03SEC2-MAP-1"
+>Generic rectilinear</A
+></H3
+><P
+>This is a linear, regularly-spaced coordinate system with no
+implied units.  This system is useful when your data is not related to
+earth science (computational fluid dynamics for example.)  North/south
+coordinates increase upward and east/west coordinates increase to the
+left. The projection is defined by four parameters:</P
+><P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN979"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>NorthBound: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Northern boundary of 3-D
+		  box</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>WestBound: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Western boundary of 3-D box</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>RowInc: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Increment (spacing) between grid
+		  columns</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>ColInc: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Increment (spacing) between grid
+		  rows</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+><P
+><DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN995"
+></A
+><P
+></P
+><P
+>	    Example:  Suppose your 3-D grid has 80 rows and 60 columns
+	    and NorthBound = 100.0 meters, WestBound = 50.0 meters,
+	    RowInc = 0.5 meters, and ColInc = 0.5 meters, then:</P
+><P
+>	    the south boundary will be at 60.5 meters, i.e. </P
+><P
+>	    southbound = NorthBound - (RowInc * (rows-1)) </P
+><P
+>	    and the east boundary will be at 20.5 meters, i.e. </P
+><P
+>	    eastbound = WestBound - (ColInc * (columns-1))</P
+><P
+></P
+></DIV
+></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="CH03SEC2-MAP-2"
+>Rectilinear lat/lon (cylindrical equidistant)</A
+></H3
+><P
+>This is the rectangular latitude/longitude coordinate system
+used in previous versions of Vis5D. Latitude increases to the North
+(upward in the graphical display) and longitude increases to the West
+(leftward in the graphical display; positive west latitude).  The
+projection is defined by four parameters:</P
+><P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1005"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> NorthBound: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Northern boundary of 3-D box in degrees of
+		  latitude in therange [-90S,90N].</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> WestBound: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Western boundary of 3-D box in degrees of
+		  longitude in therange [-180E,180W].</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> RowInc: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Increment (spacing) between grid rows in
+		  degrees of latitude greater than zero.</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> ColInc: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Increment (spacing) between grid columns in
+		  degrees of longitude greater than zero.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+><P
+><DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN1021"
+></A
+><P
+></P
+><P
+>	    Example:  If your 3-D grid has 30 rows and 60 columns and
+	    if NorthBound = 70.0, WestBound = 140.0, RowInc = 1.0, and
+	    ColInc = 0.5, then:</P
+><P
+>     
+	    the south boundary will be at 41 degrees latitude.  i.e. </P
+><P
+>	    (NorthBound - RowInc * (rows-1))</P
+><P
+>	    and the east boundary will be at 110.5 degrees longitude. i.e.</P
+><P
+>	    (WestBound - ColInc * (columns-1))</P
+><P
+></P
+></DIV
+></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="CH03SEC2-MAP-3"
+>Lambert conformal</A
+></H3
+><P
+>This is a conic projection defined by the following six parameters.</P
+><P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1031"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Lat1, Lat2: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> First and second standard latitudes in the
+		  range [-90S,90N]. Lat1 and Lat2 define where the
+		  imaginary cone intersects the sphere of the Earth.
+		  Lat1 and Lat2 must have the same sign, that is, they
+		  must both be positive or both negative.  Also, Lat1
+		  must be greater than or equal to Lat2.</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> PoleRow, PoleCol: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> These parameters indicate the position of the
+		  north or south pole with respect to the 3-D grid
+		  coordinate system. These values may be outside the
+		  3-D grid.  If Lat1 and Lat2 are positive, the north
+		  pole is assumed, else, the south pole is
+		  assumed.</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> CentLon: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Central longitude:  this parameter indicates
+		  which Earth longitude is to be parallel to the 3-D
+		  grid columns.</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> ColInc: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Increment (spacing) between grid columns at the
+		  central longitude and standard latitudes, in km.
+		  This parameter controls the scale of the
+		  projection.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+> </P
+><P
+><DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN1047"
+></A
+><P
+></P
+><P
+>	    Example 1:  Suppose your 3-D grid has 35 rows and 40
+	    columns and you want a Lambert conformal projection of the
+	    United States centered over Wisconsin: </P
+><P
+>	    Lat1 = 70.0 Lat2 = 20.0 PoleRow = -35.0 PoleCol = 20.0
+	    Central Longitude = 90.0 ColInc = 100.0 </P
+><P
+>	    Example 2:  Suppose your 3-D grid has 35 rows and 40
+	    columns and you want a Lambert conformal projection over
+	    Australia: </P
+><P
+>	    Lat1 = -20.0 Lat2 = -70.0 PoleRow = 60.0 PoleCol = 20.0
+	    Central Longitude = -130.0 ColInc = 200.0</P
+><P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="./stylesheet-images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>		Beware that when the pole is visible in a Lambert
+conformal projection, there is usually a wedge-shaped region (with its
+apex at the pole) which is undefined (i.e. Longitude is &#62;180 AND
+&#60;-180).  In this region, there will be no map lines and the topography
+will be incorrect.</P
+></TD
+></TR
+></TABLE
+></DIV
+></P
+><P
+></P
+></DIV
+></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="CH03SEC2-MAP-4"
+>Azimuthal Stereographic</A
+></H3
+><P
+>An aximuthal stereographic projection defined by five parameters:</P
+><P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1059"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> CentLat, CentLon: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Latitude and longitude of the center of
+		  projection. The apex of the imaginary cone will be
+		  over this coordinate.</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> CentRow, CentCol: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Row and column of the center of projection.
+		  The grid row and column indicated will be at the
+		  center of the projection.  These values may be
+		  outside the 3-D box.</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> ColInc: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Increment (spacing) between grid columns in km
+		  at the center of the projection.  This parameter
+		  controls the scale of the projection.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+> </P
+><P
+><DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN1072"
+></A
+><P
+></P
+><P
+>	    Example:  Suppose your 3-D grid has 40 rows and 40
+	    columns and want an azimuthal stereographic projection
+	    centered over of the north pole: </P
+><P
+>	    CentLat = 90.0 CentLon = 0.0 CentRow = 20.0 CentCol = 20.0
+	    ColInc = 200.0 </P
+><P
+></P
+></DIV
+></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="CH03SEC2-MAP-5"
+>Rotated rectilinear lat/lon</A
+></H3
+><P
+>	This is the rectangular latitude/longitude coordinate system
+on a sphere rotated with respect to the Earth's natural
+latitude/longitude. North/south coordinates increase upward on the
+rotated sphere and east/west coordinates increase leftward on the
+rotated sphere. The projection is defined by seven parameters:</P
+><P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1079"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> NorthBound: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Northern boundary of 3-D box in degrees of
+		  latitude in the range [-90S,90N].</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> WestBound: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Western boundary of 3-D box in degrees of
+		  longitude in the range [-180E,180W].</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> RowInc: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Increment (spacing) between grid rows in
+		  degrees of latitude greater than zero.</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> ColInc: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Increment (spacing) between grid columns in
+		  degrees of longitude greater than zero.</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> CentLat, CentLon: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Latitude and longitude on Earth corresponding
+		  to Latitude/Longitude = (0,0) on the rotated sphere.
+		</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Rotation: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Clockwise angle of rotation of rotated sphere
+		  about its (0,0) point.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+><P
+><DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN1101"
+></A
+><P
+></P
+><P
+>     Example:  Over small regions the Earth is nearly flat and we can
+exploit this to create nearly square grids for small scale models.  We
+can generate a nearly square grid of 41 rows by 41 columns over a
+small region over Wisconsin with:</P
+><P
+>          NorthBound = 2.0</P
+><P
+>          WestBound = 2.0</P
+><P
+>          RowInc = 0.1</P
+><P
+>          ColInc = 0.1</P
+><P
+>          CentLat = 43.0</P
+><P
+>          CentLon = 90.0</P
+><P
+>          Rotation = 0.0</P
+><P
+></P
+></DIV
+></P
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="CH03SEC2-VERT"
+>Vertical coordinate systems</A
+></H2
+><P
+>Vis5D 5.2 supports the following vertical coordinate systems:</P
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="CH03SEC2-VERT-1"
+>Equally spaced, generic units:</A
+></H3
+><P
+>	This is a linear vertical coordinate system in which levels in
+the 3-D grid are equally spaced.  No specific units are implied.  The
+coordinate system is defined by two parameters:
+<DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1116"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> BottomBound: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Bottom boundary boundary of 3-D box.</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> LevInc: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Increment(spacing) between grid
+levels.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+>      </P
+><P
+><DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN1126"
+></A
+><P
+></P
+><P
+>	Example:  Suppose your 3-D grid has 20 levels and you want the
+bottom boundary to be 0.0 meters and you want .1 meters between
+levels. Then: </P
+><P
+>	BottomBound = 0.0 </P
+><P
+>	LevInc = 0.1 </P
+><P
+></P
+></DIV
+></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="CH03SEC2-VERT-2"
+>Equally spaced, kilometers</A
+></H3
+><P
+>	This is a linear vertical coordinate system used in previous
+versions of Vis5D.  Grid levels are equally spaced.  The coordinate
+system is defined by two parameters:</P
+><P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1134"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> BottomBound: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Bottom boundary of 3-D box in km.</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> LevInc: </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Increment (spacing) between grid levels in km greater than
+		  zero.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+>     </P
+><P
+><DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN1144"
+></A
+><P
+></P
+><P
+>	    Example:  Suppose your 3-D grid has 20 levels and you want
+	    .5 kilometers between grid levels.  Then: </P
+><P
+>	    BottomBound	= 0.0 </P
+><P
+>	   
+	    LevInc = 0.5 </P
+><P
+></P
+></DIV
+></P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="CH03SEC2-VERT-3"
+>Unequally spaced, kilometers</A
+></H3
+><P
+>This is a linear vertical coordinate system in which grid
+levels can be unequally spaced.  The coordinate system is defined by
+an array of N height parameters where N is the number of levels in the
+3-D grids.  If the number of grid levels is different for each
+variable, N is the maximum number of grid levels.</P
+><P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1152"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Height(1): </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Height of first (bottom) grid level in km</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Height(2): </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Height of second grid level in km </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>  ... </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>  ... </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Height(N): </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Height of Nth (top) grid level in km </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+>  
+<DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="./stylesheet-images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>      Note that the Height values must increase with N.</P
+></TD
+></TR
+></TABLE
+></DIV
+>
+<DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN1169"
+></A
+><P
+></P
+><P
+>	Example:  Suppose your 3-D grids have 10 levels and you want
+the grid levels to be more closely spaced near the bottom than near
+the top.  Then: 
+<DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1171"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Height(1) = 0.0 </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Height(2) = 0.1 </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Height(3) = 0.2 </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Height(4) = 0.3 </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Height(5) = 0.4 </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Height(6) = 0.6 </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Height(7) = 0.8 </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Height(8)	= 1.0 </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Height(9) = 1.3 </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Height(10) = 1.6 </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+><P
+></P
+></DIV
+></P
+><P
+>	It is also possible to display the vertical axis on a
+logarithmic scale.  This is done with the -log  command line option
+when you start vis5d.  In this case, the vertical axis is logarithmic
+with respect to height but linear with respect to pressure.  The
+relationship between height (H) and pressure (P) is:</P
+><P
+>	P = 1012.5 * exp[ H / -7.2 ]</P
+><P
+>	H = -7.2 * Ln[ P / 1012.5 ]</P
+><P
+>	The constants 1012.5 and -7.2 are just defaults which can be
+overriden when you specify the <TT
+CLASS="PARAMETER"
+><I
+>-log</I
+></TT
+> option. 
+See <A
+HREF="ch06.html#CH06SEC1"
+>section 6.1</A
+> for details. </P
+></DIV
+><DIV
+CLASS="SECT3"
+><H3
+CLASS="SECT3"
+><A
+NAME="CH03SEC2-VERT-4"
+>Unequally spaced, millibars</A
+></H3
+><P
+>This is a linear vertical coordinate system in which grid
+levels can be unequally spaced.  The coordinate system is defined by
+an array of N pressure parameters where N is the number of levels in
+the 3-D grids.  If the number of grid levels is different for each
+variable, N is the maximum number of grid levels.</P
+><P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1204"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Pressure(1): </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Pressure of first (bottom) grid level in km</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Pressure(2): </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Pressure of second grid level in km</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>     ...   </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>     ...   </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Pressure(N): </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Pressure of Nth (top) grid level in km</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+>
+<DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="./stylesheet-images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>     Note that the Pressure values must decrease with N.</P
+></TD
+></TR
+></TABLE
+></DIV
+>
+For the purposes of calculating wind trajectories, Vis5D assumes the
+relationship between height (H) and pressure (P) is:</P
+><P
+>     
+          P = 1012.5 * exp[ H / -7.2 ]</P
+><P
+>          
+          H = -7.2 * Ln[ P / 1012.5 ]</P
+><P
+>	Only the v5d file format is capable of storing the new map
+projection and vertical coordinate system information.  When a v5d
+file is read into vis5d this information is used to setup the
+topography, map lines, and compute wind trajectories.</P
+><P
+>	The vis5d program also supports two other display projections:
+spherical and cylindrical.  Instead of drawing a rectangular 3-D box,
+these projections will actually warp the 3-D box into a spherical or
+cylincrical shape.  These projections are used by specifying the
+<TT
+CLASS="PARAMETER"
+><I
+>-projection</I
+></TT
+> option with the value spherical or 
+cylindrical; they are not specified in the v5d file.  
+The spherical option can be used to display your data on a 3-D globe.  
+The cylindrical option can be used to display your data on a flat, 
+round topography.  It's probably best to just experiment with these 
+options using the LAMPS dataset for example.  
+See the section on Vis5d's command line options for more information.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch03.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch03sec3.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Putting Your Data Into Vis5D</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ch03.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Special Variables and Data Values</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

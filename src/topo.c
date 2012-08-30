@@ -76,7 +76,7 @@ struct topo_header {
 };
 
 /* MJK 12.02.98 begin */
-int check_face_norm (int_2 *verts)
+int check_face_norm (int_vert2 *verts)
 {
   int         i, j;
   float       xyz[3], xy[3][2], area;
@@ -103,7 +103,7 @@ int make_topo_strips (Display_Context dtx )
 {
   
   int         i, j, n, ir, ic, nr, nc;
-  int_2       *verts;
+  int_vert2       *verts;
   int_1       *norms;
   struct Topo *topo;
 
@@ -115,7 +115,7 @@ int make_topo_strips (Display_Context dtx )
   n = ((nr * nc * 2) * 2) + ((nc * 2) * 2) + ((nr * 2) * 2);
 
   topo->TopoStripsVerts = realloc (topo->TopoStripsVerts,
-                                    (n * 3 * sizeof (int_2)));
+                                    (n * 3 * sizeof (int_vert2)));
   topo->TopoStripsNorms = realloc (topo->TopoStripsNorms,
                                     (n * 3 * sizeof (int_1)));
   if ((topo->TopoStripsVerts == NULL) || (topo->TopoStripsNorms == NULL))
@@ -160,7 +160,7 @@ int make_topo_strips (Display_Context dtx )
   if (topo->DisplayTopoBase)
     {
 		float           z;
-		int_2           base_z;
+		int_vert2           base_z;
 		int_1           norm_0 = 0.0 * NORMAL_SCALE;
 		int_1           norm_1 = 1.0 * NORMAL_SCALE;
 		
@@ -177,7 +177,7 @@ int make_topo_strips (Display_Context dtx )
 			 
 			 norm_1 = -norm_1;
         }
-		/* clamp z to keep from overflowing int_2 base_z */
+		/* clamp z to keep from overflowing int_vert2 base_z */
 		z = (z < -3.0) ? -3.0 : (z > 3.0) ? 3.0 : z;
 		
 		base_z = z * VERTEX_SCALE;
@@ -1029,7 +1029,7 @@ void draw_topo( Display_Context dtx, int time, int texture_flag, int flat_flag )
 {
    /* MJK 12.02.98 begin */
    int         i, j, n, ir, ic, nr, nc, nr2, nc2;
-   int_2       *verts;
+   int_vert2       *verts;
    int_1       *norms;
    uint_1      *color;
    /* MJK 12.02.98 end */

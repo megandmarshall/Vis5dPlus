@@ -118,6 +118,9 @@ static char TmpResult[TCL_RESULT_SIZE];
 
 static int Tcl_EvalFile( Tcl_Interp *interp, const char *filename );
 
+static int pack_withscale(int index, int graphic, int varowner, int var, unsigned int *ctable,int entry,int r,int g,int b,int a);
+
+
 /*
  * Assign a value to a variable.
  */
@@ -3241,6 +3244,9 @@ static int cmd_compute_ext_func( ClientData client_data, Tcl_Interp *interp,
    if (gtx->funcpath[0]) {
       strcpy( funcname, gtx->funcpath );
    */
+   
+   printf ( "PATH %s \n", Vis5dFuncPath );
+   
    if (Vis5dFuncPath[0]){
       strcpy( funcname, Vis5dFuncPath );
    }
@@ -3250,6 +3256,8 @@ static int cmd_compute_ext_func( ClientData client_data, Tcl_Interp *interp,
    strcat( funcname, "/" );
    strcat( funcname, argv[2] );
 
+   printf ( "ultimo PATH %s \n", funcname );
+   
    result = vis5d_compute_ext_func( index, funcname, &newvar );
 
    /* WLH 11 Nov 98 */
@@ -3276,7 +3284,11 @@ static int cmd_make_expr_var( ClientData client_data, Tcl_Interp *interp,
                                  &recompute );
 
    /* WLH 11 Nov 98 */
+   // JCM: below is problem.  When create new variable causes isosurface to not display or have level set during scripts
+   // for now only avoid if off-screen so can do batch processing correctly -- fix later GODMARK
+   if (!off_screen_rendering){
    if (index >= 0) redo_this_gui[index] = 1;
+   }
 
    return error_check( interp, "vis5d_make_expr_var", result );
 }
@@ -3644,12 +3656,14 @@ static int cmd_enable_graphics( ClientData client_data, Tcl_Interp *interp,
    else {
       n = atoi( argv[3] );
    }
-
+   //   result = vis5d_enable_graphics( index, what, n, VIS5D_GET );
    result = vis5d_enable_graphics( index, what, n, mode );
+   //   fprintf(stderr,"index=%d what=%d n=%d mode=%d result=%d\n",index,what,n,mode,result);
    return error_check( interp, "vis5d_enable_graphics", result );
 }
 
 
+// JCM: Only gives "CurrentVolume"
 static int cmd_get_volume( ClientData client_data, Tcl_Interp *interp,
                            int argc, const char *argv[] )
 {
@@ -3663,6 +3677,7 @@ static int cmd_get_volume( ClientData client_data, Tcl_Interp *interp,
 }
 
 
+// JCM: Only gives "CurrentVolume"
 static int cmd_get_volume_and_owner( ClientData client_data, Tcl_Interp *interp,
                            int argc, const char *argv[] )
 {
@@ -3687,6 +3702,11 @@ static int cmd_set_volume( ClientData client_data, Tcl_Interp *interp,
    varowner = atoi(argv[1]);
    var = varnum( varowner, argv[2] );
    result = vis5d_set_volume( index, varowner, var ); 
+
+   // JCM:
+   vis5d_add_volume(index, varowner, var);
+
+
    return error_check( interp, "vis5d_set_volume", result );
 }
 
@@ -3711,6 +3731,11 @@ static int cmd_set_volume_and_owner( ClientData client_data, Tcl_Interp *interp,
    }
 
    result = vis5d_set_volume( index, varowner, var );
+
+   // JCM:
+   vis5d_add_volume(index, varowner, var);
+
+
    return error_check( interp, "vis5d_set_volume_and_owner", result );
 }
 
@@ -3795,7 +3820,11 @@ static int cmd_set_color( ClientData client_data, Tcl_Interp *interp,
    }
 
 
-   if (varflag && argc>8){
+
+
+   // JCM bug fix -- if argc>8 then reading in $ctx so rest of arguments *always* shifted regardless of whether processing variable
+   //   if (varflag && argc>8){
+   if (argc>8){
       r = atof( argv[5] );
       g = atof( argv[6] );
       b = atof( argv[7] );
@@ -3810,21 +3839,30 @@ static int cmd_set_color( ClientData client_data, Tcl_Interp *interp,
 
    index = atoi(argv[1]);
 
-   if (varflag && argc>8) {
+   // JCM bug fix for general argument number
+   if(varflag){
+     if (argc>8) {
       int m;
       m = atoi( argv[3] );
       n = varnum(m , argv[4] );
       n = m*MAXVARS+n;
    }
-   else if (varflag && argc <= 8){
+     else{
       int m;
       m = atoi( argv[1] );
       n = varnum(m ,argv[3] );
       n = m*MAXVARS+n;
    }  
+   }
+   else{
+     if (argc>8) {
+       n = atoi( argv[4] );
+     }
    else {
       n = atoi( argv[3] );
    }
+   }
+
    /* MJK 7.19.99 */
    if (do_both_maps){
       result = vis5d_set_color( index, VIS5D_LIGHT_MAP, n, r, g, b, a );
@@ -3966,6 +4004,96 @@ static int cmd_load_color_table( ClientData client_data,
    return 1;
 }
 
+// pack but keep absolute scale
+static int pack_withscale(int index, int graphic, int varowner, int var, unsigned int *ctable,int entry,int r,int g,int b,int a)
+{
+  float *params;
+  float mintablefunc,maxtablefunc;
+  int remapentry;
+  float min,max;
+  int i;
+  float fentry;
+  float width;
+
+#define ROUND2INT(x) ((int)((x)>0.0 ? (x)+0.5 : (x)-0.5))
+#define MAXCOLORLOCAL 254 // 255 reserved for missing data in V5D
+
+  // get table params
+  vis5d_get_color_table_params(index, graphic, varowner, var,  &params );
+
+  // DEBUG:
+  //  fprintf(stderr,"var=%d :: %g %g\n",var,params[MINFUNC],params[MAXFUNC]);
+
+  if(params[MINFUNC] == params[MAXFUNC]){ // then assume old vis5d method
+    
+    if (entry>=0 && entry<=255) {
+      ctable[entry] = PACK_COLOR( r, g, b, a );
+    }
+  }
+  else{
+    // JCM: Then use input scale and variable scale to determine table colors so that absolute reference for color table to physical value
+    mintablefunc=params[MINFUNC];
+    maxtablefunc=params[MAXFUNC];
+
+    if(vis5d_get_ctx_var_range(index, var, &min, &max )== VIS5D_BAD_VAR_NUMBER){
+      fprintf(stderr,"Didn't get range\n");
+      exit(1);
+    }
+    else{
+      //      fprintf(stderr,"got min/max  = %g %g\n",min,max); // DEBUG
+    }
+
+    // obtain functional value of color table entry
+    fentry = mintablefunc + ((float)entry - 0.0)/((float)MAXCOLORLOCAL-0.0)*(maxtablefunc-mintablefunc);
+    
+    // obtain new color table entry assuming new color table ranges from new min to max
+    remapentry = ROUND2INT(0.0 + (fentry - min)/(max-min)*((float)MAXCOLORLOCAL-0.0));
+
+    // obtain factor by which new cell shrunk compared to old cell
+    width=(maxtablefunc-mintablefunc)/(max-min);
+    
+    //    fprintf(stderr,"var=%d entry=%d mint=%g maxt=%g :: min=%g max=%g :: fentry=%g remapentry=%d width=%g\n",var,entry,mintablefunc,maxtablefunc,min,max,fentry,remapentry,width); // DEBUG
+
+
+    if (remapentry>=0 && remapentry<=MAXCOLORLOCAL) { // 255 is reserved for missing data
+      // if cell shrunk, then fill in surrounding table values with nearest neighbor from original table
+      for(i=remapentry-ROUND2INT(width);i<=remapentry+ROUND2INT(width);i++){
+	if(i>=0 && i<=MAXCOLORLOCAL){
+	  ctable[i] = PACK_COLOR( r, g, b, a );
+	}
+      }
+    }
+
+    // set all real table values to 0 if below entered values
+    if(entry==0){
+      for(i=remapentry-1;i>=0;i--){
+	if(i>=0 && i<=MAXCOLORLOCAL){
+	  ctable[i] = PACK_COLOR( 0, 0, 0, 0 ); // make invisible if off range (GODMARK: alternative is to extrapolate, but leads to arbitrary results different than expected)
+	}
+      }
+    }
+
+    // set all real table values to 0 if above entered values
+    if(entry==MAXCOLORLOCAL){
+      for(i=remapentry+1;i<=MAXCOLORLOCAL;i++){ // avoid 255
+	if(i>=0 && i<=MAXCOLORLOCAL){
+	  ctable[i] = PACK_COLOR( 0, 0, 0, 0 ); // make invisible if off range (as above)
+	}
+      }
+    }
+
+    if(entry==255){
+      // just copy this missing data entry
+      ctable[entry] = PACK_COLOR( r, g, b, a );
+    }
+
+  }// end else
+
+
+  return(0);
+}
+
+
 static int cmd_set_color_table_entry( ClientData client_data,
                                       Tcl_Interp *interp,
                                       int argc, const char *argv[] )
@@ -4023,9 +4151,7 @@ static int cmd_set_color_table_entry( ClientData client_data,
       a = atoi( argv[8] );
    }
    vis5d_get_color_table_address( index, what, varowner, var, &ctable ); 
-   if (entry>=0 && entry<=255) {
-      ctable[entry] = PACK_COLOR( r, g, b, a );
-   }
+   pack_withscale(index,what,varowner,var,ctable,entry,r,g,b,a);
    return TCL_OK;
 }
 
@@ -4035,9 +4161,13 @@ static int cmd_set_color_table_params( ClientData client_data,
                                        int argc, const char *argv[] )
 {
    int index, varowner, var, what;
-   float p[4];
+   float p[NUMCOLORTABLEPARAMS];
+   int ii;
 
-   if (!arg_check( interp, "vis5d_set_color_table_params", argc, 7,8 )) {
+
+   // arg_check doesn't include argv[0].  Below as 7,8 corresponding to argc=8,9
+   // 4 includes dtx, what, ctx, varname
+   if (!arg_check( interp, "vis5d_set_color_table_params", argc, 7, NUMCOLORTABLEPARAMS+4 )) {
       return TCL_ERROR;
    }
 
@@ -4063,23 +4193,38 @@ static int cmd_set_color_table_params( ClientData client_data,
       interp->result = "error in vis5d_set_color_table_params: bad constant";
       return TCL_ERROR;
    }
+
+   // JCM:
+   if(argc-1==NUMCOLORTABLEPARAMS+4){
+      index = atoi( argv[1] );
+      varowner = atoi( argv[3] );
+      var = varnum( varowner, argv[4] );
+
+      for (ii=0;ii<NUMCOLORTABLEPARAMS;ii++) {
+	p[ii] = atof(argv[1+4+ii]);
+      }
+   }
+   else{
+     // old way:
    if (argc==9){
       index = atoi( argv[1] );
       varowner = atoi( argv[3] );
       var = varnum( varowner, argv[4] );
-      p[0] = atof( argv[5] );
-      p[1] = atof( argv[6] );
-      p[2] = atof( argv[7] );
-      p[3] = atof( argv[8] );
+       p[CURVE] = atof( argv[5] );
+       p[BIAS] = atof( argv[6] );
+       p[ALPHAPOW] = atof( argv[7] );
+       p[ALPHAVAL] = atof( argv[8] );
    }
    else{
       index = atoi( argv[1] );
       varowner = atoi( argv[1] );
       var = varnum( varowner, argv[3] );
-      p[0] = atof( argv[4] );
-      p[1] = atof( argv[5] );
-      p[2] = atof( argv[6] );
-      p[3] = atof( argv[7] );
+       p[CURVE] = atof( argv[4] );
+       p[BIAS] = atof( argv[5] );
+       p[ALPHAPOW] = atof( argv[6] );
+       p[ALPHAVAL] = atof( argv[7] );
+     }
+     p[MINFUNC]=p[MAXFUNC]=0.0;
    }
 
 
@@ -4416,6 +4561,7 @@ static int cmd_grid_to_xyz( ClientData client_data, Tcl_Interp *interp,
    time = atoi(argv[2]);
    var = varnum(index, argv[3] );
    string_to_float_array( argv[4], 3, grid );
+   //   fprintf(stderr,"grid[0]=%g grid[1]=%g grid[2]=%g\n",grid[0],grid[1],grid[2]);
    n = vis5d_grid_to_xyz( index, time, var, grid[0], grid[1], grid[2],
                           &x, &y, &z );
    if (n) {
@@ -6539,14 +6685,20 @@ static int cmd_stereo_enabled( ClientData client_data, Tcl_Interp *interp,
 static int cmd_stereo_get( ClientData client_data, Tcl_Interp *interp,
 			  int argc, const char *argv[])
 {
-   int stereo_status;
+  int stereo_status,fakevalue;
    int n;
 
-   if(!arg_check(interp, "vis5d_stereo_get", argc, 1, 1))
+   if(!arg_check(interp, "vis5d_stereo_get", argc, 1, 2))
 	return TCL_ERROR;
 
-   n = vis5d_stereo_get(atoi(argv[1]), &stereo_status);
+   n = vis5d_stereo_get(atoi(argv[1]), &stereo_status,&fakevalue);
+
+   if(argc==1+1){
+     sprintf(interp->result, "%d %d", stereo_status,fakevalue);
+   }
+   else if(argc==2+1){
    sprintf(interp->result, "%d", stereo_status);
+   }
 
    return error_check(interp, "vis5d_stereo_get",n);
 }
@@ -6556,11 +6708,27 @@ static int cmd_stereo_set( ClientData client_data, Tcl_Interp *interp,
 {
    int stereo_status;
    int n;
+   int whicheye;
 
-   if(!arg_check(interp, "vis5d_stereo_set", argc, 2, 2))
+   if(!arg_check(interp, "vis5d_stereo_set", argc, 1, 2))
 	return TCL_ERROR;
 
-   n = vis5d_stereo_set(atoi(argv[1]), atoi(argv[2]));
+   if(argc==1+1){
+     n = vis5d_stereo_set(atoi(argv[1]), 1, -1);
+   }
+   else if(argc==2+1){
+     if(strcmp(argv[2],"VIS5D_STEREO_LEFT")==0) {
+       whicheye = VIS5D_STEREO_LEFT;
+     }
+     else if(strcmp(argv[2],"VIS5D_STEREO_RIGHT")==0) {
+       whicheye = VIS5D_STEREO_RIGHT;
+     }
+     else if(strcmp(argv[2],"VIS5D_STEREO_BOTH")==0) {
+       whicheye = VIS5D_STEREO_BOTH;
+     }
+
+     n = vis5d_stereo_set(atoi(argv[1]), 0, whicheye);
+   }
 
    return error_check(interp, "vis5d_stereo_get",n);
 }
@@ -6570,11 +6738,28 @@ static int cmd_stereo_on( ClientData client_data, Tcl_Interp *interp,
 {
    int stereo_status;
    int n;
+   int whicheye;
 
-   if(!arg_check(interp, "vis5d_stereo_on", argc, 1, 1))
+   if(!arg_check(interp, "vis5d_stereo_on", argc, 1, 2))
 	return TCL_ERROR;
 
-   n = vis5d_stereo_set(atoi(argv[1]), 1);
+   if(argc==1+1){
+     n = vis5d_stereo_set(atoi(argv[1]), 1, -1);
+   }
+   else if(argc==2+1){
+
+     if(strcmp(argv[2],"VIS5D_STEREO_LEFT")==0) {
+       whicheye = VIS5D_STEREO_LEFT;
+     }
+     else if(strcmp(argv[2],"VIS5D_STEREO_RIGHT")==0) {
+       whicheye = VIS5D_STEREO_RIGHT;
+     }
+     else if(strcmp(argv[2],"VIS5D_STEREO_BOTH")==0) {
+       whicheye = VIS5D_STEREO_BOTH;
+     }
+
+     n = vis5d_stereo_set(atoi(argv[1]), 0, whicheye);
+   }
 
    return error_check(interp, "vis5d_stereo_on",n);
 }
@@ -6588,7 +6773,8 @@ static int cmd_stereo_off( ClientData client_data, Tcl_Interp *interp,
    if(!arg_check(interp, "vis5d_stereo_off", argc, 1, 1))
 	return TCL_ERROR;
 
-   n = vis5d_stereo_set(atoi(argv[1]), 0);
+   n = vis5d_stereo_set(atoi(argv[1]), 0, -1);
+
 
    return error_check(interp, "vis5d_stereo_off",n);
 }

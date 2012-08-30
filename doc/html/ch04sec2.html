@@ -1,0 +1,508 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Using the McIDAS Utilities</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="McIDAS 3D Grid Data Files"
+HREF="ch04.html"><LINK
+REL="PREVIOUS"
+TITLE="McIDAS 3D Grid Data Files"
+HREF="ch04.html"><LINK
+REL="NEXT"
+TITLE="Vis5D Utilities"
+HREF="ch05.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch04.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>McIDAS 3D Grid Data Files</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch05.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH04SEC2"
+>Using the McIDAS Utilities</A
+></H1
+><P
+>     Once your data set is in a 3D grid file, you can list directory information
+about the grids using the command:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>     igg3d list I J -gr3df N</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>where N is the 3D grid file number, and I and J give the range of grid numbers
+to list.  You can get a quick idea of the data values using the command:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>     igg3d info I J -gr3df N</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>which will list the minimum and maximum values, the mean, the standard deviation
+and the number of grid points marked for missing data, for grid numbers I to J
+in 3D grid file number N.</P
+><P
+>     There are restrictions on the dimensions of data sets which can be
+visualized using the vis5d program.  Currently, you are limited to a maximum of
+30 physical variables and 400 times steps.  The vis5d program will also fail if
+there is a trivial spatial dimension:</P
+><P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1490"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>NLATS &#60; 2</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>NLONS &#60; 2</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>NHGTS &#60; 2</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+><P
+>The vis5d program will perform badly, possibly making errors, if the total 5-D
+size:</P
+><P
+>     NLATS * NLONS * NHGTS * NTIMES * NVARS</P
+><P
+>is too large.  The limit depends on the amount of memory in your system.  For a
+64MB system, the limit is around 25,000,000, with performance degrading as the
+data set size exceedes the limit.</P
+><P
+>     Vis5D provides the gg3d and igg3d programs which can be used to reduce the
+resolution and scale of a data set to meet these limits.  The gg3d program
+resamples a 3D grid to new array dimensions and new extents in latitude,
+longitude and height, using the command:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>     gg3d samp N I M J</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>     gg3d ave  N I M J</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>     
+where N and I are the numbers of the source 3D grid file and grid, and M and J
+are the numbers of the destination 3D grid file and grid.  The 'samp' version
+calculates destination grid point values by linearly interpolating between
+source grid point values, and is appropriate for increasing resolution.  The
+'ave' version calculates destination grid points by averaging multiple source
+grid point values, and is appropriate for decreasing resolution.  Without any
+keywords gg3d will do a straight copy operation.  Invoke the gg3d command with
+the keyword:</P
+><P
+>     <TT
+CLASS="PARAMETER"
+><I
+>-size NLATS NLONS NHGTS</I
+></TT
+></P
+><P
+>to set the grid dimensions for the destination grid as different from the
+dimensions for the source grid.  Invoke gg3d with the keywords:</P
+><P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1512"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>-lat XLATS XLATN</I
+></TT
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>-lon XLONE XLONW</I
+></TT
+></TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>-hgt XHGTB XHGTT</I
+></TT
+></TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+><P
+>to set extents (range bounds) for the latitude, longitude and height for the
+destination grid as different from the extents for the source grid.  
+The <TT
+CLASS="PARAMETER"
+><I
+>-lat</I
+></TT
+>,<TT
+CLASS="PARAMETER"
+><I
+>-lon</I
+></TT
+> and <TT
+CLASS="PARAMETER"
+><I
+>-hgt</I
+></TT
+>
+keywords take real arguments.</P
+><P
+>     The igg3d program provides options for copying and deleting 3D grids and
+for interpolating between 3D grids in time.  Sequences of 3D grids are copied
+using the command:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>     igg3d get N I J M K</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>where N is the source 3D grid file number, I and J are the range of source grid
+numbers, M is the destination grid file number, and K is the starting
+destination grid number.  A single grid may be copied within a 3D grid file
+using the command:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>     igg3d copy I J -gr3df N</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>where N is the 3D grid file number, I is the number of the source grid and J is
+the number of the destination grid.  A range of grids may be deleted with the
+command:</P
+><P
+>  <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+> igg3d del I J -gr3df N</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>where N is the 3D grid file number and grid numbers between I and J are to be
+deleted.</P
+><P
+>The igg3d command provides two different options for time interpolation.  The
+first is:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+> igg3d ave K I J D T -gr3df N</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>where grid number K is produced by interpolating between grid numbers I and J,
+all in 3D grid file number N.  Grid number K will be assigned day D (in YYDDD
+format) and time T (in HHMMSS format).  The relative weighting of grids I and J
+is calculated from this date and time, assuming linear time interpolation.  If
+grid K is not between grids I and J in date and time, igg3d prints an error
+message.  The igg3d command also provides a more complex time interpolation
+option:</P
+><P
+>    <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>igg3d int I D T -setdel S M -lag U V -gr3df N</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>     This will put a grid in the next empty slot of 3D grid file number N,
+assigned to day D (in YYDDD format) and time T (in HHMMSS format).  This grid
+will be interpolated from a sequence of grids, all in file number N, at grid
+numbers I, I+S, I+2S, ... , I+(M-1)S.  This sequence of grids should be
+ascending in date and time.  igg3d will search the sequence and linearly
+interpolate between the two consectutive grids from the sequence which bracket
+day D and time T.  Furthermore, the interpolation will be done in a coordinate
+system moving at constant velocity (U, V), where U and V are in meters per
+second, with V positive for motion from south to north and U positive for motion
+from west to east.  The two bracketing grids from the sequence will be shifted
+in latitude and longitude to their positions at day D and time T, and the result
+interpolated between these two spatially shifted grids.  Furthermore, if the
+grids in the sequence are identified in their directory entries with variable
+name 'U   ' or 'V   ', then the corresponding component of the velocity (U, V)
+will be subtracted from the grid values.</P
+><P
+>     The 'int' option of igg3d may seem complex, but it is just what you need if
+you want to write a script to re-interpolate a five-dimensional data set to a
+new sequence of time steps.  It is particularly useful if the source sequence
+does not have uniform time steps, or if the physics are moving through the
+spatial grid and you want to avoid blurring in the time re-interpolation.  You
+would set M equal to the number of time steps and S equal to the number of
+physical variables in the source five-dimensional data set.  The I parameter
+would be set equal to the grid number in the first time step of the variable
+being interpolated.  Note that this igg3d option will put the new grid at the
+end of the grid file containing the source data set, but you can use 'igg3d get'
+to move it to another grid.</P
+><P
+>You can use the command:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>igu3d make N M</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>to create 3D grid file number N, which allows 3D grids of up to M points each.
+The names of 3D grid files have the form:
+<TT
+CLASS="FILENAME"
+>GR3Dnnnn</TT
+>,
+where <TT
+CLASS="FILENAME"
+>nnnn</TT
+> is the four digit decimal grid file number, padded with leading zeros
+if needed to make four digits.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch04.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch05.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>McIDAS 3D Grid Data Files</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ch04.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Vis5D Utilities</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

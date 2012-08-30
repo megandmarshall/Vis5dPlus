@@ -43,6 +43,10 @@ extern int trace( Context ctx, float row0, float col0, float lev0,
                   int time0, int step, int max,
                   float vr[], float vc[], float vl[], int vt[] );
 
+extern int trace1( Context ctx, float row0, float col0, float lev0,
+                  int time0, int step, int max,
+                  float vr[], float vc[], float vl[], int vt[] );
+
 
 extern int to_ribbon( int num, float xt[], float yt[], float zt[],
                       int itint[], float xn[], float yn[], float zn[] );

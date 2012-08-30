@@ -106,7 +106,7 @@ struct volume *alloc_volume( Context ctx, int nr, int nc, int nl )
    volren = 1;
 #endif
 
-/* MJK 12.15.98 */
+  /* MJK 12.15.98 */
 #ifdef HAVE_PEX
    volren = 1;
 #endif
@@ -118,6 +118,7 @@ struct volume *alloc_volume( Context ctx, int nr, int nc, int nl )
       v->valid = 0;
       /* No matter which way we slice it, we need the same size arrays for */
       /* storing the vertices and colors. */
+    //    fprintf(stderr,"totalvolumebytes=%d\n",nl*nr*nc*3*sizeof(float));
       v->vertex = (float *) allocate( ctx, nl*nr*nc*3*sizeof(float) );
       v->index = (uint_1 *) allocate( ctx, nl*nr*nc*sizeof(uint_1) );
       if (!v->vertex || !v->index) {
@@ -129,7 +130,7 @@ struct volume *alloc_volume( Context ctx, int nr, int nc, int nl )
       v->oldnr = nr;
       v->oldnc = nc;
       v->oldnl = nl;
-/* MJK 12.15.98 */
+    /* MJK 12.15.98 */
 #ifdef HAVE_PEX 
       v->dir = -1;
 #endif
@@ -146,12 +147,24 @@ struct volume *alloc_volume( Context ctx, int nr, int nc, int nl )
 
 void free_volume( Context ctx)
 {
-   deallocate( ctx, ctx->Volume->vertex,
-     ctx->Volume->oldnl*ctx->Volume->oldnr*ctx->Volume->oldnc*3*sizeof(float));
-   deallocate( ctx, ctx->Volume->index,
-    ctx->Volume->oldnl*ctx->Volume->oldnr*ctx->Volume->oldnc*sizeof(uint_1));
-   free(ctx->Volume);
-   ctx->Volume = NULL;
+
+  int j;
+  int truenumvars;
+
+  // JCM
+  truenumvars=(ctx->NumVars > MAXVOLUMEVARS) ? MAXVOLUMEVARS : ctx->NumVars;
+
+  // JCM
+  for(j=0;j<truenumvars;j++){
+    if(ctx->Volume[j]){
+      deallocate( ctx, ctx->Volume[j]->vertex,
+		  ctx->Volume[j]->oldnl*ctx->Volume[j]->oldnr*ctx->Volume[j]->oldnc*3*sizeof(float));
+      deallocate( ctx, ctx->Volume[j]->index,
+		  ctx->Volume[j]->oldnl*ctx->Volume[j]->oldnr*ctx->Volume[j]->oldnc*sizeof(uint_1));
+      free(ctx->Volume[j]);
+      ctx->Volume[j] = NULL;
+    }
+  }
 }
 
 
@@ -168,11 +181,11 @@ void free_volume( Context ctx)
  * Output:  v - volume struct describing the computed volume.
  */
 static int compute_volume( Context ctx, float data[],
-                           int time, int var,
+                           int time, int var, int volvar, int numvolvars,
                            int nr, int nc, int nl, int lowlev,
                            float min, float max,
                            int dir,
-                           struct volume *v )
+                           struct volume *v)
 {
    Display_Context dtx;
    float zs[MAXLEVELS];
@@ -180,12 +193,43 @@ static int compute_volume( Context ctx, float data[],
    register float x, y, dx, dy;
    register float dscale, val;
    register int ilnrnc, icnr;           /* to help speed up array indexing */
+  float dfrac,dz;
+
+  // setup shift for each variable
+  dfrac=(double)volvar*0.1/((double)numvolvars);
 
    dtx = ctx->dpy_ctx;
+
+  if(dir==BOTTOM_TO_TOP){
+    /* compute graphics Z for each grid level */
+    for (il=0; il<nl; il++) {
+      if(il!=0){
+	dz = gridlevel_to_z(ctx, time, var, (float) (il + lowlev)) - gridlevel_to_z(ctx, time, var, (float) (il-1 + lowlev));
+      }
+      else{
+	dz = gridlevel_to_z(ctx, time, var, (float) (il+1 + lowlev)) - gridlevel_to_z(ctx, time, var, (float) (il + lowlev));
+      }
+      zs[il] = gridlevel_to_z(ctx, time, var, (float) (il + lowlev))         +dz*dfrac;
+    }
+  }
+  else if(dir==TOP_TO_BOTTOM){
+    /* compute graphics Z for each grid level */
+    for (il=0; il<nl; il++) {
+      if(il!=0){
+	dz = gridlevel_to_z(ctx, time, var, (float) (il + lowlev)) - gridlevel_to_z(ctx, time, var, (float) (il-1 + lowlev));
+      }
+      else{
+	dz = gridlevel_to_z(ctx, time, var, (float) (il+1 + lowlev)) - gridlevel_to_z(ctx, time, var, (float) (il + lowlev));
+      }
+      zs[il] = gridlevel_to_z(ctx, time, var, (float) (il + lowlev))         -dz*dfrac;
+    }
+  }
+  else{
    /* compute graphics Z for each grid level */
    for (il=0; il<nl; il++) {
      zs[il] = gridlevel_to_z(ctx, time, var, (float) (il + lowlev));
    }
+  }
 
    /* compute some useful values */
    dx = (dtx->Xmax-dtx->Xmin) / (nc-1);
@@ -224,7 +268,7 @@ static int compute_volume( Context ctx, float data[],
 
                   x += dx;
                }
-               y -= dy;
+	y -= dy; // JCM LEFT HAND GODMARK (and others as such)
             }
          }
          break;
@@ -271,7 +315,7 @@ static int compute_volume( Context ctx, float data[],
 
          i = 0;  /* index into vertex array */
          j = 0;  /* index into index array */
-         x = dtx->Xmin;
+    x = dtx->Xmin                                  +dx*dfrac;
          for (ic=0; ic<nc; ic++) {
             icnr = ic * nr;
             for (il=nl-1;il>=0;il--) {
@@ -306,7 +350,7 @@ static int compute_volume( Context ctx, float data[],
 
          i = 0;  /* index into vertex array */
          j = 0;  /* index into index array */
-         x = dtx->Xmax;
+    x = dtx->Xmax                                  -dx*dfrac;
          for (ic=nc-1; ic>=0; ic--) {
             icnr = ic*nr;
             for (il=nl-1;il>=0;il--) {
@@ -341,7 +385,7 @@ static int compute_volume( Context ctx, float data[],
 
          i = 0;  /* index into vertex array */
          j = 0;  /* index into index array */
-         y = dtx->Ymax;
+    y = dtx->Ymax                                  -dy*dfrac;
          for (ir=0; ir<nr; ir++) {
             for (il=nl-1;il>=0;il--) {
                x = dtx->Xmin;
@@ -375,7 +419,7 @@ static int compute_volume( Context ctx, float data[],
 
          i = 0;  /* index into vertex array */
          j = 0;  /* index into index array */
-         y = dtx->Ymin;
+    y = dtx->Ymin                                  +dy*dfrac;
          for (ir=nr-1; ir>=0; ir--) {
             for (il=nl-1;il>=0;il--) {
                x = dtx->Xmin;
@@ -411,11 +455,11 @@ static int compute_volume( Context ctx, float data[],
 }
 
 static int compute_volumePRIME( Context ctx, float data[],
-                           int time, int var,
+				int time, int var, int volvar, int numvolvars,
                            int nr, int nc, int nl, int lowlev,
                            float min, float max,
                            int dir,
-                           struct volume *v )
+				struct volume *v)
 {
    Display_Context dtx;
    float zs[MAXLEVELS];
@@ -428,11 +472,42 @@ static int compute_volumePRIME( Context ctx, float data[],
    float row, col, lev;
    int gr0,gr1,gc0,gc1,gl0,gl1;
    float ger, gec, gel;
+  float dfrac,dz;
+
+  // setup shift for each variable
+  dfrac=(double)volvar*0.1/((double)numvolvars);
 
    dtx = ctx->dpy_ctx;
+
+  if(dir==BOTTOM_TO_TOP){
    /* compute graphics Z for each grid level */
    for (il=0; il<nl; il++) {
-     zs[il] = gridlevelPRIME_to_zPRIME(dtx, time, var, (float) (il + lowlev));
+      if(il!=0){
+	dz = gridlevel_to_z(ctx, time, var, (float) (il + lowlev)) - gridlevel_to_z(ctx, time, var, (float) (il-1 + lowlev));
+      }
+      else{
+	dz = gridlevel_to_z(ctx, time, var, (float) (il+1 + lowlev)) - gridlevel_to_z(ctx, time, var, (float) (il + lowlev));
+      }
+      zs[il] = gridlevel_to_z(ctx, time, var, (float) (il + lowlev))         +dz*dfrac;
+    }
+  }
+  else if(dir==TOP_TO_BOTTOM){
+    /* compute graphics Z for each grid level */
+    for (il=0; il<nl; il++) {
+      if(il!=0){
+	dz = gridlevel_to_z(ctx, time, var, (float) (il + lowlev)) - gridlevel_to_z(ctx, time, var, (float) (il-1 + lowlev));
+      }
+      else{
+	dz = gridlevel_to_z(ctx, time, var, (float) (il+1 + lowlev)) - gridlevel_to_z(ctx, time, var, (float) (il + lowlev));
+      }
+      zs[il] = gridlevel_to_z(ctx, time, var, (float) (il + lowlev))         -dz*dfrac;
+    }
+  }
+  else{
+    /* compute graphics Z for each grid level */
+    for (il=0; il<nl; il++) {
+      zs[il] = gridlevel_to_z(ctx, time, var, (float) (il + lowlev));
+    }
    }
 
    /* compute some useful values */
@@ -649,7 +724,7 @@ static int compute_volumePRIME( Context ctx, float data[],
 
          i = 0;  /* index into vertex array */
          j = 0;  /* index into index array */
-         x = dtx->Xmin;
+    x = dtx->Xmin                                 +dx*dfrac;
          for (ic=0; ic<nc; ic++) {
             icnr = ic * nr;
             for (il=nl-1;il>=0;il--) {
@@ -750,7 +825,7 @@ static int compute_volumePRIME( Context ctx, float data[],
 
          i = 0;  /* index into vertex array */
          j = 0;  /* index into index array */
-         x = dtx->Xmax;
+    x = dtx->Xmax                                     -dx*dfrac;
          for (ic=nc-1; ic>=0; ic--) {
             icnr = ic*nr;
             for (il=nl-1;il>=0;il--) {
@@ -850,7 +925,7 @@ static int compute_volumePRIME( Context ctx, float data[],
 
          i = 0;  /* index into vertex array */
          j = 0;  /* index into index array */
-         y = dtx->Ymax;
+    y = dtx->Ymax                                  -dy*dfrac;
          for (ir=0; ir<nr; ir++) {
             for (il=nl-1;il>=0;il--) {
                x = dtx->Xmin;
@@ -949,7 +1024,7 @@ static int compute_volumePRIME( Context ctx, float data[],
 
          i = 0;  /* index into vertex array */
          j = 0;  /* index into index array */
-         y = dtx->Ymin;
+    y = dtx->Ymin                                +dy*dfrac;
          for (ir=nr-1; ir>=0; ir--) {
             for (il=nl-1;il>=0;il--) {
                x = dtx->Xmin;
@@ -1056,17 +1131,25 @@ static int compute_volumePRIME( Context ctx, float data[],
  * Return:  1 = ok
  *          0 = bad volume struct.
  */
-static int render_volume( Context ctx,
-                          struct volume *v, unsigned int ctable[] )
+
+//  error=render_volume( ctx, volumevarnum, volumevarlist, volumelist, ctablelist, numallslices, totalslices );
+
+static int render_volume( Context ctx, int volumevarnum, int *volumevarlist, struct volume **volumelist, unsigned int **ctablelist, int  numallslices, int **totalslices )
 {
+  int var;
+  int volvar;
+  int realvar;
+  struct volume *v;
+  unsigned int *ctable;
    register int rows, cols, slices, i, j, s;
 	register int rows1, cols1;
    register uint_1 *cp0, *cp1;
    register float *vp0, *vp1;
 	int	fastdraw;
 	int	stride = 1;
-   if (!v || !v->slices)
-      return 0;
+
+
+  //  fprintf(stderr,"totalslices=%d %d\n",totalslices[0][0],totalslices[1][0]);
 
 
 #if defined (HAVE_SGI_GL) || defined (DENALI)
@@ -1074,38 +1157,64 @@ static int render_volume( Context ctx,
    blendfunction( BF_SA, BF_MSA );   /* enable alpha blending */
 #endif
 #ifdef HAVE_OPENGL
-   glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
    glEnable( GL_BLEND );
+  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
    check_gl_error( "render_volume (glBlendFunc)" );
 #endif
+
+
+  /* loop over slices from back to front! */
+  int alls;
+  for (alls=0;alls<numallslices;alls++) {
+    //+=stride // need to stride in a smarter way GODMARK
+    
+    s=totalslices[0][alls]; // which true slice 
+    volvar=totalslices[1][alls]; // which variable in reduced list
+    realvar=volumevarlist[volvar]; // which variable in original list
+    v=volumelist[volvar]; // which volume pointer
+    ctable=ctablelist[volvar];
+
+   
+    // DEBUG:
+    //    fprintf(stderr,"alls=%d s=%d volvar=%d realvar=%d v=%ld ctable=%ld\n",alls,s,volvar,realvar,v,ctable);
+    //    fflush(stderr);
+
+    // ensure memory really there
+    if (!v || !v->slices)  return 0;
+
 
    /* put rows, cols, slices values into registers */
    rows = v->rows-1;  /* number of quad strips = number of data rows - 1 */
    cols = v->cols;
-   slices = v->slices;
    /* setup color and vertex pointers */
    cp0 = v->index;
    cp1 = cp0 + cols;
    vp0 = v->vertex;
    vp1 = vp0 + cols * 3;   /* 3 floats per vertex */
 
-/* MJK 12.15.98 */
+
+
+
+      /* MJK 12.15.98 */
 #ifdef HAVE_PEX
 
+    if(alls==0){
    rows++;
    j = rows * cols;
+    }
 
-   for (s = 0; s < slices; s++)
-   {
       draw_volume_quadmesh (rows, cols, vp0, cp0, ctable);
       vp0 += j * 3;
       cp0 += j;
-   }
+    
    return 1;
 #endif
 
+
+
    vis5d_check_fastdraw(ctx->dpy_ctx->dpy_context_index, &fastdraw);
 
+    
    if (fastdraw) {
 	  stride = ctx->dpy_ctx->VStride;
    } 
@@ -1122,19 +1231,20 @@ static int render_volume( Context ctx,
    cols1 = ((cols - 1) / stride) + 1;
   
 
-	/* loop over slices */
-   for (s=0;s<slices;s+=stride) {
+    cp0 = v->index + (s * rows * cols) + (s * cols);	/* skip a row after each slice */
 
-     cp0 = v->index + (s * rows * cols) +
-		 (s * cols);	/* skip a row after each slice */
-
-     vp0 = v->vertex + (s * rows * cols * 3) +
-		 (s * cols * 3);	/* skip a row after each slice */
+    vp0 = v->vertex + (s * rows * cols * 3) + (s * cols * 3);	/* skip a row after each slice */
 
      cp1 = cp0 + (cols * stride);
      vp1 = vp0 + (cols * stride * 3);   /* 3 floats per vertex */
   
-	  /* draw 'rows' quadrilateral strips */
+
+  
+    //////////////////
+    //
+    // draw 'rows' quadrilateral strips
+    //
+    //////////////////
 	  for (i=0;i<rows1;i++) {
 #if defined(SGI_GL) || defined(DENALI)
 		 bgnqstrip();
@@ -1147,36 +1257,51 @@ static int render_volume( Context ctx,
 		 endqstrip();
 #endif
 #ifdef HAVE_OPENGL
+      // START SINGLE QUADRALATERAL STRIP
+      // Bottom Left, Bottom Right, Top Right, Top left
 		 glBegin( GL_QUAD_STRIP );
 		 for (j=0;j<cols1;j++) {
-			glColor4ubv( (GLubyte *) &ctable[cp0[i*stride*cols+j*stride]] );
+	glColor4ubv( (const GLubyte *) &ctable[cp0[i*stride*cols+j*stride]] );
 			glVertex3fv( &vp0[(i*stride*cols+j*stride)*3] );
 			
-			glColor4ubv( (GLubyte *) &ctable[cp1[i*stride*cols+j*stride]] );
+	glColor4ubv( (const GLubyte *) &ctable[cp1[i*stride*cols+j*stride]] );
 			glVertex3fv( &vp1[(i*stride*cols+j*stride)*3] );
 		 }
 		 glEnd();
+      //      swap_3d_window(); // DEBUG
+      // END SINGLE QUADRALATERAL STRIP
 #endif
-	  }
+    }// over rows
+  }// over all slices
 	  
-	}
 	
+  /////////////
+  //
+  // Disable blending (default)
+  //
+  /////////////	
 #if defined(HAVE_SGI_GL) || defined(DENALI)
    blendfunction( BF_ONE, BF_ZERO );  /* disable alpha blending */
 #endif
 #ifdef HAVE_OPENGL
-   glDisable( GL_BLEND );
-   check_gl_error( "render_volume (glDisable)" );
-
+  //  glDisable( GL_BLEND ); // JCM (get error in Mesa)
+  //  check_gl_error( "render_volume (glDisable)" ); // JCM
 #endif
+
    return 1;
+
 }
+
 
 
 /* MJK 12.15.98 */
 #ifdef HAVE_PEX
-void draw_volume( Context ctx, int it, int ip, unsigned int *ctable )
+
+
+void draw_volume( Context ctx, int it, unsigned int (*Colors)[256] )
 {
+  
+  unsigned int *ctable;
    float *data;
    static int prev_it[VIS5D_MAX_CONTEXTS];
    static int prev_ip[VIS5D_MAX_CONTEXTS];
@@ -1185,8 +1310,15 @@ void draw_volume( Context ctx, int it, int ip, unsigned int *ctable )
    float x, y, z, ax, ay, az;
    float xyz[3], xy[3][2], xy0[2];
    Display_Context dtx;
+  int ip,whichVolume;
+
 
    dtx = ctx->dpy_ctx;
+
+  whichVolume=ip=dtx->CurrentVolume;
+  ctable=Colors[ctx->context_index*MAXVARS+ip];
+
+
    if (do_once){
       int yo;
       for (yo=0; yo<VIS5D_MAX_CONTEXTS; yo++){
@@ -1234,30 +1366,29 @@ void draw_volume( Context ctx, int it, int ip, unsigned int *ctable )
 
    /* If this is a new time step or variable then invalidate old volumes */
    if (it!=prev_it[ctx->context_index] || ip!=prev_ip[ctx->context_index]) {
-      ctx->Volume->valid = 0;
+    ctx->Volume[whichVolume]->valid = 0;
       prev_it[ctx->context_index] = it;
       prev_ip[ctx->context_index] = ip;
    }
 
    /* Determine if we have to compute a set of slices for the direction. */
-   if (ctx->Volume->dir!=dir || ctx->Volume->valid==0) {
+  if (ctx->Volume[whichVolume]->dir!=dir || ctx->Volume[whichVolume]->valid==0) {
       data = get_grid( ctx, it, ip );
       if (data) {
          if (ctx->GridSameAsGridPRIME){
             compute_volume( ctx, data, it, ip, ctx->Nr, ctx->Nc, ctx->Nl[ip],
                             ctx->Variable[ip]->LowLev, ctx->Variable[ip]->MinVal, ctx->Variable[ip]->MaxVal,
-                            dir, ctx->Volume );
+			dir, ctx->Volume[whichVolume]);
          }
          else{
             compute_volumePRIME( ctx, data, it, ip, dtx->Nr, dtx->Nc, dtx->Nl,
                             dtx->LowLev, ctx->Variable[ip]->MinVal, ctx->Variable[ip]->MaxVal,
-                            dir, ctx->Volume );
+			     dir, ctx->Volume[whichVolume]);
          }
          release_grid( ctx, it, ip, data );
       }
    }
-
-   render_volume( ctx, ctx->Volume, ctable );
+  render_volume( ctx, ctx->Volume[whichVolume], whichVolume, ctable );
 }
 #else
 
@@ -1266,11 +1397,29 @@ void draw_volume( Context ctx, int it, int ip, unsigned int *ctable )
  * Input: it - timestep
  *        ip - variable
  */
-void draw_volume( Context ctx, int it, int ip, unsigned int *ctable )
+void draw_volume( Context ctx, int it, unsigned int (*Colors)[256] )
 {
+  int volumevarnum;
+  int volumevarlist[MAXVARS];
+  unsigned int *ctablelist[MAXVARS];
+  struct volume *volumelist[MAXVARS];
+  struct volume *curvol;
+  int truenl[MAXVARS];
+  int *totalslices[2];
+  PTRINT numallslices;
+  int numslicepervar[MAXVARS];
+  int sliceorig,slicenew;
+  PTRINT largestslice;
+  int volvar;
+  int origvar;
+  int nr,nc,nl;
+  int renewedvolumememory;
+  //
+  int error;
    float *data;
+  static int prevvolumevarnum[VIS5D_MAX_CONTEXTS];
    static int prev_it[VIS5D_MAX_CONTEXTS];
-   static int prev_ip[VIS5D_MAX_CONTEXTS];
+  static int prev_ip[VIS5D_MAX_CONTEXTS][MAXVARS];
    static int do_once = 1;
    int dir;
    float x, y, z, ax, ay, az;
@@ -1280,10 +1429,18 @@ void draw_volume( Context ctx, int it, int ip, unsigned int *ctable )
    dtx = ctx->dpy_ctx;
    if (do_once){
       int yo;
+#if(MULTIVOLUMERENDER==1)
+    for(origvar=0;origvar<MAXVARS;origvar++)
+#else
+    origvar=0;
+#endif
+    {
       for (yo=0; yo<VIS5D_MAX_CONTEXTS; yo++){
+	prevvolumevarnum[yo]=0;
          prev_it[yo] = -1;
-         prev_ip[yo] = -1;
+	prev_ip[yo][origvar] = -1;
       }
+    }// end over origvar
       do_once = 0;
    }
 
@@ -1298,10 +1455,151 @@ void draw_volume( Context ctx, int it, int ip, unsigned int *ctable )
    getmatrix( ctm );
 #endif
 #if defined(HAVE_OPENGL)
+  // JCM
    glGetFloatv( GL_PROJECTION_MATRIX, (GLfloat *) proj );
    glGetFloatv( GL_MODELVIEW_MATRIX, (GLfloat *) ctm );
    check_gl_error( "draw_volume" );
 #endif
+
+
+
+
+  ////////////////////
+  //
+  // get total true variables that will plot volume for
+  //
+  ///////////////////
+  volumevarnum=0;
+#if(MULTIVOLUMERENDER==0)
+  origvar=dtx->CurrentVolume;// true variable rendered for non-multi-volume method
+#else
+  for(origvar=0;origvar<ctx->NumVars;origvar++)
+#endif
+  {
+    if(MULTIVOLUMERENDER==1 && ctx->DisplayVolume[origvar]==0){ // we don't use DisplayVolume when MULTIVOLUMERENDER==0
+      continue;
+    }
+    else{
+      // here if MULTIVOLUMERENDER==0 or MULTIVOLUMERENDER==1 but wanting to render this volume
+      //      fprintf(stderr,"Volume rendering origvar=%d\n",origvar);
+      volumevarlist[volumevarnum]=origvar;
+      ctablelist[volumevarnum]=Colors[ctx->context_index*MAXVARS+origvar];
+      truenl[volumevarnum]=ctx->Nl[origvar];
+      // iterate real number of volumes to be rendered
+      volumevarnum++;
+    }
+  }
+
+
+
+
+  // Check if new and old volumes match.  If not, then set renewvolumememory so got new volume memory needed
+  // If this is a new time step or variable then invalidate old volumes
+  renewedvolumememory=0;
+  if(
+     volumevarnum!=prevvolumevarnum[ctx->context_index]
+     || it!=prev_it[ctx->context_index]
+     ){
+    // then number of volumes doesn't match
+    renewedvolumememory=1;
+    prev_it[ctx->context_index] = it;
+    prevvolumevarnum[ctx->context_index]=volumevarnum;
+  }
+  else{
+    // number of volumes match, check that volume numbers doing match
+    // check that all volume origvar numbers match
+    for (volvar=0;volvar<volumevarnum;volvar++) { // over real list of volumes
+      if(volumevarlist[volvar]!=prev_ip[ctx->context_index][volvar]){
+	// then volume lists don't match
+	renewedvolumememory=1;
+      }
+      // assign correct (or same) volume origvar number to "previous" storage for next comparison
+      prev_ip[ctx->context_index][volvar] = volumevarlist[volvar]; // store real "origvar" value of variable
+    }
+  }
+
+
+
+  // If created new variable or something, then deallocate ALL and allocate new needed memory
+  if(renewedvolumememory){
+    renew_volume_memory(ctx->context_index,ctx->dpy_ctx->dpy_context_index);
+  }
+
+
+
+  // obtain (new) volume *memory* list
+  for (volvar=0;volvar<volumevarnum;volvar++) {
+    origvar=volumevarlist[volvar];
+
+    if(ctx->Volume[origvar]==NULL){
+      fprintf(stderr,"Volume=%d still NULL\n",origvar);
+      exit(1);
+    }
+
+    //    fprintf(stderr,"Volume rendering volvar=%d origvar=%d\n",volvar,origvar);
+    volumelist[volvar]=ctx->Volume[origvar];
+    truenl[volvar]=ctx->Nl[origvar];
+  }
+
+
+
+
+  // invalidate current volumes
+  for (volvar=0;volvar<volumevarnum;volvar++){
+    origvar=volumevarlist[volvar];
+    curvol=volumelist[volvar];
+
+    if(curvol==NULL){
+      fprintf(stderr,"Volume=%d (volvar=%d) still NULL\n",origvar,volvar);
+      exit(1);
+    }
+    // invalidate
+    curvol->valid = 0;
+  }
+
+
+
+
+  /////////////////////////////////////////
+  //
+  // see if anything to do
+  //
+  /////////////////////////////////////////
+  if(volumevarnum==0) return;
+
+
+  // DEBUG:
+  //  fprintf(stderr,"volumevarnum=%d\n",volumevarnum);
+
+
+  if (ctx->GridSameAsGridPRIME){
+    nr=ctx->Nr;
+    nc=ctx->Nc;
+    // nl is multi-valued
+  }
+  else{
+    nr=dtx->Nr;
+    nc=dtx->Nc;
+    nl=dtx->Nl;
+  }
+
+
+#if(0) // DEBUG:
+  int llll;
+  unsigned int tempi;
+  GLubyte * glbytearray;
+  int CV;
+  CV = volumevarlist[0];
+  if(volumevarnum>0){
+    for(llll=0;llll<256;llll++){
+      glbytearray=(GLubyte *) &(Colors[ctx->context_index*MAXVARS+CV][llll]);
+      // RBGA
+      fprintf(stderr,"CV=%d color=%d %d %d %d\n",CV,glbytearray[0],glbytearray[1],glbytearray[2],glbytearray[3]);
+    }
+  }
+#endif
+
+
 
    /* compute third column values in the product of ctm*proj */
    x = ctm[0][0]*proj[0][2] + ctm[0][1]*proj[1][2]
@@ -1318,41 +1616,174 @@ void draw_volume( Context ctx, int it, int ip, unsigned int *ctable )
    if (ax>=ay && ax>=az) {
       /* draw x-axis slices */
       dir = (x<0.0) ? WEST_TO_EAST : EAST_TO_WEST;
+    //         v->slices = nc;
+    //         v->rows = nl;
+    //         v->cols = nr;
+    for (volvar=0;volvar<volumevarnum;volvar++) { // must be on inner loop!
+      numslicepervar[volvar]=nc;
+    }
+    largestslice=nc;
    }
    else if (ay>=ax && ay>=az) {
       /* draw y-axis slices */
       dir = (y<0.0) ? SOUTH_TO_NORTH : NORTH_TO_SOUTH;
+    //v->slices = nr;
+    //      v->rows = nl;
+    //      v->cols = nc;
+    for (volvar=0;volvar<volumevarnum;volvar++) { // must be on inner loop!
+      numslicepervar[volvar]=nr;
+    }
+    largestslice=nr;
    }
    else {
       /* draw z-axis slices */
       dir = (z<0.0) ? BOTTOM_TO_TOP : TOP_TO_BOTTOM;
+    //         v->slices = nl;
+    //         v->rows = nr;
+    //         v->cols = nc;
+
+    largestslice=0;
+    if (ctx->GridSameAsGridPRIME){
+      for (volvar=0;volvar<volumevarnum;volvar++) { // must be on inner loop!
+	numslicepervar[volvar]=truenl[volvar]; // for which variable
+	if(numslicepervar[volvar]>largestslice) largestslice=numslicepervar[volvar];
+      }
+    }
+    else{
+      for (volvar=0;volvar<volumevarnum;volvar++) { // must be on inner loop!
+	numslicepervar[volvar]=nl; // for which variable
+      }
+      largestslice=nl;
+    }
    }
 
-   /* If this is a new time step or variable then invalidate old volumes */
-   if (it!=prev_it[ctx->context_index] || ip!=prev_ip[ctx->context_index]) {
-      ctx->Volume->valid = 0;
-      prev_it[ctx->context_index] = it;
-      prev_ip[ctx->context_index] = ip;
+
+  // DEBUG:
+  //  fprintf(stderr,"dir=%d isspecialnl=%d\n",dir,ctx->GridSameAsGridPRIME);
+
+
+  //////////////////////////////
+  //
+  // allocate totalslices
+  //
+  //////////////////////////////
+  numallslices=0;
+  for(volvar=0;volvar<volumevarnum;volvar++){
+    //    numallslices+=numslicepervar[volvar]; // to complicated to keep track of this with multi-volumes
+    numallslices+=largestslice; // just use maximum slice to do everything
+  }
+
+  totalslices[0]=(int *)malloc(numallslices*sizeof(int)); // true slice number of a variable
+  totalslices[1]=(int *)malloc(numallslices*sizeof(int)); // variable for that slice
+
+  //////////////////////////////
+  //
+  // check totalslice allocations
+  //
+  //////////////////////////////
+  if(totalslices[0]==NULL || totalslices[1]==NULL){
+    fprintf(stderr,"Couldn't allocate totalslices %ld %ld\n",(PTRINT)totalslices[0],(PTRINT)totalslices[1]);
+    exit(1);
    }
+
+
+  // DEBUG:
+  //  fprintf(stderr,"Before ipcheck: %d\n",ctx->context_index);
+
+
+
+
+  // DEBUG:
+  //  fprintf(stderr,"Before compute:\n");
+
+  //////////////////////////////
+  //
+  // Compute all volumes wanted to display if necessary to recompute them
+  //
+  // Both compute_volume() and compute_volumePRIME() have been corrected for multi-volumes
+  //////////////////////////////
+  for (volvar=0;volvar<volumevarnum;volvar++) {
+    int ip;
+    ip=volumevarlist[volvar];
+    curvol=volumelist[volvar];
+    // DEBUG:
+    //fprintf(stderr,"volvar=%d %d %ld\n",volvar,ip,curvol); fflush(stderr);
 
    /* Determine if we have to compute a set of slices for the direction. */
-   if (ctx->Volume->dir!=dir || ctx->Volume->valid==0) {
+    if (curvol->dir!=dir || curvol->valid==0) {
+
+      // DEBUG:
+      //fprintf(stderr,"Get data: it=%d ip=%d\n",it,ip);
+
+
       data = get_grid( ctx, it, ip );
       if (data) {
          if (ctx->GridSameAsGridPRIME){
-            compute_volume( ctx, data, it, ip, ctx->Nr, ctx->Nc, ctx->Nl[ip],
+	  compute_volume( ctx, data, it, ip, volvar, volumevarnum, ctx->Nr, ctx->Nc, ctx->Nl[ip],
                             ctx->Variable[ip]->LowLev, ctx->Variable[ip]->MinVal, ctx->Variable[ip]->MaxVal,
-                            dir, ctx->Volume );
+			  dir, curvol);
          }
          else{
-            compute_volumePRIME( ctx, data, it, ip, dtx->Nr, dtx->Nc, dtx->Nl,
+	  compute_volumePRIME( ctx, data, it, ip, volvar, volumevarnum, dtx->Nr, dtx->Nc, dtx->Nl,
                             dtx->LowLev, ctx->Variable[ip]->MinVal, ctx->Variable[ip]->MaxVal,
-                            dir, ctx->Volume );
+			       dir, curvol);
          }
          release_grid( ctx, it, ip, data );
       }
    }
+  }
 
-   render_volume( ctx, ctx->Volume, ctable );
+
+
+  // DEBUG:
+  //fprintf(stderr,"Before totalslices setup\n");
+
+  //////////////////////////////
+  // TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+  // Setup totalslices (using "z" information from compute_volume() )
+  //
+  //////////////////////////////
+  slicenew=0;
+  //  for(sliceorig=0;sliceorig<numslicepervar[volvar];sliceorig++){
+  //  for(sliceorig=0;sliceorig<numslicepervar[0];sliceorig++){
+  for(sliceorig=0;sliceorig<largestslice;sliceorig++){
+    for (volvar=0;volvar<volumevarnum;volvar++) {
+      
+      // repeat if necessary to make all variables have the same number of slices to make multi-volume rendering easier
+      totalslices[0][slicenew]=(int)(sliceorig*(numslicepervar[volvar]-1)/(largestslice-1));
+      // ensure don't go over!
+      if(totalslices[0][slicenew]>numslicepervar[volvar]-1) totalslices[0][slicenew]=numslicepervar[volvar]-1;
+
+      totalslices[1][slicenew]=volvar;
+
+      // DEBUG:
+      //      fprintf(stderr,"ts: %d %d :: slice=%d var=%d\n",volvar,sliceorig,totalslices[0][slicenew],totalslices[1][slicenew]);
+
+      slicenew++;
+    }
+  }
+
+
+
+
+
+  ////////////
+  //
+  // Render the volumes
+  //
+  ////////////
+  //  fprintf(stderr,"Rendering begin:\n");
+  error=render_volume( ctx, volumevarnum, volumevarlist, volumelist, ctablelist, numallslices, totalslices );
+  //fprintf(stderr,"Rendering done: error=%d\n",error);
+
+   
+  ////////////
+  //
+  // Free totalslices memory
+  //
+  ////////////
+  free(totalslices[0]);
+  free(totalslices[1]);
+
 }
 #endif

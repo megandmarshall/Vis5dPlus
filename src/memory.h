@@ -104,25 +104,25 @@
 #define VWIND_TYPE 67
 #define VERTDATA_TYPE 68
 
-extern int init_memory( Context ctx, int bytes );
+extern int init_memory( Context ctx, PTRINT bytes );
 
-extern int init_shared_memory( Context ctx, void *start, int bytes );
+extern int init_shared_memory( Context ctx, void *start, PTRINT bytes );
 
 extern int reinit_memory( Context ctx );
 
 #ifndef allocate
-extern void *allocate( Context ctx, int bytes );
+extern void *allocate( Context ctx, PTRINT bytes );
 #endif
 
-extern void *allocate_type( Context ctx, int bytes, int type );
+extern void *allocate_type( Context ctx, PTRINT bytes, int type );
 
-extern void *pallocate( Context ctx, int bytes );
+extern void *pallocate( Context ctx, PTRINT bytes );
 
-extern void deallocate( Context ctx, void *addr, int bytes );
+extern void deallocate( Context ctx, void *addr, PTRINT bytes );
 
-extern int mem_available( Context ctx );
+extern PTRINT mem_available( Context ctx );
 
-extern int mem_used( Display_Context dtx );
+extern PTRINT mem_used( Display_Context dtx );
 
 extern void *MALLOC( size_t  size );
 

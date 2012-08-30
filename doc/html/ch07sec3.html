@@ -1,0 +1,433 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Using v5dimport's text interface</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="The v5dimport Utility"
+HREF="ch07.html"><LINK
+REL="PREVIOUS"
+TITLE="The v5dimport User Interface Embedded in Vis5D"
+HREF="ch07sec2.html"><LINK
+REL="NEXT"
+TITLE="Adding support for new file format"
+HREF="ch07sec4.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch07sec2.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>The v5dimport Utility</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch07sec4.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH07SEC3"
+>Using <B
+CLASS="COMMAND"
+>v5dimport</B
+>'s text interface</A
+></H1
+><P
+>     The text/type-in interface to <B
+CLASS="COMMAND"
+>v5dimport</B
+> is useful when X is not availableor
+when you want to run <B
+CLASS="COMMAND"
+>v5dimport</B
+> with a script.  To start <B
+CLASS="COMMAND"
+>v5dimport</B
+> in text mode
+enter:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>v5dimport -t [-path pathname] [files]</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>where [<TT
+CLASS="PARAMETER"
+><I
+>files</I
+></TT
+>] is an optional list of input files and 
+[<TT
+CLASS="PARAMETER"
+><I
+>-path pathname</I
+></TT
+>] specifies
+that the directory named "pathname" is to be used as the default, in place of
+the current directory, for the input file browser and for making output files.
+Through the text interface it's possible to run <B
+CLASS="COMMAND"
+>v5dimport</B
+> with a script by using
+your shell's import redirection feature:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>v5dimport -t &#60; script</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>After you've invoked <B
+CLASS="COMMAND"
+>v5dimport</B
+> with the -t option you'll see a <TT
+CLASS="PROMPT"
+>&#62;&#62;</TT
+> prompt at
+which you can issue any of these commands:
+<DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2795"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>exit</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>exit v5dimport</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>help</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>online help</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>list</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>show lists of grids, timesteps, variables, map projections, or
+            vertical coordinate systems.</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>read</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>read an input file</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>keep/omit</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>used to select which grids, according to timestep, variable,
+            map projection or vcs, are to be included in or omitted from the
+            output file.</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>info</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>display parameters of output file</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>rows</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>specify number of grid rows for output file</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>columns</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>specify number of grid columns for output file</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>levels</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>specify max number of grid levels for output file</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>projection</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>specify the output file's map projection</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>vertical</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>specify the output file's vertical coordinate system</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>make</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>make the output file</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>visualize</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>make the output file and start Vis5D</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+><P
+>Using the text interface to <B
+CLASS="COMMAND"
+>v5dimport</B
+> is similar in strategy to the graphical
+interface:
+<P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>       Read input files</P
+></LI
+><LI
+><P
+>       Select grids by timestep, variable, projection, and/or VCS.  This is
+       typically done by a series of list, omit, and keep commands.</P
+></LI
+><LI
+><P
+>       Set/adjust output file parameters. Typically a series of info, rows,
+       columns, levels, projection, and vertical commands.</P
+></LI
+><LI
+><P
+>       Make the output file, or make the output file and start Vis5D.</P
+></LI
+></OL
+></P
+><P
+>Use the <B
+CLASS="COMMAND"
+>help</B
+> command to learn the exact syntax for each command.</P
+><P
+>A <B
+CLASS="COMMAND"
+>v5dimport</B
+> script is simply an ASCII file of <B
+CLASS="COMMAND"
+>v5dimport</B
+> commands and their
+arguments.  In the simplest case it may contain only a few commands such as:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>     # read my file, omit two vars, write v5d file
+     read mydata.dat
+     omit var CW
+     omit var RW
+     make outdata.v5d
+     exit</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>     
+As <B
+CLASS="COMMAND"
+>v5dimport</B
+> executes a script it prints each command and its result.  Lines
+that start with a "#" are considered comments and ignored.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch07sec2.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch07sec4.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>The v5dimport User Interface Embedded in Vis5D</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ch07.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Adding support for new file format</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

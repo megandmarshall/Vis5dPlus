@@ -1,0 +1,261 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Wind Trajectories</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Using Vis5D to Visualize Your Data"
+HREF="ch06.html"><LINK
+REL="PREVIOUS"
+TITLE="Volume Rendering"
+HREF="ch06sec7.html"><LINK
+REL="NEXT"
+TITLE="Wind Variables"
+HREF="ch06sec9.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch06sec7.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Using Vis5D to Visualize Your Data</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch06sec9.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH06SEC8"
+>Wind Trajectories</A
+></H1
+><P
+>     Wind trajectories trace the motion of air through the 3-D volume much line
+smoke trails in a wind tunnel.  To enter trajectory mode select the TRAJECTORY
+radio button on the control panel.  A pop-up window will appear near the bottom
+of the screen and a 3-D cursor will appear inside the 3-D view box.  This 3-D
+cursor is used to specify where a new wind trajectory should be made.  The STEP
+button on the main control panel is also important because it is used to select
+the time step at which to create the trajectory.</P
+><P
+>     Wind trajectories are dealt with in sets.  Currently, eight sets are
+available.  Each set is represented in the trajectory window with a button
+labeled Set1, Set2, ..., Set8.  Each set can be individually displayed, colored,
+or deleted.  As you create new trajectories you may want to group them in sets
+corresponding to location, time, etc.</P
+><P
+>     The first step in creating a trajectory is to select a position with the 3-
+D cursor.  Use the right mouse button to drag the 3-D cursor around inside the 3-
+D box.  The 3-D cursor will move in 2-D in a plane parallel to the plane of
+projection.  That is, the cursor will stay at a constant distance of depth.  By
+alternately rotating the view box with the left mouse button and placing the
+cursor with the right mouse button, the 3-D cursor can be placed anywhere inside
+the view box.  The TOP, SOUTH, and WEST buttons as explained in 
+<A
+HREF="ch06sec2.html"
+>section 6.2</A
+> can
+also be useful when making trajectories.</P
+><P
+>     Second you should select a time step with the STEP button on the control
+panel.  When the trajectory is made, it will be traced forward from the current
+time step to the last time step and will be traced backward through time to the
+first time step.</P
+><P
+>     Finally, to make a trajectory at the current cursor location and current
+time step, press the middle mouse button when pointing inside the 3-D window.
+The trajectory will appear as a line segment.  By turning on the ANIMATE button,
+you can observe how the trajectory travels through time and space.  Typically,
+you will repeat the process of positioning the 3-D cursor and clicking the
+middle mouse button to create a set of trajectories.</P
+><P
+>     Interesting results can be seen by making a trajectory when the ANIMATE
+button is turned on:  a trajectory will be created for every time step instead
+of just one.  This will show you the path of every air parcel which passes
+through a single point in space.</P
+><P
+>Here is a summary of the various trajectory functions:</P
+><P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>  
+        To position the 3-D cursor, use a combination of rotating the view box
+        with the left mouse button and dragging the 3-D cursor with the right
+        mouse button.</P
+></LI
+><LI
+><P
+>  
+        Use the STEP button or ANIMATE option to select a time step.</P
+></LI
+><LI
+><P
+>  
+        Press the middle mouse button to create a trajectory at the current
+        cursor location and time step.</P
+></LI
+><LI
+><P
+>  
+        To toggle the display of a trajectory set on or off, click on the set
+        button with the left mouse button.</P
+></LI
+><LI
+><P
+>  
+        Select the current trajectory set by clicking on the set button with
+        the middle mouse button.</P
+></LI
+><LI
+><P
+>  
+        A trajectory set may be deleted with the 'Delete Set' button in the
+        trajectories window.  You will asked to verify your decision.</P
+></LI
+><LI
+><P
+>     
+        You can delete the last trajectory made by clicking on the 'Delete
+        Last' button in the trajectories window.</P
+></LI
+></OL
+></P
+><P
+>     Wind trajectories can be depicted in two ways:  as line segments or as
+ribbons.  You can select ribbons by clicking on the RIBBON button in the
+trajectory window.  Toggling the RIBBON button will not effect trajectories you
+have already made; it only controls how new trajectories will be displayed.</P
+><P
+>     The trajectory window also contains two type-in widgets labeled STEP and
+LENGTH.  The STEP value is used to control the step size used in the trajectory
+tracing algorithm.  The LENGTH value is used to control the length of
+trajectories.  1.0 is the default value for each.  Each acts as a multiplier.
+If you want the trajectory tracer to integrate in steps 1/2 the default size,
+enter a step value of 0.5.  If you want trajectories to be twice as long as the
+default length, enter a length value of 2.0</P
+><P
+>     The color of trajectories is controlled in the same way as for isosurfaces.
+That is, a trajectory set may either be mono-colored or colored according to
+another physical variable.  Click on the trajectory set button with the right
+mouse button to bring up its color window.  
+See <A
+HREF="ch06sec5.html#CH06SEC5.1"
+>section 6.5.1</A
+> for details on
+using the color window.</P
+><P
+>     When viewing color-mapped trajectores be aware that the color of a
+trajectory is time dependent.  Only the head of the trajectory is colored
+according to the value of another variable for the current time step.  The tail
+of the trajectory is colored according to the color of the other variable when
+the head was at that location.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch06sec7.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch06sec9.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Volume Rendering</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ch06.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Wind Variables</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

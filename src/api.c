@@ -107,7 +107,7 @@
 
 
 
-#define MEGA 1024*1024
+#define MEGA (1024L*1024L)
 #define MAX(A,B)  ( (A) > (B) ? (A) : (B) )
 
 #define VERY_LARGE_RATIO 0.1
@@ -177,14 +177,16 @@ int noexit = 0; /* if true, don't exit on bad vis5d_open_gridfile */
 /*  | MJK 11.19.98 |  */
 
 int off_screen_rendering = 0;
+int very_off_screen_rendering = 0; // JCM
+char framebuffername[V5D_MAXSTRLEN]="";
 
 int REVERSE_POLES = 1.0;
 
 int in_the_init_stage = 0;
 
 /* MJK 4.27.99 */
-char Vis5dDataPath[1000] = "";
-char Vis5dFuncPath[1000] = "";
+char Vis5dDataPath[V5D_MAXSTRLEN] = "";
+char Vis5dFuncPath[V5D_MAXSTRLEN] = "";
 
 struct varlink var_link[MAXVARS * MAXTYPES * VIS5D_MAX_CONTEXTS];
 struct varlink group_var_link[MAXVARS * MAXTYPES * VIS5D_MAX_CONTEXTS];
@@ -377,7 +379,9 @@ static void init_context( Context ctx )
 
    ctx->MegaBytes = MBS;
 
-   ctx->Volume = NULL;
+   for (i=0;i<MAXVOLUMEVARS;i++) {
+     ctx->Volume[i] = NULL;
+   }
    for (i=0;i<MAXVARS;i++) {
       ctx->IsoColorVar[i] = -1;
       ctx->SameIsoColorVarOwner[i] = 1;
@@ -682,7 +686,6 @@ static int init_display_context( Display_Context dtx ,int initXwindow)
    dtx->ContFontFactorX = 0;
    dtx->ContFontFactorY = 0;
 
- 
    dtx->CurrentVolume = -1; 
    dtx->CurrentVolumeOwner = -1;
 
@@ -810,7 +813,7 @@ static void destroy_context( Context ctx )
 			 
 	 free(ctx->Variable[j]);
   }
-  if(ctx->Volume)
+  
 	 free_volume(ctx);
 
   free_grid_cache( ctx );
@@ -1686,23 +1689,44 @@ int vis5d_assign_display_to_data( int index, int display_index)
 	  }
 
       if (!dtx->CurvedBox) {
-         if (ctx->Volume){
-            free_volume( ctx );
-         }
-         ctx->Volume = alloc_volume( ctx, dtx->Nr, dtx->Nc, dtx->MaxNl);
+	renew_volume_memory(index, display_index);
       }
       else{
-         if (ctx->Volume){
             free_volume( ctx );
          }
-         ctx->Volume = NULL;
-      }
    }
    
    dtx->do_not_recalc_probe_text_width = 0;      
 
    return 1;
 }
+
+
+// JCM
+void renew_volume_memory(int index, int display_index)
+{
+  int truenumvars;
+  Context ctx;
+  Display_Context dtx;
+  int var;
+
+  
+  ctx = vis5d_get_ctx (index );
+  dtx = vis5d_get_dtx( display_index );
+
+
+  truenumvars=(ctx->NumVars > MAXVOLUMEVARS) ? MAXVOLUMEVARS : ctx->NumVars;
+
+  free_volume( ctx ); // first free all volumes
+
+  // now get memory for all new volumes
+  for (var=0;var<truenumvars;var++) {
+    if(ctx->DisplayVolume[var]==0) continue; // don't allocate for not-renderingn volume
+    //    fprintf(stderr,"Allocated volume for var=%d\n",var);
+    ctx->Volume[var] = alloc_volume( ctx, dtx->Nr, dtx->Nc, dtx->MaxNl);
+  }
+}
+
 
 int vis5d_check_dtx_same_as_ctx( int dindex, int vindex )
 {
@@ -2686,18 +2710,22 @@ int setup_dtx( Display_Context dtx, int index )
       ctx = dtx->ctxpointerarray[yo];
       ctx->GridSameAsGridPRIME = vis5d_check_dtx_same_as_ctx(dtx->dpy_context_index,
                                                           ctx->context_index);
+
+
+      // JCM
+      int truenumvars,var;
+      truenumvars=(ctx->NumVars > MAXVOLUMEVARS) ? MAXVOLUMEVARS : ctx->NumVars;
+
       if (!dtx->CurvedBox) {
-         if (ctx->Volume){
             free_volume( ctx );
+	for (var=0;var<truenumvars;var++) {
+	  if(ctx->DisplayVolume[var]==0) continue; // don't allocate for not-renderingn volume
+	  ctx->Volume[var] = alloc_volume( ctx, dtx->Nr, dtx->Nc, dtx->MaxNl);
          }
-         ctx->Volume = alloc_volume( ctx, dtx->Nr, dtx->Nc, dtx->MaxNl);
       }
       else{
-         if (ctx->Volume){
             free_volume( ctx);
          }
-         ctx->Volume = NULL;
-      }
    }
    return 0;
 }
@@ -3021,6 +3049,7 @@ int vis5d_init_display_values ( int index, int iindex, int display )
       memset(  ctx->DisplayVSlice, 0, sizeof(ctx->DisplayVSlice) );
       memset(  ctx->DisplayCHSlice, 0, sizeof(ctx->DisplayCHSlice) );
       memset(  ctx->DisplayCVSlice, 0, sizeof(ctx->DisplayCVSlice) );
+      memset(  ctx->DisplayVolume, 0, sizeof(ctx->DisplayVolume) );
       ctx->CurTime = 0; 
    }
 
@@ -3992,7 +4021,7 @@ int vis5d_init_data_end( int index )
    void *pool;
 #endif
    int yo;
-   int memsize;
+   PTRINT memsize;
    float ratio;
    /* New 5.2 */
    CONTEXT("vis5d_init_data_end");
@@ -4027,7 +4056,7 @@ int vis5d_init_data_end( int index )
          ctx->MegaBytes = 10;
       }
       /* use 80% of MegaBytes */
-      memsize = (int) ( (float) ctx->MegaBytes * 0.80 ) * MEGA;
+      memsize = (PTRINT) ( (double) ctx->MegaBytes * 0.80 ) * MEGA;
 #ifdef CAVE
       pool = amalloc(memsize,cave_shmem);
       if (!pool) {
@@ -4047,12 +4076,12 @@ int vis5d_init_data_end( int index )
    /* Let 2/5 of the memory pool be used for caching grid data. */
    if (memsize==0) {
       /* Grid cache size = 100MB */
-      if (!init_grid_cache( ctx, 100*1024*1024, &ratio )) {
+      if (!init_grid_cache( ctx, 100L*1024L*1024L, &ratio )) {
          return VIS5D_OUT_OF_MEMORY;
       }
    }
    else {
-      if (!init_grid_cache( ctx, memsize * 2 / 5, &ratio )) {
+     if (!init_grid_cache( ctx, memsize * 2L / 5L, &ratio )) {
          return VIS5D_OUT_OF_MEMORY;
       }
    }
@@ -4072,7 +4101,7 @@ int vis5d_init_data_end( int index )
    }
    if (memsize!=0) {
       /* check if there's enough memory left after loading the data set */
-      int min_mem = MAX( memsize/3, 3*MEGA );
+      PTRINT min_mem = MAX( memsize/3L, 3L*MEGA );
       if (mem_available(ctx)<min_mem) {
          printf("Not enough memory left for graphics (only %d bytes free)\n",
                 mem_available(ctx));
@@ -4148,13 +4177,24 @@ int vis5d_init_data_end( int index )
       return VIS5D_FAIL;
    }
   
+   // JCM
+   int truenumvars;
+   truenumvars=(ctx->NumVars > MAXVOLUMEVARS) ? MAXVOLUMEVARS : ctx->NumVars;
+
+
    if (ctx->dpy_ctx->CurvedBox) {
       /* Can't do volume rendering with curved box */
-      ctx->Volume = NULL;
+     for (yo=0;yo<truenumvars;yo++) {
+       ctx->Volume[yo] = NULL;
+     }
    }
    else {
-      ctx->Volume = alloc_volume( ctx, ctx->dpy_ctx->Nr, ctx->dpy_ctx->Nc,
+     for (yo=0;yo<truenumvars;yo++) {
+       if(ctx->DisplayVolume[yo]==0) continue; // don't allocate for not-renderingn volume
+
+       ctx->Volume[yo] = alloc_volume( ctx, ctx->dpy_ctx->Nr, ctx->dpy_ctx->Nc,
                                   ctx->dpy_ctx->MaxNl );
+   }
    }
 
    /*** Create threads ***/
@@ -4270,12 +4310,12 @@ int vis5d_open_gridfile( int index, const char *name, int read_flag )
             
          if (ctx->memory_limit==0) {
             /* Grid cache size = 100MB */
-            if (!init_grid_cache( ctx, 100*1024*1024, &ratio )) {
+            if (!init_grid_cache( ctx, 100L*1024L*1024L, &ratio )) {
                return VIS5D_FAIL;
             }
          }
          else {
-            if (!init_grid_cache( ctx, ctx->memory_limit * 2 / 5, &ratio )) {
+            if (!init_grid_cache( ctx, ctx->memory_limit * 2L / 5L, &ratio )) {
                return VIS5D_FAIL;
             }
          }
@@ -4313,18 +4353,23 @@ int vis5d_open_gridfile( int index, const char *name, int read_flag )
                xtc = dtx->ctxpointerarray[yo];
                xtc->GridSameAsGridPRIME = vis5d_check_dtx_same_as_ctx(
                         dtx->dpy_context_index, xtc->context_index); 
+
+	       // JCM
+	       int truenumvars,var;
+	       truenumvars=(ctx->NumVars > MAXVOLUMEVARS) ? MAXVOLUMEVARS : ctx->NumVars;
+
+
                if (!dtx->CurvedBox) {
-                  if (xtc->Volume){
                      free_volume( xtc );
+		 for (var=0;var<truenumvars;var++) {
+		   if(xtc->DisplayVolume[var]==0) continue; // don't allocate for not-renderingn volume
+
+		   xtc->Volume[var] = alloc_volume( xtc, dtx->Nr, dtx->Nc, dtx->MaxNl);
                   }
-                  xtc->Volume = alloc_volume( xtc, dtx->Nr, dtx->Nc, dtx->MaxNl);
                }
                else{
-                  if (xtc->Volume){
                      free_volume( xtc);
                   }
-                  xtc->Volume = NULL;
-               }
             }
          }      
          else{
@@ -4365,14 +4410,25 @@ int vis5d_open_gridfile( int index, const char *name, int read_flag )
          if (!init_traj(ctx)) {
             return VIS5D_FAIL;
          }
+
+	 // JCM
+	 int truenumvars;
+	 truenumvars=(ctx->NumVars > MAXVOLUMEVARS) ? MAXVOLUMEVARS : ctx->NumVars;
+	 
          if (ctx->dpy_ctx->CurvedBox) {
             /* Can't do volume rendering with curved box */
-            ctx->Volume = NULL;
+	   for (yo=0;yo<truenumvars;yo++) {
+	     ctx->Volume[yo] = NULL;
+	   }
          }
          else { 
-            ctx->Volume = alloc_volume( ctx, ctx->dpy_ctx->Nr,
+	   for (yo=0;yo<truenumvars;yo++) {
+	     if(ctx->DisplayVolume[yo]==0) continue; // don't allocate for not-renderingn volume
+
+	     ctx->Volume[yo] = alloc_volume( ctx, ctx->dpy_ctx->Nr,
                                      ctx->dpy_ctx->Nc, ctx->dpy_ctx->MaxNl );
          }
+      }
       }
       else {
          return VIS5D_FAIL;
@@ -4954,6 +5010,7 @@ int vis5d_get_ctx_var_range( int index, int var, float *min, float *max )
    if (var>=0 && var<ctx->NumVars) {
       *min = ctx->Variable[var]->MinVal;
       *max = ctx->Variable[var]->MaxVal;
+      //      fprintf(stderr,"inside: min=%g max=%g\n",*min,*max); // DEBUG
       return 0;
    }
    else {
@@ -5394,6 +5451,18 @@ int vis5d_reset_var_graphics( int index, int newvar )
   return 0;
 }
 
+
+// JCM:
+//int vis5d_getminmax_var_graphics( int index, int var, float *min, float *max )
+//{
+//  CONTEXT("vis5d_getminmax_var_graphics")
+//
+//  *max=ctx->Variable[var]->MaxVal;
+//  *min=ctx->Variable[var]->MinVal;
+//
+//  return 0;
+//}
+
 /* helper function similar to init_var_colortable in gui.c */
 int init_var_clrtable( int dindex, int vindex, int var )
 {
@@ -5403,6 +5472,7 @@ int init_var_clrtable( int dindex, int vindex, int var )
    /* Isosurfaces */
    vis5d_get_color_table_params( dindex, VIS5D_ISOSURF, vindex, var, &p);
    vis5d_get_color_table_address( dindex, VIS5D_ISOSURF, vindex, var, &table );
+   vis5d_other_table_init_params( dindex, VIS5D_ISOSURF, vindex, var, p);
    vis5d_color_table_init_params( p, 1, 1 );
    vis5d_color_table_set_alpha( p, 255 );
    vis5d_color_table_recompute( table, 256, p, 1, 1 );
@@ -5410,6 +5480,7 @@ int init_var_clrtable( int dindex, int vindex, int var )
    /* CHSlices */
    vis5d_get_color_table_params( dindex, VIS5D_CHSLICE, vindex, var, &p);
    vis5d_get_color_table_address( dindex, VIS5D_CHSLICE, vindex, var, &table );
+   vis5d_other_table_init_params( dindex, VIS5D_CHSLICE, vindex, var, p);
    vis5d_color_table_init_params( p, 1, 1 );
    vis5d_color_table_set_alpha( p, -2 );
 /* MJK 2.8.99
@@ -5420,6 +5491,7 @@ int init_var_clrtable( int dindex, int vindex, int var )
    /* CVSlices */
    vis5d_get_color_table_params( dindex, VIS5D_CVSLICE, vindex, var, &p);
    vis5d_get_color_table_address( dindex, VIS5D_CVSLICE, vindex, var, &table );
+   vis5d_other_table_init_params( dindex, VIS5D_CVSLICE, vindex, var, p);
    vis5d_color_table_init_params( p, 1, 1 );
    vis5d_color_table_set_alpha( p, -2 );
 /* MJK 2.8.99
@@ -5430,6 +5502,7 @@ int init_var_clrtable( int dindex, int vindex, int var )
    /* Volumes */
    vis5d_get_color_table_params( dindex, VIS5D_VOLUME, vindex, var, &p);
    vis5d_get_color_table_address( dindex, VIS5D_VOLUME, vindex, var, &table );
+   vis5d_other_table_init_params( dindex, VIS5D_VOLUME, vindex, var, p);
    vis5d_color_table_init_params( p, 1, 1 );
    vis5d_color_table_set_alpha( p, -1 );
    vis5d_color_table_recompute( table, 256, p, 1, 1 );
@@ -5437,6 +5510,7 @@ int init_var_clrtable( int dindex, int vindex, int var )
    /* Trajectories */
    vis5d_get_color_table_params( dindex, VIS5D_TRAJ, vindex, var, &p);
    vis5d_get_color_table_address( dindex, VIS5D_TRAJ, vindex, var, &table );
+   vis5d_other_table_init_params( dindex, VIS5D_TRAJ, vindex, var, p);
    vis5d_color_table_init_params( p, 1, 1 );
    vis5d_color_table_set_alpha( p, 255 );
    vis5d_color_table_recompute( table, 256, p, 1, 1 );
@@ -5444,6 +5518,7 @@ int init_var_clrtable( int dindex, int vindex, int var )
    /* Topography */
    vis5d_get_color_table_params( dindex, VIS5D_TOPO, vindex, var, &p);
    vis5d_get_color_table_address( dindex, VIS5D_TOPO, vindex, var, &table );
+   vis5d_other_table_init_params( dindex, VIS5D_TOPO, vindex, var, p);
    vis5d_color_table_init_params( p, 1, 1 );
    vis5d_color_table_set_alpha( p, 255 );
    vis5d_color_table_recompute( table, 256, p, 1, 1 );
@@ -5458,6 +5533,7 @@ int init_irregular_var_clrtable( int dindex, int iindex, int var )
    /* Textplots */
    vis5d_get_color_table_params( dindex, VIS5D_TEXTPLOT, iindex, var, &p);
    vis5d_get_color_table_address( dindex, VIS5D_TEXTPLOT, iindex, var, &table );
+   vis5d_other_table_init_params( dindex, VIS5D_TEXTPLOT, iindex, var, p);
    vis5d_color_table_init_params( p, 1, 1 );
    vis5d_color_table_set_alpha( p, -2 );
    vis5d_color_table_set_alpha( p, 255 );
@@ -5513,7 +5589,7 @@ int vis5d_get_grid( int index, int time, int var, float *data )
    CONTEXT("vis5d_get_grid");
 
    grid = get_grid( ctx, time, var );
-   memcpy( data, grid, ctx->Nr*ctx->Nc*ctx->Nl[var]*sizeof(float) );
+   memcpy( data, grid, (PTRINT)ctx->Nr*(PTRINT)ctx->Nc*(PTRINT)ctx->Nl[var]*sizeof(float) );
    release_grid( ctx, time, var, grid );
    return 0;
 }
@@ -6072,7 +6148,7 @@ int vis5d_compute_ext_func( int index, char *funcpathname, int *newvar )
   DPY_CONTEXT("vis5d_compute_ext_func")
 
   ctx = dtx->ctxpointerarray[0]; 
-  printf("Computing external function %s\n", funcpathname );
+  printf("Computing external functio %s\n", funcpathname );
   var = -1;
   *newvar = -1;
   recompute_flag = 0;
@@ -6108,12 +6184,14 @@ int vis5d_compute_ext_func( int index, char *funcpathname, int *newvar )
       }
     }
 
+ //  printf("calling allocate_extfunc_variableX %s\n", newname);
     var = allocate_extfunc_variable( ctx, newname );
     if (var==-1) {
       /* unable to make a new variable */
       deallocate_variable( ctx, var );
       return VIS5D_FAIL;
     }
+ //  printf("done calling allocate_extfunc_variable %s\n", newname);
   }
 
   /* call the external function... */
@@ -6191,10 +6269,11 @@ int vis5d_make_expr_var( int index, const char *expression, char *newname,
       ctx = vis5d_get_ctx( *newvarowner );
       /* should this have same recompute logic as vis5d_compute_ext_func ?? */
       *newvar = result;
+
+      //      fprintf(stderr,"newvar=%d\n",*newvar); // JCM DEBUG
 		ctx->Variable[*newvar]->ExpressionList = strdup(expression);
-		/*
-      strcpy( ctx->ExpressionList[*newvar], expression );
-		*/
+      //strcpy( ctx->ExpressionList[*newvar], expression );
+      
       turn_off_and_free_var_graphics( ctx, *newvar); 
       vis5d_reset_var_graphics(ctx->context_index, *newvar);
       init_var_clrtable( index, ctx->context_index, *newvar);
@@ -6302,7 +6381,6 @@ int vis5d_draw_frame( int index, int animflag )
 	
    set_line_width( dtx->LineWidth );
 
-	/*
 #ifndef NCAR_STEREO
 #ifndef CAVE
     if (dtx->Reversed){
@@ -6314,7 +6392,6 @@ int vis5d_draw_frame( int index, int animflag )
    clear_3d_window(); 
 #endif
 #endif
-	*/
 
 	render_everything( dtx, animflag );
 
@@ -6560,7 +6637,7 @@ int vis5d_graphics_mode( int index, int what, int mode )
 int vis5d_check_ctx_volume( int index, int *volume )
 {
    CONTEXT("vis5d_check_ctx_volume") 
-   *volume = ctx->Volume ? 1 : 0;
+     *volume = ctx->Volume[0] ? 1 : 0; // JCM: make [0]
    return 0;
 }
 
@@ -6696,6 +6773,7 @@ int vis5d_var_graphics_options(int index, int type, int number, int what, int mo
 int vis5d_enable_graphics( int index, int type, int number, int mode )
 {
   int *val;
+  int isvolume;
   CONTEXT("vis5d_enable_graphics");
 
 
@@ -6720,10 +6798,12 @@ int vis5d_enable_graphics( int index, int type, int number, int mode )
 			volume rendering without otherwise affecting the current volume.
 			In gui.c this is applied to turn volume graphics off when the mouse
 			is pressed and turn them on again when it is released */
+      isvolume=vis5d_is_check_volume(index, ctx->dpy_ctx->CurrentVolumeOwner, ctx->dpy_ctx->CurrentVolume,number);
       switch (mode) {
         case VIS5D_OFF:
 			 ctx->dpy_ctx->VolumeFlag=0;
-          if (number == ctx->dpy_ctx->CurrentVolume &&
+	  //          if (number == ctx->dpy_ctx->CurrentVolume &&
+	  if (isvolume &&
               ctx->context_index == ctx->dpy_ctx->CurrentVolumeOwner) {
             ctx->dpy_ctx->CurrentVolume = -1;
             ctx->dpy_ctx->CurrentVolumeOwner = -1;
@@ -6734,7 +6814,8 @@ int vis5d_enable_graphics( int index, int type, int number, int mode )
           break;
         case VIS5D_ON:
 			 ctx->dpy_ctx->VolumeFlag=1;
-          if (number>=0 && number != ctx->dpy_ctx->CurrentVolume && 
+	  //          if (number>=0 && number != ctx->dpy_ctx->CurrentVolume && 
+	  if (number>=0 && !isvolume && 
               ctx->context_index != ctx->dpy_ctx->CurrentVolumeOwner) {
             ctx->dpy_ctx->CurrentVolume = number;
             ctx->dpy_ctx->CurrentVolumeOwner = ctx->context_index;
@@ -6743,12 +6824,14 @@ int vis5d_enable_graphics( int index, int type, int number, int mode )
           }
           break;
         case VIS5D_TOGGLE:
-          if (number == ctx->dpy_ctx->CurrentVolume &&
+	  //          if (number == ctx->dpy_ctx->CurrentVolume &&
+          if (isvolume &&
               ctx->context_index == ctx->dpy_ctx->CurrentVolumeOwner) {
             ctx->dpy_ctx->CurrentVolume = -1;
             ctx->dpy_ctx->CurrentVolumeOwner = -1;
           }
-          else if (number != ctx->dpy_ctx->CurrentVolume &&
+	  //          else if (number != ctx->dpy_ctx->CurrentVolume &&
+          else if (!isvolume &&
                    ctx->context_index != ctx->dpy_ctx->CurrentVolumeOwner) {
             ctx->dpy_ctx->CurrentVolume = number;
             ctx->dpy_ctx->CurrentVolumeOwner = ctx->context_index;
@@ -6832,9 +6915,197 @@ int vis5d_set_volume( int index, int CurrentVolumeOwner, int CurrentVolume )
 	dtx->VolumeFlag=1;
    dtx->CurrentVolumeOwner = CurrentVolumeOwner;
    dtx->CurrentVolume = CurrentVolume;
+
    return 0;
 }
 
+//JCM
+int vis5d_remove_volume( int index, int CurrentVolumeOwner, int CurrentVolume )
+{
+   CONTEXT("vis5d_remove_volume")
+
+     if(CurrentVolume>-1){
+       ctx->DisplayVolume[CurrentVolume]=0;
+     }
+   //   fprintf(stderr,"remove: CurrentVolume=%d\n",CurrentVolume); fflush(stderr);
+
+   return 0;
+}
+//JCM
+int vis5d_add_volume( int index, int CurrentVolumeOwner, int CurrentVolume )
+{
+   CONTEXT("vis5d_add_volume")
+
+     
+#if(MULTIVOLUMERENDER==0)
+   // reset all other DisplayVolume's since can only show 1 at a time
+   int j;
+   for(j=0;j<MAXVARS;j++){
+     ctx->DisplayVolume[j]=0;
+   }
+#endif
+
+   if(CurrentVolume>-1){
+     ctx->DisplayVolume[CurrentVolume]=1;
+   }
+
+
+
+   return 0;
+}
+
+//JCM
+int vis5d_resetcurrent_volume( int index, int *CurrentVolumeOwner, int *CurrentVolume )
+{
+   CONTEXT("vis5d_resetcurrent_volume")
+
+     //     fprintf(stderr,"Got resetcurrent\n"); fflush(stderr);
+
+#if(MULTIVOLUMERENDER==0)
+   *CurrentVolumeOwner = -1;
+   *CurrentVolume = -1;
+#else
+   int truenumvars,j;
+   truenumvars=(ctx->NumVars > MAXVOLUMEVARS) ? MAXVOLUMEVARS : ctx->NumVars;
+
+   for(j=0;j<truenumvars;j++){
+     //     fprintf(stderr,"currentreset1: j=%d of %d\n",j,truenumvars); fflush(stderr);
+     if(ctx->DisplayVolume[j]==1){
+       //       *CurrentVolumeOwner = ; // just don't reset
+       //fprintf(stderr,"currentreset: j=%d\n",j); fflush(stderr);
+       *CurrentVolume = j;
+       break;
+     }
+   }
+   if(j==truenumvars){
+     // then no volume left to render
+     *CurrentVolumeOwner = -1;
+     *CurrentVolume = -1;
+   }
+
+#endif
+
+   return 0;
+}
+
+//JCM
+int vis5d_is_volume( int index, int CurrentVolume )
+{
+   CONTEXT("vis5d_is_volume")
+
+#if(MULTIVOLUMERENDER==0)
+
+#else
+   if(CurrentVolume>-1){
+     if(ctx->DisplayVolume[CurrentVolume]==1){
+       return(1);
+     }
+     else return(0);
+   }
+   else return(0);
+#endif
+}
+
+//JCM
+int vis5d_is_check_volume( int index, int CurrentVolumeOwner, int CurrentVolume, int check )
+{
+   CONTEXT("vis5d_is_volume")
+
+#if(MULTIVOLUMERENDER==0)
+     if(check==CurrentVolume) return(1);
+     else return(0);
+#else
+   if(CurrentVolumeOwner>-1){
+     if(ctx->DisplayVolume[check]==1){
+       return(1);
+     }
+     else return(0);
+   }
+   else return(0);
+#endif
+}
+
+
+//JCM
+int vis5d_printtcl_volume(FILE *f, int index, int CurrentVolumeOwner, int CurrentVolume, int cwhichones)
+{
+   CONTEXT("vis5d_printtcl_volume")
+
+
+#if(MULTIVOLUMERENDER==0)
+   if(CurrentVolume > -1){
+     /* WLH 16 Nov 98
+	fprintf(f,"vis5d_set_volume_and_owner $dtx %d %d\n", current_vol_owner,
+	current_vol);
+     */
+     /* WLH 16 Nov 98 */
+     if (CurrentVolumeOwner == cwhichones) {
+       fprintf(f,"vis5d_set_volume_and_owner $dtx $ctx %d\n", CurrentVolume);
+     }
+     else {
+       fprintf(f,"vis5d_set_volume_and_owner $dtx %d %d\n", CurrentVolumeOwner,CurrentVolume);
+     }
+   }
+#else
+   int truenumvars,j;
+   truenumvars=(ctx->NumVars > MAXVOLUMEVARS) ? MAXVOLUMEVARS : ctx->NumVars;
+
+   for(j=0;j<truenumvars;j++){
+     if(ctx->DisplayVolume[j]==1){
+       if (CurrentVolumeOwner == cwhichones) {
+	 fprintf(f,"vis5d_set_volume_and_owner $dtx $ctx %d\n", j);
+       }
+       else {
+	 fprintf(f,"vis5d_set_volume_and_owner $dtx %d %d\n", CurrentVolumeOwner,j);
+       }
+     }
+   }
+
+#endif
+
+   return 0;
+}
+
+
+//JCM
+int vis5d_check_volume(FILE *f, int index, int CurrentVolumeOwner, int CurrentVolume, int cwhichones)
+{
+   CONTEXT("vis5d_printtcl_volume")
+
+
+#if(MULTIVOLUMERENDER==0)
+   if(CurrentVolume > -1){
+     /* WLH 16 Nov 98
+	fprintf(f,"vis5d_set_volume_and_owner $dtx %d %d\n", current_vol_owner,
+	current_vol);
+     */
+     /* WLH 16 Nov 98 */
+     if (CurrentVolumeOwner == cwhichones) {
+       fprintf(f,"vis5d_set_volume_and_owner $dtx $ctx %d\n", CurrentVolume);
+     }
+     else {
+       fprintf(f,"vis5d_set_volume_and_owner $dtx %d %d\n", CurrentVolumeOwner,CurrentVolume);
+     }
+   }
+#else
+   int truenumvars,j;
+   truenumvars=(ctx->NumVars > MAXVOLUMEVARS) ? MAXVOLUMEVARS : ctx->NumVars;
+
+   for(j=0;j<truenumvars;j++){
+     if(ctx->DisplayVolume[j]==1){
+       if (CurrentVolumeOwner == cwhichones) {
+	 fprintf(f,"vis5d_set_volume_and_owner $dtx $ctx %d\n", j);
+       }
+       else {
+	 fprintf(f,"vis5d_set_volume_and_owner $dtx %d %d\n", CurrentVolumeOwner,j);
+       }
+     }
+   }
+
+#endif
+
+   return 0;
+}
 
 
 /*
@@ -6961,6 +7232,8 @@ int vis5d_set_color( int index, int type, int number,
    b = (int) (blue * 255.0);
    a = (int) (alpha * 255.0);
   
+   //   fprintf(stderr,"r=%d g=%d b=%d a=%d\n",r,g,b,a); // DEBUG
+  
    *ptr = PACK_COLOR(r,g,b,a);
 
    return 0;
@@ -7077,6 +7350,17 @@ int get_color_table_params_internal(struct ColorTable *CT, int offset, float **p
   *params = CT->Params[offset];
   return 0;
 }
+
+
+
+//JCM
+int vis5d_other_table_init_params( int index, int graphic, int varowner, int var,float *params )
+{
+
+  vis5d_get_ctx_var_range(index, var, &params[MINFUNC], &params[MAXFUNC] );
+
+}
+
 
 /*
  * Return the parameters which describe a color table curve.
@@ -7221,7 +7505,7 @@ int vis5d_set_color_table_params( int index, int graphic, int varowner, int var,
 		return VIS5D_FAIL;
 	 }
   
-  for (i=0;i<7;i++) {
+  for (i=0;i<NUMCOLORTABLEPARAMS;i++) {
 	 p[i] = params[i];
   }
 
@@ -7231,7 +7515,20 @@ int vis5d_set_color_table_params( int index, int graphic, int varowner, int var,
 }
 
 
+int output_params(FILE *f, char *varname, float *params)
+{
+  int i;
 
+  fprintf(f," \"%s\" ", varname);
+  
+  for(i=0;i<NUMCOLORTABLEPARAMS;i++){
+    fprintf(f,"%15.7f ", params[i]);
+    //    fprintf(stderr,"%.3f ", params[i]);
+  }
+
+  fprintf(f,"\n");
+
+}
 
 /*
  * Reset the RGB and/or Alpha curve parameters to their defaults.
@@ -7245,6 +7542,7 @@ int vis5d_color_table_init_params( float params[], int rgb_flag, int alpha_flag 
    if (alpha_flag) {
       params[ALPHAPOW] = DEFAULT_ALPHAPOW;
    }
+   
    return 0;
 }
 
@@ -7261,6 +7559,9 @@ int vis5d_color_table_recompute( unsigned int table[], int size, float params[],
 
    rfact = 0.5 * params[BIAS];
    curve = params[CURVE];
+
+   // DEBUG:
+   //   fprintf(stderr,"alphatest=%d : %d\n",(params[ALPHAVAL]==-1),params[ALPHAVAL]); // DEBUG
 
    if (alpha_flag) {
       if (params[ALPHAVAL]==-1) {
@@ -9953,6 +10254,7 @@ int vis5d_grid_to_xyz( int index, int time, int var,
 {
   float r[1], c[1], l[1];
   CONTEXT("vis5d_grid_to_xyz")
+    //    fprintf(stderr,"row=%g col=%g lev=%g\n",row,col,lev);
   r[0] = row;
   c[0] = col;
   l[0] = lev;
@@ -10709,7 +11011,9 @@ int vis5d_set_all_invalid (int index)
       }
    }
 
-   if (ctx->Volume != NULL) ctx->Volume->valid = 0;
+   for (var=0;var<MAXVOLUMEVARS;var++) {
+     if (ctx->Volume[var] != NULL) ctx->Volume[var]->valid = 0;
+   }
 
 
    return 0;
@@ -10983,7 +11287,7 @@ int vis5d_init_irregular_data_end( int index )
 {
 #ifdef HAVE_LIBNETCDF
 
-   int memsize;
+   PTRINT memsize;
    float ratio;
    IRG_CONTEXT("vis5d_init_irregular_data_end")
 
@@ -11001,7 +11305,7 @@ int vis5d_init_irregular_data_end( int index )
          itx->MegaBytes = 10;
       }
       /* use 80% of MegaBytes */
-      memsize = (int) ( (float) itx->MegaBytes * 0.80 ) * MEGA;
+      memsize = (PTRINT) ( (double) itx->MegaBytes * 0.80 ) * MEGA;
       if (!init_irregular_memory( itx, memsize )) {
          return VIS5D_FAIL;
       }
@@ -11014,7 +11318,7 @@ int vis5d_init_irregular_data_end( int index )
       }
    }
    else {
-      if (!init_record_cache( itx, memsize * 2 / 5, &ratio )) {
+      if (!init_record_cache( itx, memsize * 2L / 5L, &ratio )) {
          return VIS5D_OUT_OF_MEMORY;
       }
    }
@@ -11031,7 +11335,7 @@ int vis5d_init_irregular_data_end( int index )
   
    if (memsize!=0) {
       /* check if there's enough memory left after loading the data set */
-      int min_mem = MAX( memsize/3, 3*MEGA );
+      PTRINT min_mem = MAX( memsize/3L, 3L*MEGA );
       if (i_mem_available(itx)<min_mem) {
          printf("Not enough memory left for graphics (only %d bytes free)\n",
                 i_mem_available(itx));
@@ -11431,23 +11735,38 @@ int vis5d_stereo_enabled( int index, int *enabled )
     return 0;
 }
 
-int vis5d_stereo_set( int index, int stereo)
+int vis5d_stereo_set( int index, int stereo, int setfakestereo)
 {
    DPY_CONTEXT("vis5d_stereo_off")
    set_current_window( dtx );
 
+   //   fprintf(stderr,"stereo_set: %d %d\n",stereo,setfakestereo); fflush(stderr);
+
+   // process fake stereo
+   if(setfakestereo){
+      dtx->FakeStereoEye = setfakestereo;
+   }
+   else dtx->FakeStereoEye = -1;
+
+
+   // process true stereo
+   if(stereo){
    if(!dtx->StereoEnabled){
       fprintf(stderr,"Stereo is unavailable.\n");
       return 1;
    }
-
-   if(stereo){
       dtx->StereoOn = 1;
+   }
+   else{
+      dtx->StereoOn = 0;
+   }
+
+   // turn on perspective mode
+   if(stereo || setfakestereo!=-1){
       dtx->OldGfxProjection =
 			 vis5d_graphics_mode(index,VIS5D_PERSPECTIVE,VIS5D_GET);
       vis5d_graphics_mode(index,VIS5D_PERSPECTIVE,VIS5D_ON);
    }else{
-      dtx->StereoOn = 0;
       vis5d_graphics_mode(index,VIS5D_PERSPECTIVE,dtx->OldGfxProjection);
    }
 
@@ -11456,12 +11775,16 @@ int vis5d_stereo_set( int index, int stereo)
    return 0;
 }
   
-int vis5d_stereo_get( int index, int *stereo )
+int vis5d_stereo_get( int index, int *stereo, int *getfakestereo )
 {
    DPY_CONTEXT("vis5d_stereo_get")
    set_current_window( dtx );
   
+   //   fprintf(stderr,"stereo_get\n"); fflush(stderr);
+  
    *stereo = dtx->StereoOn;
+   *getfakestereo = dtx->FakeStereoEye;
+
    
    return 0;
 }
@@ -11574,4 +11897,52 @@ int vis5d_get_vstride(int index, int *vstride)
 
   *vstride = dtx->VStride;
   return 0;
+}
+
+
+
+// TODO:
+// 1) Replace DefaultScreen with my version that chooses 0 as result
+void check_opendisplay(int which, Display **testdpy)
+{
+  char display_name[200];
+
+  if (! (*testdpy)) {
+     if(off_screen_rendering==0){
+       printf("Unable to open default display: which=%d\n",which);
+       printf("Must set EXPORT to reasonable thing even if using -offscreen -- Problem with vis5d+\n");
+       exit(1);
+     }
+     else{
+       ////////////////
+       // ALT DISPLAY ATTEMPT
+       // normal display might not exist (e.g. cluster with ssh -x), so try to use typical display
+       strcpy(display_name,":0");
+       //       strcpy(display_name,":0.0");
+       printf("Trying to revert to %s\n",display_name);
+       *testdpy = XOpenDisplay(display_name);
+       //
+       // Some clusters don't even have X running, then must use framebuffer display (or else would have to go through entire code and make headless)
+       // FRAMEBUFFER ATTEMPT
+       if (!(*testdpy) && strlen(framebuffername)>1) {
+	 printf("Even with off_screen_rendering==1, was unable to open default display: which=%d\n",which);
+	 printf("Reverting to known frame buffer display: %s\n",framebuffername);
+	 //
+	 //	 *testdpy = XOpenDisplay("ki-rh42.slac.stanford.edu:2");
+	 *testdpy = XOpenDisplay(framebuffername);
+       }
+       //
+       // FAILURE check
+       if (!(*testdpy)) {
+	 printf("Even with off_screen_rendering==1, was unable to open default display: which=%d\n",which);
+	 printf("Use -framebuffer to set framebuffer display if want headless (no X server to connect to) and then setup Xvfb -ac :2 (e.g.) on that server\n");
+	 // setup dummy display (for cluster purposes usually) -- not done!
+	 //(*testdpy) = (Display *)malloc(10000);
+	 very_off_screen_rendering=1;
+	 exit(1);
+       }
+     }
+   }
+
+
 }

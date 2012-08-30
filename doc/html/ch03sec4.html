@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>User Defined File Formats</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Putting Your Data Into Vis5D "
+HREF="ch03.html"><LINK
+REL="PREVIOUS"
+TITLE="Special Variables and Data Values"
+HREF="ch03sec3.html"><LINK
+REL="NEXT"
+TITLE="Getting Irregular Data into Vis5D"
+HREF="ch03sec5.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch03sec3.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Putting Your Data Into Vis5D</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch03sec5.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH03SEC4"
+>User Defined File Formats</A
+></H1
+><P
+>     This section is intended for experienced programmers.  In order
+to allow the reading of a different file format the functions in
+<TT
+CLASS="FILENAME"
+>/vis5d-5.2/src/user_data.c</TT
+> must be changed.  
+There are two functions in 
+<TT
+CLASS="FILENAME"
+>user_data.c</TT
+> which need to be changed, user_data_get_header and
+user_data_get_grid.  There is currently sample code in both of these
+functions to use as a template to create a new data file format.  The
+sample code reads the sample user data in 
+<TT
+CLASS="FILENAME"
+>/vis5d-5.2/user_data</TT
+>.</P
+><P
+>     A user can also define new topography and map file formats.  In order
+to read a new topography file format the function user_data_get_topo
+must be changed, and for a new map file format the function
+user_data_get_map must be changed.  Both of these functions are also
+found in <TT
+CLASS="FILENAME"
+>/vis5d-5.2/src/user_data.c</TT
+> 
+and they both have sample code.</P
+><P
+>     In order to invoke the reading of new file format for data,
+topography or map files the command line option 
+<TT
+CLASS="PARAMETER"
+><I
+>-userdata</I
+></TT
+> followed
+by a 'G'  (for grid data), 'M' (for map data) and/or 'T' (for
+topography data).  For example to use the sample code in 
+<TT
+CLASS="FILENAME"
+>user_data.c</TT
+>
+to read grid data and topography data, the following line would be
+used: </P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>vis5d user_data/ETA.dat -user_data GT -topo user_data/ETA_TOPO.dat</PRE
+></TD
+></TR
+></TABLE
+></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch03sec3.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch03sec5.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Special Variables and Data Values</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ch03.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Getting Irregular Data into Vis5D</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

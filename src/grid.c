@@ -419,10 +419,11 @@ void free_grid_cache( Context ctx )
  * Input:  maxbytes - maximum number of bytes to use for caching grids.
  * Return:  1 = ok, 0 = error (out of memory).
  */
-int init_grid_cache( Context ctx, int maxbytes, float *ratio )
+int init_grid_cache( Context ctx, PTRINT maxbytes, float *ratio )
 {
    int i, it, iv;
-   int maxnl, gridsize;
+   int maxnl;
+   PTRINT gridsize;
 
    free_grid_cache( ctx );
 
@@ -444,8 +445,8 @@ int init_grid_cache( Context ctx, int maxbytes, float *ratio )
          maxnl = ctx->Nl[iv];
       }
    }
-   gridsize = ctx->Nr * ctx->Nc * maxnl * ctx->CompressMode;
-   ctx->MaxCachedGrids = (int) (maxbytes / gridsize);
+   gridsize = (PTRINT)ctx->Nr * (PTRINT)ctx->Nc * (PTRINT)maxnl * (PTRINT)ctx->CompressMode;
+   ctx->MaxCachedGrids = ((PTRINT)maxbytes / (PTRINT)gridsize);
 
    if (ctx->MaxCachedGrids >= ctx->NumTimes*ctx->NumVars) {
       /* the whole file can be cached */
@@ -471,8 +472,9 @@ int init_grid_cache( Context ctx, int maxbytes, float *ratio )
    }
       
    /* Allocate the ctx->GridCache array */
-   ctx->GridCache = (struct cache_rec *) allocate( ctx, ctx->MaxCachedGrids
-                                                * sizeof(struct cache_rec) );
+   fprintf(stderr,"Allocate the ctx->GridCache array: %ld\n",(PTRINT)ctx->MaxCachedGrids
+           *(PTRINT)sizeof(struct cache_rec));
+   ctx->GridCache = (struct cache_rec *) allocate( ctx, (PTRINT)ctx->MaxCachedGrids * (PTRINT)sizeof(struct cache_rec) );
    if (!ctx->GridCache) {
       printf("Error: out of memory.  Couldn't allocate cache table.\n");
       return 0;
@@ -481,6 +483,7 @@ int init_grid_cache( Context ctx, int maxbytes, float *ratio )
 
    /* Initialize tables */
    for (i=0;i<ctx->MaxCachedGrids;i++) {
+      fprintf(stderr,"init tables: i=%d gridsize=%ld\n",i,gridsize);
       ctx->GridCache[i].Data = (void *) allocate( ctx, gridsize );
       if (!ctx->GridCache[i].Data) {
          printf("Error: out of memory.  Couldn't allocate cache space.\n");
@@ -822,13 +825,13 @@ void release_grid( Context ctx, int time, int var, float *data )
    assert( time>=0 && time<ctx->NumTimes );
    assert( var>=0 && var<ctx->NumVars );
 
-   deallocate( ctx, data, ctx->Nr*ctx->Nc*ctx->Nl[var]*sizeof(float) );
+   deallocate( ctx, data, (PTRINT)ctx->Nr*(PTRINT)ctx->Nc*(PTRINT)ctx->Nl[var]*(PTRINT)sizeof(float) );
 }
 
 
 void release_grid2( Context ctx, int time, int var, int nl, float *data )
 {
-   deallocate( ctx, data, ctx->Nr*ctx->Nc*nl*sizeof(float) );
+   deallocate( ctx, data, (PTRINT)ctx->Nr*(PTRINT)ctx->Nc*(PTRINT)nl*(PTRINT)sizeof(float) );
 }
 
 
@@ -1123,14 +1126,17 @@ int allocate_extfunc_variable( Context ctx, char name[] )
 {
    int newvar;
 
+ //  printf("start of allocate_extfunc_variableX\n");
+
    for (newvar=0;newvar<MAXVARS;newvar++) {
-      if (ctx->Variable[newvar]->VarType==0)
+	  if(ctx->Variable[newvar]==NULL)
          break;
    }
    if (newvar==MAXVARS) {
       /* no space for a new variable */
       return -1;
    }
+	ctx->Variable[newvar] = (vis5d_variable *) calloc(1,sizeof(vis5d_variable));
 
    ctx->Variable[newvar]->VarType = VIS5D_EXT_FUNC;
    ctx->Variable[newvar]->CloneTable = newvar;
@@ -1138,6 +1144,10 @@ int allocate_extfunc_variable( Context ctx, char name[] )
 
    strncpy( ctx->Variable[newvar]->VarName, name, 8 );
    min_max_init(ctx, newvar);
+
+
+
+ //  printf("end of allocate_new_variableX\n");
 
    return newvar;
 }
@@ -1187,7 +1197,8 @@ int allocate_computed_variable( Context ctx, const char *name )
  */
 int allocate_new_variable( Context ctx, const char *name, int nl, int lowlev )
 {
-   int newvar, time, gridsize, i;
+   int newvar, time, i;
+   PTRINT gridsize;
    float *griddata;
 
    for (newvar=0;newvar<MAXVARS;newvar++) {
@@ -1208,7 +1219,7 @@ int allocate_new_variable( Context ctx, const char *name, int nl, int lowlev )
    strncpy( ctx->Variable[newvar]->VarName, name, 8 );
    min_max_init(ctx, newvar);
 
-   gridsize = ctx->Nr * ctx->Nc * nl * 4;
+   gridsize = (PTRINT)ctx->Nr * (PTRINT)ctx->Nc * (PTRINT)nl * 4L;
    griddata = (float *) allocate ( ctx, gridsize );
    for (i=0; i<gridsize; i++) griddata[i] = MISSING;
    for (time=0; time<ctx->NumTimes; time++) {
@@ -1260,7 +1271,8 @@ int install_new_grid( Context ctx, int time, int var,
    ctx->Variable[var]->LowLev = lowlev;
 
    if (!ctx->GridTable[time][var].Data) {
-      int bytes = ctx->Nr * ctx->Nc * nl * ctx->CompressMode;
+      PTRINT bytes = (PTRINT)ctx->Nr * (PTRINT)ctx->Nc * (PTRINT)nl * (PTRINT)ctx->CompressMode;
+      fprintf(stderr,"install new grid: bytes=%ld\n",bytes);
       ctx->GridTable[time][var].Data = (void *) allocate( ctx, bytes );
       if (ctx->Ga[time][var]){
          deallocate( ctx, ctx->Ga[time][var], -1);

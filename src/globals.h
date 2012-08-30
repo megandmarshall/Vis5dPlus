@@ -50,6 +50,10 @@
 #  define NULL 0
 #endif
 
+// JCM 8/28/12
+// define memory size so can go beyond 4GB barrier
+//#define PTRINT int
+#define PTRINT long int
 
 /*** Data types ***/
 #if SIZEOF_SIGNED_CHAR == 1
@@ -64,6 +68,16 @@ typedef unsigned char  uint_1;    /* 1-byte unsigned integer */
 typedef short int      int_2;     /* 2-byte signed integer */
 typedef unsigned short uint_2;    /* 2-byte unsigned integer */
 typedef unsigned int   uint_4;    /* 4-byte unsigned integer */
+// JCM: use integers instead of shorts so can have more vertices
+#if(USEVERTINT)
+typedef int            int_vert2;     /* 2-byte signed integer */
+typedef unsigned int   uint_vert2;    /* 2-byte unsigned integer */
+typedef unsigned int   uint_vert4;    /* 4-byte unsigned integer */
+#else
+typedef short int        int_vert2;     /* 2-byte signed integer */
+typedef unsigned short   uint_vert2;    /* 2-byte unsigned integer */
+typedef unsigned int     uint_vert4;    /* 4-byte unsigned integer */
+#endif
 
   /* V5D_MAXSTRLEN is also defined in api.h */
 #ifndef V5D_MAXSTRLEN
@@ -85,7 +99,8 @@ typedef enum
 } plottypes;
 
 
-#define MAXTRAJ 10000    /* May be increased */
+//  maximum *number* of trajectories
+#define MAXTRAJ 150000    /* May be increased */
 
 #define MAX_THREADS 8
 
@@ -99,7 +114,7 @@ typedef enum
 
 
 /* size of index values */
-#ifdef BIG_GFX
+#if(USEVERTINT)// BIG_GFX // JCM 1||
 typedef uint_4 uint_index ;
 #else
 typedef uint_2 uint_index ;
@@ -114,7 +129,7 @@ struct isosurface {
    int     valid;       /* valid/initialized surface flag */
    float   isolevel;    /* the isolevel of the surface */
 
-   int_2   *verts;      /* array [numverts][3] of vertices */
+   int_vert2   *verts;      /* array [numverts][3] of vertices */
    int_1   *norms;      /* array [numverts][3] of normals */
    int     numindex;    /* number of indexes */
    uint_index  *index;      /* array of indices into verts, norms arrays */
@@ -130,7 +145,7 @@ struct isosurface {
   **   Decimated version of isosurface
   */
   int		deci_numverts;    /* number of vertices */
-  int_2	*deci_verts;      /* array [numverts][3] of vertices */
+  int_vert2	*deci_verts;      /* array [numverts][3] of vertices */
   int_1	*deci_norms;      /* array [numverts][3] of normals */
   uint_1	*deci_colors;     /* array [numverts] of color table indexes */
 
@@ -237,7 +252,7 @@ struct textplot {
    int    lock;
    int    valid;
    int    numverts;
-   int_2  *verts;
+   int_vert2  *verts;
    float  size;
    float  spacing;
    float  fontx;
@@ -271,11 +286,11 @@ struct hslice {
   float  highlimit;         /* highest level to contour */
   float  level;             /* position of slice in grid levels */
   int    num1;              /* number of line segment vertices */
-  int_2  *verts1;           /* array [num1][3] of int_2 vertices */
+  int_vert2  *verts1;           /* array [num1][3] of int_vert2 vertices */
   int    num2;              /* number of 'hidden' line segment vertices */
-  int_2  *verts2;           /* array [num2][3] of int_2 vertices */
+  int_vert2  *verts2;           /* array [num2][3] of int_vert2 vertices */
   int    num3;              /* number of label line segment vertices */
-  int_2  *verts3;           /* array [num3][3] of int_2 vertices */
+  int_vert2  *verts3;           /* array [num3][3] of int_vert2 vertices */
   float  *boxverts;         /* array of vertices for bounding rectangle */
   int    numboxverts;       /* number of vertices in boxverts array */
 #ifdef USE_SYSTEM_FONTS
@@ -331,11 +346,11 @@ struct vslice {
    float  r2, c2;            /* 2nd corner position in [0,Nr-1],[0,Nc-1] */
 
    int    num1;              /* number of line segment vertices */
-   int_2  *verts1;           /* array [num1][3] of int_2 vertices */
+   int_vert2  *verts1;           /* array [num1][3] of int_vert2 vertices */
    int    num2;              /* number of 'hidden' line segment vertices */
-   int_2  *verts2;           /* array [num2][3] of int_2 vertices */
+   int_vert2  *verts2;           /* array [num2][3] of int_vert2 vertices */
    int    num3;              /* number of label line segment vertices */
-   int_2  *verts3;           /* array [num3][3] of int_2 vertices */
+   int_vert2  *verts3;           /* array [num3][3] of int_vert2 vertices */
    float  *boxverts;         /* array of vertices for bounding rectangle */
    int    numboxverts;       /* number of vertices in boxverts array */
 #ifdef USE_SYSTEM_FONTS
@@ -354,7 +369,7 @@ struct chslice {
   float   level;           /* position of slice in grid levels */
 
   int     rows, columns;   /* size of quadmesh */
-  int_2   *verts;          /* array [rows*columns][3] of int_2 vertices */
+  int_vert2   *verts;          /* array [rows*columns][3] of int_vert2 vertices */
   uint_1  *color_indexes;  /* quadmesh vertex color indexes */
 
 };
@@ -368,7 +383,7 @@ struct cvslice {
    float   r2, c2;            /* 2nd corner position in [0,Nr-1],[0,Nc-1] */
    float   mark[2][3];        /* tiny marker at midpoint of top edge */
    int     rows, columns;     /* size of quadmesh */
-   int_2   *verts;            /* array [rows*columns][3] of int_2 vertices */
+   int_vert2   *verts;            /* array [rows*columns][3] of int_vert2 vertices */
    uint_1  *color_indexes;    /* quadmesh vertex color indexes */
 
 };
@@ -405,7 +420,7 @@ struct hwind {
    float  density;       /* relative density of vectors (1.0 is nominal) */
    float  scale;         /* vector length scale factor (1.0 is nominal) */
    int    nvectors;      /* number of vectors */
-   int_2  *verts;        /* array [nvectors*4][3] of int_2 vertices */
+   int_vert2  *verts;        /* array [nvectors*4][3] of int_vert2 vertices */
    float  *boxverts;     /* pointer to array of vertices for bounding box */
    int    numboxverts;   /* number of vertices in boxverts array */
 };
@@ -424,7 +439,7 @@ struct vwind {
    float  density;       /* relative density of vectors (1.0 is nominal) */
    float  scale;         /* vector length scale factor (1.0 is nominal) */
    int    nvectors;      /* number of vectors */
-   int_2  *verts;        /* array [nvectors*4][3] of int_2 vertices */
+   int_vert2  *verts;        /* array [nvectors*4][3] of int_vert2 vertices */
    float  *boxverts;     /* pointer to array of vertices for bounding box */
    int    numboxverts;   /* number of vertices in boxverts array */
 };
@@ -440,7 +455,7 @@ struct hstream {
    float  level;         /* position of slice in grid levels */
    float  density;       /* relative density of vectors (1.0 is nominal) */
    int    nlines;        /* number of line segment vertices */
-   int_2  *verts;        /* array [nlines][3] of int_2 vertices */
+   int_vert2  *verts;        /* array [nlines][3] of int_vert2 vertices */
    float  *boxverts;     /* pointer to array of vertices for bounding box */
    int    numboxverts;   /* number of vertices in boxverts array */
 };
@@ -457,13 +472,17 @@ struct vstream {
    float  r1,c1,r2,c2;       /* position in [0,Nr-1],[0,Nc-1] */
    float  density;       /* relative density of vectors (1.0 is nominal) */
    int    nlines;        /* number of line segment vertices */
-   int_2  *verts;        /* array [nlines][3] of int_2 vertices */
+   int_vert2  *verts;        /* array [nlines][3] of int_vert2 vertices */
    float  *boxverts;     /* pointer to array of vertices for bounding box */
    int    numboxverts;   /* number of vertices in boxverts array */
 };
 
 
+#define BADSTART 0xffff
+#define VERTINTTYPE int // was int_2
+
 /* Info about a wind trajectory */
+// JCM: Allowed verts to be int and start,len to be uint_4
 struct traj {
    int     lock;
    float   row, col, lev;  /* initial position of trajectory */
@@ -471,13 +490,13 @@ struct traj {
    float   stepmult;       /* user's integration step multiplier */
    float   lengthmult;     /* user's traj length multiplier */
    int     length;         /* total number of vertices */
-   int_2   *verts;         /* array [length][3] of int_2 vertices */
-   int_1   *norms;         /* array [length][3] of int_2 normals */
+   int_vert2   *verts;         /* array [length][3] of int_vert2 vertices */
+   int_1   *norms;         /* array [length][3] of int_vert2 normals */
    uint_1  *colors;        /* array [length] of color table indexes */
    int     colorvar;       /* which variable is coloring the traj, or -1 */
    int     colorvarowner;  /* index of the vis5d_ctx the colorvar belongs too */
-   uint_2  *start;         /* array [NumTimes] 1st vertex for each timestep */
-   uint_2  *len;           /* array [NumTimes] of lengths for each time step */
+   uint_vert2  *start;         /* array [NumTimes] 1st vertex for each timestep */
+   uint_vert2  *len;           /* array [NumTimes] of lengths for each time step */
    int     group;          /* trajectory group */
    int     kind;           /* type of trajectory:  0 = line, 1 = ribbon */
    int     ctx_owner;      /* ctx->index of the owner of these traj's */
@@ -576,7 +595,7 @@ struct Topo{
   int DisplayTopo;      /* display topography? */
   int DisplayTopoBase;    /* display a base under topography */  
   float TopoBaseLev;           /* level value of the topo base */
-  int_2 *TopoStripsVerts;      /* Topo triangle strip vertices */
+  int_vert2 *TopoStripsVerts;      /* Topo triangle strip vertices */
   int_1 *TopoStripsNorms;      /* Topo triangle strip normals */
 
   /*** Topography File Data (use from topo.c only) ***/
@@ -604,9 +623,9 @@ struct Topo{
 };
 
 struct ColorTable{
-   unsigned int Colors[MAXVARS*VIS5D_MAX_CONTEXTS+1][256];
+   unsigned int Colors[MAXVARS*VIS5D_MAX_CONTEXTS+1][NUMCOLORSINTABLE];
    /*** colorbar parameters for sine, cosine curves ***/
-   float Params[MAXVARS*VIS5D_MAX_CONTEXTS+1][10];
+   float Params[MAXVARS*VIS5D_MAX_CONTEXTS+1][NUMCOLORTABLEPARAMS];
 };  
 
 #ifdef HAVE_OPENGL
@@ -1051,6 +1070,7 @@ struct display_context {
 
    int		StereoEnabled;		/* Stereo mode enabled		*/
    int		StereoOn;		/* Actually display stereo	*/
+   int          FakeStereoEye; // whether doing fake stereo and what eye if so
    int		OldGfxProjection;       /* 0 = parallel, 1 = perspective */
 
 };
@@ -1144,7 +1164,7 @@ struct irregular_context {
    char ItxName[100];      /* Name of file we're vizing */
    char Path[V5D_MAXSTRLEN];          /* Directory path to topo, map files */
    char DataFile[V5D_MAXSTRLEN];      /* Name of file we're vizing */
-   int MegaBytes;            /* Memory limit in megabytes */
+   PTRINT MegaBytes;            /* Memory limit in megabytes */
 
    int Type;
 
@@ -1169,8 +1189,8 @@ struct irregular_context {
    void *mempool;
    struct mem *head, *tail;
    struct mem *guess;
-   int memory_limit;
-   int memory_used;
+   PTRINT memory_limit;
+   PTRINT memory_used;
    LOCK memlock;
    LOCK lrulock;
 
@@ -1217,7 +1237,7 @@ struct vis5d_context {
    int context_index;        /* index of this context */
    char DataFile[V5D_MAXSTRLEN];      /* Name of file we're vizing */
    char Path[V5D_MAXSTRLEN];          /* Directory path to topo, map files */
-   int MegaBytes;            /* Memory limit in megabytes */
+   PTRINT MegaBytes;            /* Memory limit in megabytes */
    int InsideInit;           /* Are we between init_begin & init_end? */
    char ContextName[100];     /* name of the context */
    int GridSameAsGridPRIME;    /* 1 grid=gridPRIME    0 grid != gridPRIME */
@@ -1255,8 +1275,9 @@ struct vis5d_context {
    float IsoLevel[MAXVARS];              /* in [MinVal..MaxVal] */
 
 
-
-   struct volume *Volume;                /* The volume graphics stuff */
+  // JCM
+   struct volume *Volume[MAXVOLUMEVARS];                /* The volume graphics stuff */
+  int DisplayVolume[MAXVARS]; // always MAXVARS not MAXVOLUMEVARS
 
    int IsoColorVar[MAXVARS];
    int IsoColorVarOwner[MAXVARS];        /* which vis5d_ctx the colorvar belongs to */
@@ -1327,11 +1348,11 @@ struct vis5d_context {
    void *mempool;
    struct mem *head, *tail;
    struct mem *guess;
-   int memory_limit;
-   int memory_used;
+   PTRINT memory_limit;
+   PTRINT memory_used;
    LOCK memlock;
    LOCK lrulock;
-   int meminited;
+   PTRINT meminited;
 
 #ifdef HAVE_OPENGL
    GLdouble ModelMat[16], ProjMat[16];  /* ModelView and Projection matrices */
@@ -1377,7 +1398,7 @@ struct vis5d_context {
    LOCK Mutex;        /* Mutual exclusion lock for grid/cache access */
    /* array of cache_rec structs is used to manage the contents of the cache */
    struct cache_rec *GridCache;     /* Dynamically allocated array */
-   int MaxCachedGrids;              /* No. positionss in GridCache array */
+   PTRINT MaxCachedGrids;              /* No. positionss in GridCache array */
    int NumCachedGrids;              /* Number of positions in use */
    int CacheClock;                  /* To implement LRU replacement */
    /* An array of grid_rec structs is used to determine if (and where)

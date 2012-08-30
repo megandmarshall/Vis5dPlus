@@ -491,6 +491,7 @@ void init_irregular_var_colortable( GuiContext gtx, int varowner, int var )
    /* Textplots */
    vis5d_get_color_table_params( index, VIS5D_TEXTPLOT, varowner, var, &p);
    vis5d_get_color_table_address( index, VIS5D_TEXTPLOT, varowner, var, &table );
+   vis5d_other_table_init_params( index, VIS5D_TEXTPLOT, varowner, var, p);
    vis5d_color_table_init_params( p, 1, 1 );
    vis5d_color_table_set_alpha( p, -2 );
    vis5d_color_table_set_alpha( p, 255 );
@@ -509,6 +510,7 @@ static void init_var_colortable( GuiContext gtx, int varowner, int var )
    /* Isosurfaces */
    vis5d_get_color_table_params( index, VIS5D_ISOSURF, varowner, var, &p);
    vis5d_get_color_table_address( index, VIS5D_ISOSURF, varowner, var, &table );
+   vis5d_other_table_init_params( index, VIS5D_ISOSURF, varowner, var, p);
    vis5d_color_table_init_params( p, 1, 1 );
    vis5d_color_table_set_alpha( p, 255 );
    vis5d_color_table_recompute( table, 256, p, 1, 1 );
@@ -516,6 +518,7 @@ static void init_var_colortable( GuiContext gtx, int varowner, int var )
    /* CHSlices */
    vis5d_get_color_table_params( index, VIS5D_CHSLICE, varowner, var, &p);
    vis5d_get_color_table_address( index, VIS5D_CHSLICE, varowner, var, &table );
+   vis5d_other_table_init_params( index, VIS5D_CHSLICE, varowner, var, p);
    vis5d_color_table_init_params( p, 1, 1 );
    vis5d_color_table_set_alpha( p, -2 );
 /* MJK 2.8.99
@@ -526,6 +529,7 @@ static void init_var_colortable( GuiContext gtx, int varowner, int var )
    /* CVSlices */
    vis5d_get_color_table_params( index, VIS5D_CVSLICE, varowner, var, &p);
    vis5d_get_color_table_address( index, VIS5D_CVSLICE, varowner, var, &table );
+   vis5d_other_table_init_params( index, VIS5D_CVSLICE, varowner, var, p);
    vis5d_color_table_init_params( p, 1, 1 );
    vis5d_color_table_set_alpha( p, -2 );
 /* MJK 2.8.99
@@ -536,6 +540,7 @@ static void init_var_colortable( GuiContext gtx, int varowner, int var )
    /* Volumes */
    vis5d_get_color_table_params( index, VIS5D_VOLUME, varowner, var, &p);
    vis5d_get_color_table_address( index, VIS5D_VOLUME, varowner, var, &table );
+   vis5d_other_table_init_params( index, VIS5D_VOLUME, varowner, var, p);
    vis5d_color_table_init_params( p, 1, 1 );
    vis5d_color_table_set_alpha( p, -1 );
    vis5d_color_table_recompute( table, 256, p, 1, 1 );
@@ -543,6 +548,7 @@ static void init_var_colortable( GuiContext gtx, int varowner, int var )
    /* Trajectories */
    vis5d_get_color_table_params( index, VIS5D_TRAJ, varowner, var, &p);
    vis5d_get_color_table_address( index, VIS5D_TRAJ, varowner, var, &table );
+   vis5d_other_table_init_params( index, VIS5D_TRAJ, varowner, var, p);
    vis5d_color_table_init_params( p, 1, 1 );
    vis5d_color_table_set_alpha( p, 255 );
    vis5d_color_table_recompute( table, 256, p, 1, 1 );
@@ -550,6 +556,7 @@ static void init_var_colortable( GuiContext gtx, int varowner, int var )
    /* Topography */
    vis5d_get_color_table_params( index, VIS5D_TOPO, varowner, var, &p);
    vis5d_get_color_table_address( index, VIS5D_TOPO, varowner, var, &table );
+   vis5d_other_table_init_params( index, VIS5D_TOPO, varowner, var, p);
    vis5d_color_table_init_params( p, 1, 1 );
    vis5d_color_table_set_alpha( p, 255 );
    vis5d_color_table_recompute( table, 256, p, 1, 1 );
@@ -589,6 +596,7 @@ void init_colortables( int index )
       spandex = whichones[0];
       vis5d_get_color_table_params( index, VIS5D_TOPO, whichones[0], -1, &p);
       vis5d_get_color_table_address( index, VIS5D_TOPO, whichones[0], -1, &table );
+      vis5d_other_table_init_params( index, VIS5D_TOPO, whichones[0], -1, p);
       vis5d_color_table_init_params( p, 1, 1 );
       vis5d_color_table_set_alpha( p, 255 );
       vis5d_color_table_recompute( table, 256, p, 1, 1 );
@@ -986,7 +994,9 @@ void enable_gui_button_windows( int vindex, int dindex, int type, int num, int m
             cb_graphic[dindex]= VIS5D_VOLUME;
          }
          else{
-            if (gtx->CurrentVolume == num &&
+	   // JCM
+	   //            if (gtx->CurrentVolume == num &&
+	   if(vis5d_is_check_volume(dindex, gtx->CurrentVolumeOwner, gtx->CurrentVolume, num) &&
                 gtx->CurrentVolumeOwner == vindex){
                gtx->CurrentVolume = -1;
                gtx->CurrentVolumeOwner = -1;
@@ -1145,10 +1155,13 @@ void enable_and_make_gui_button_graphics( int vindex, int dindex, int type, int 
          }
       }
       else if (type == VIS5D_VOLUME){
-         int cvo, cv;
+	// JCMCOMMENT: Here appears need to be modified for multiple volumes
+	int cvo, cv,isvolume;
          vis5d_get_volume(dindex,  &cvo, &cv);
+	isvolume=vis5d_is_check_volume(dindex,cvo,cv,num);
          if (mode != 0){
-            if ((cvo != vindex || cv != num) && cvo != -1){
+	   //            if ((cvo != vindex || cv != num) && cvo != -1){
+	   if ((cvo != vindex || !isvolume ) && cvo != -1){
                vis5d_enable_graphics(cvo, VIS5D_VOLUME,
                                      cv, VIS5D_OFF);
             }
@@ -1159,7 +1172,8 @@ void enable_and_make_gui_button_graphics( int vindex, int dindex, int type, int 
             vis5d_set_volume( dindex, vindex, num);
          }
          else{
-            if (cv == num &&
+	   //            if (cv == num &&
+            if (isvolume &&
                 cvo == vindex){
                vis5d_set_volume( dindex, -1, -1);
             }
@@ -1245,19 +1259,29 @@ void map_all_windows( int onlyrecolor )
             height =  winatts.height-(bottom_margin*DisplayRows)-
                                      (top_margin*DisplayRows);
             if (DisplayRows == 1 && DisplayCols == 1){
+             /* ERM 08.06.2003   
                wstep = width-8;
-               hstep = height-8;
+                 hstep = height-8; */
+               wstep = width-0;
+               hstep = height-0;
             }
             else{
                wstep = ((width-4) -(DisplayCols*8)) / DisplayCols;
                hstep = ((height-4) -(DisplayRows*8))/ DisplayRows;
             }
+           /* ERM 8.06.2003 
             if (!StaticWin){
                wstep = wstep > hstep ? hstep : wstep;
                hstep = hstep > wstep ? wstep : hstep;
+             } */
+               if (StaticWin){
+                width = StaticWinWidth;
+                height = StaticWinHeight;
             }
+
             if (DisplayRows == 1 && DisplayCols == 1){
-               set_display_border_color(0, 0, 0, 0 );
+       /*        set_display_border_color(0, 0, 0, 0 );  */
+               set_display_border_color(0, 180, 180, 180 );
             }
             else if (gtx->group_index >= 1){
                switch(gtx->group_index){
@@ -1299,13 +1323,30 @@ void map_all_windows( int onlyrecolor )
             }
             if (onlyrecolor == 0){
                vis5d_map_3d_window( gtx->context_index );
-               vis5d_moveresize_3d_window( gtx->context_index,
+        /*       vis5d_moveresize_3d_window( gtx->context_index,
                              x * 8 + 4 + x * wstep + (left_margin*(x+1)) +
                                                      (right_margin*x),
                           y * 8 + 4 + y * hstep + (top_margin*(y+1)) +
                                                    (bottom_margin*y),
+                            wstep, hstep);  */
+         
+               if (DisplayRows == 1 && DisplayCols == 1){ 
+                          vis5d_moveresize_3d_window( gtx->context_index,
+                             x * 8 - 1 + x * wstep + (left_margin*(x+1)) +
+                                                      (right_margin*x),
+                           y * 8 - 1 + y * hstep + (top_margin*(y+1)) +
+                                                    (bottom_margin*y),
                            wstep, hstep);
                vis5d_invalidate_dtx_frames(gtx->context_index);
+            }
+               else {
+                vis5d_moveresize_3d_window( gtx->context_index,
+                              x * 8 + 4 + x * wstep + (left_margin*(x+1)) +
+                                                      (right_margin*x),
+                           y * 8 + 4 + y * hstep + (top_margin*(y+1)) +
+                                                    (bottom_margin*y),
+                            wstep, hstep); 
+               }
             }
             yo++;
          }
@@ -1314,7 +1355,8 @@ void map_all_windows( int onlyrecolor )
    wstep = wstep + right_margin + left_margin; 
    hstep = hstep + bottom_margin + top_margin; 
    if (DisplayRows == 1 && DisplayCols == 1){
-      vis5d_resize_BIG_window((wstep+8)*DisplayCols, (hstep+8)*DisplayRows);
+    /* ERM  vis5d_resize_BIG_window((wstep+8)*DisplayCols, (hstep+8)*DisplayRows); */
+      vis5d_resize_BIG_window((wstep+0)*DisplayCols, (hstep+0)*DisplayRows);
    }
    else if (DisplayRows != 0 && DisplayCols != 0){
       vis5d_resize_BIG_window((wstep+8)*DisplayCols+4, (hstep+8)*DisplayRows+4);
@@ -1569,9 +1611,16 @@ static int do_clone_cb( LUI_NEWBUTTON *b, int state )
     int func = -(b->index+1);
     if (FuncType[index][func]==VIS5D_EXT_FUNC) {
       char funcname[1000];
+
+      /*
       if (gtx->funcpath[0]) {
          strcpy( funcname, gtx->funcpath );
       }
+      */
+
+      if (Vis5dFuncPath[0]){
+	strcpy( funcname, Vis5dFuncPath );
+      } 
       else {
          strcpy( funcname, FUNCTION_PATH );
       }
@@ -2109,6 +2158,8 @@ static int tp_colorbar_callback( LUI_COLORBAR *cb, int action )
                                      iindex, var, &ctable);
       vis5d_get_color_table_params( dindex, VIS5D_TEXTPLOT,
                                     iindex, var, &p);
+      vis5d_other_table_init_params( index, VIS5D_TEXTPLOT, iindex, var, p);
+
       if (action==LUI_RGB_RESET) {
          vis5d_color_table_init_params( p, 1, 0 );
          vis5d_color_table_recompute( ctable, 256, p, 1, 0 );
@@ -3246,7 +3297,8 @@ void turn_off_everything( int index )
          XUnmapWindow( GuiDpy, gtx->SoundCtrlWindow );
       }
       LUI_ButtonState( gtx->normalBUTTON, 1 );
-      if (gtx->total_ctx_numtimes>1) {
+      // JCM: if TRACEAS, then trace is for each time
+      if (gtx->total_ctx_numtimes>1 || TRACEVERSION==TRACEAS) {
          LUI_ButtonState( gtx->trajectoryBUTTON, 0);
       }
       gtx->cur_isosurf = gtx->cur_isosurfvindex = -1;
@@ -3423,7 +3475,9 @@ void update_button_states( int index, int double_check )
                                &r, &g, &b, &a );
                LUI_ButtonMatrixSetColor( gtx->ButtonMatrix, i, what, r, g, b );
                if (vis5d_enable_graphics( ctxindex, what, ctxrow, VIS5D_GET ) && (j != 5 ||
-                   (j==5 && ctxindex==volo && ctxrow==volvar))){
+										  // JCM:
+	      //                   (j==5 && ctxindex==volo && ctxrow==volvar))){
+										  (j==5 && ctxindex==volo && vis5d_is_check_volume(index, volo, volvar, ctxrow) ))){
                   
                   LUI_ButtonMatrixSetState( gtx->ButtonMatrix, i, j, 1 );
                   if (double_check){
@@ -3629,8 +3683,8 @@ void show_widgets( int index )
    gtx->legendsBUTTON->state = vis5d_graphics_mode(index, VIS5D_LEGENDS, VIS5D_GET);
 
 	if(gtx->stereoBUTTON){
-	  int value;
-	  vis5d_stereo_get(index,&value);
+	  int value,value2;
+	  vis5d_stereo_get(index,&value,&value2);
 	  gtx->stereoBUTTON->state = value;
 	}
 
@@ -3792,16 +3846,17 @@ static void reset_widgets( int index )
    if (gtx->cur_hwind>=0 || gtx->cur_vwind>=0 ||
        gtx->cur_hstream>=0 || gtx->cur_vstream>=0) {
       XUnmapWindow( GuiDpy, gtx->WindWindow );
+      // JCM 01/23/2008: removed else's
       if (gtx->cur_hwind>=0) {
         map_hwind_window( index, gtx->cur_hwind );
       }
-      else if (gtx->cur_vwind>=0) {
+      if (gtx->cur_vwind>=0) {
         map_vwind_window( index, gtx->cur_vwind );
       }
-      else if (gtx->cur_hstream>=0) {
+      if (gtx->cur_hstream>=0) {
         map_hstream_window( index, gtx->cur_hstream );
       }
-      else {
+      if (gtx->cur_vstream>=0) {
         map_vstream_window( index, gtx->cur_vstream );
       }
    }
@@ -5198,9 +5253,9 @@ static int proj_cb( LUI_NEWBUTTON *pb )
    GuiContext gtx = get_gui_gtx(index);
 
    /* projection should be perspective for STEREO */
-   int	value;
+   int	value,value2;
 
-   vis5d_stereo_get(pb->context_index,&value);
+   vis5d_stereo_get(pb->context_index,&value,&value2);
    if(value){
 	  LUI_ButtonSetState(gtx->perspec_button, value);
 	  return 0;
@@ -6081,34 +6136,48 @@ static int button_matrix_cb( LUI_BUTTON_MATRIX *bm, int row, int col,
             /** Volume **/
             /** Volume **/
             vis5d_get_volume(dindex,  &CVO, &CV);
-            if (vrow==CV && vindex == CVO &&
-                CV != -1) {
+	    //	    if (vrow==CV && vindex == CVO && CV != -1) {
+	    if (vis5d_is_volume(dindex, vrow) && vindex == CVO && CV != -1) {
                /* turn off the volume */
+	       // JCM:
+	       vis5d_remove_volume(vindex, vindex, vrow);
+
                LUI_ButtonMatrixSetState( gtx->ButtonMatrix, row, 5, 0 );
                if (cb_graphic[cb_dindex]==VIS5D_VOLUME && cb_var[cb_dindex]==vrow) {
                   hide_colorbar_window( dindex );
                }
                update_linked_buttons(CVO, dindex,
-                                     VIS5D_VOLUME, CV, 0);
-               gtx->CurrentVolume = -1;
-               gtx->CurrentVolumeOwner = -1;
+                                     VIS5D_VOLUME, vrow, 0);
+	       vis5d_resetcurrent_volume(vindex, &(gtx->CurrentVolumeOwner),&(gtx->CurrentVolume));
+
+	       // see if another volume still active (Actually, general "bug" that doesn't show extra panels)
+	       // below use of "row" not correct -- need old row
+	       //	       if(gtx->CurrentVolume!=-1){
+	       //		 update_linked_buttons(vindex, dindex, VIS5D_VOLUME, gtx->CurrentVolume , 1);
+	       //		 show_colorbar_window( dindex, vindex, VIS5D_VOLUME, row );
+	       //		 LUI_ButtonMatrixSetState( gtx->ButtonMatrix, row, 5, 1 );
+	       //	       }
+	       //	       fprintf(stderr,"post reset\n"); fflush(stderr);
             }
             else {
+	   // JCMCOMMENT: Here appears need to be modified for multiple volumes
+#if(MULTIVOLUMERENDER==0)
                /* turn on a different volume */
                if (CV>=0) {
                   int cv;
                   /* turn off previous volume button */
                   cv = get_button_gtx_index(dindex, CVO, CV);
                   LUI_ButtonMatrixSetState( gtx->ButtonMatrix, cv, 5, 0 );
-                  update_linked_buttons(CVO, dindex, VIS5D_VOLUME,
-                                        CV , 0);
+                  update_linked_buttons(CVO, dindex, VIS5D_VOLUME, CV , 0);
                }
+#endif
                gtx->CurrentVolume = vrow;
                gtx->CurrentVolumeOwner = vindex;
-               update_linked_buttons(vindex, dindex, VIS5D_VOLUME, 
-                                        vrow , 1);
+               update_linked_buttons(vindex, dindex, VIS5D_VOLUME, vrow , 1);
                show_colorbar_window( dindex, vindex, VIS5D_VOLUME, row );
                LUI_ButtonMatrixSetState( gtx->ButtonMatrix, row, 5, 1 );
+	       // JCM:
+	       vis5d_add_volume(vindex, vindex, vrow);
             }
             vis5d_set_volume(dindex, gtx->CurrentVolumeOwner, gtx->CurrentVolume);
             break;
@@ -6569,7 +6638,8 @@ static int windscale_cb( LUI_FIELD *field, char *text )
          }
       }
    }
-   else if (gtx->cur_vwind>=0) {
+   // JCM 01/23/2008: removed else
+   if (gtx->cur_vwind>=0) {
       if (gtx->group_index > 0){
          vis5d_get_num_of_dtxs_in_group( gtx->group_index, &dhowmany, dwhichones);
          for (dyo = 0; dyo < dhowmany; dyo++){
@@ -6607,7 +6677,8 @@ static int windscale_cb( LUI_FIELD *field, char *text )
          }
       }
    }
-   else if (gtx->cur_hstream>=0) {
+   // JCM 01/23/2008: removed else
+   if (gtx->cur_hstream>=0) {
       f = 1.0;
       LUI_FieldSetDouble( field, f );
    }
@@ -6682,7 +6753,8 @@ static int winddensity_cb( LUI_FIELD *field )
          }
       }
    }
-   else if ((field == gtx->winddensity_field) && (gtx->cur_vwind >= 0)) {
+   // JCM 01/23/2008: removed else
+   if ((field == gtx->winddensity_field) && (gtx->cur_vwind >= 0)) {
       if (gtx->group_index > 0){
          vis5d_get_num_of_dtxs_in_group( gtx->group_index, &dhowmany, dwhichones);
          for (dyo = 0; dyo < dhowmany; dyo++){
@@ -6727,15 +6799,16 @@ static int winddensity_cb( LUI_FIELD *field )
          }
       }
    }
-   else if ((field == gtx->hwinddensity_field) && (gtx->cur_hstream >= 0)) {
+   // JCM 01/23/2008: removed else
+   if ((field == gtx->hwinddensity_field) && (gtx->cur_hstream >= 0)) {
       if (gtx->group_index > 0){
          vis5d_get_num_of_dtxs_in_group( gtx->group_index, &dhowmany, dwhichones);
          for (dyo = 0; dyo < dhowmany; dyo++){
             gtx = gtx_table[dwhichones[dyo]];
             if (gtx->cur_hstream>=0) {
-               if (d < 0.5 || d > 2.0) {
-                  if (d < 0.5) d = 0.5;
-                  if (d > 2.0) d = 2.0;
+               if (d < MINWINDDENSITY || d > MAXWINDDENSITY) {
+                  if (d < MINWINDDENSITY) d = MINWINDDENSITY;
+                  if (d > MAXWINDDENSITY) d = MAXWINDDENSITY;
                   LUI_FieldSetDouble( field, d );
                }
                vis5d_get_hstreamslice(dwhichones[dyo], gtx->cur_hstream,
@@ -6756,9 +6829,9 @@ static int winddensity_cb( LUI_FIELD *field )
          }
       }
       else{
-         if (d < 0.5 || d > 2.0) {
-            if (d < 0.5) d = 0.5;
-            if (d > 2.0) d = 2.0;
+         if (d < MINSTREAMDENSITY || d > MAXSTREAMDENSITY) {
+            if (d < MINSTREAMDENSITY) d = MINSTREAMDENSITY;
+            if (d > MAXSTREAMDENSITY) d = MAXSTREAMDENSITY;
             LUI_FieldSetDouble( field, d );
          }
          vis5d_get_hstreamslice(index, gtx->cur_hstream, &HStreamDensity, &HStreamLevel);
@@ -6772,15 +6845,16 @@ static int winddensity_cb( LUI_FIELD *field )
          }
       }
    }
-   else if ((field == gtx->winddensity_field) && (gtx->cur_vstream >= 0)) {
+   // JCM 01/23/2008: removed else
+   if ((field == gtx->winddensity_field) && (gtx->cur_vstream >= 0)) {
       if (gtx->group_index > 0){
          vis5d_get_num_of_dtxs_in_group( gtx->group_index, &dhowmany, dwhichones);
          for (dyo = 0; dyo < dhowmany; dyo++){
             gtx = gtx_table[dwhichones[dyo]];
             if (gtx->cur_vstream>=0) {
-               if (d < 0.5 || d > 2.0) {
-                  if (d < 0.5) d = 0.5;
-                  if (d > 2.0) d = 2.0;
+               if (d < MINWINDDENSITY || d > MAXWINDDENSITY) {
+                  if (d < MINWINDDENSITY) d = MINWINDDENSITY;
+                  if (d > MAXWINDDENSITY) d = MAXWINDDENSITY;
                   LUI_FieldSetDouble( field, d );
                }
                vis5d_get_vstreamslice(dwhichones[dyo], gtx->cur_vstream,
@@ -6801,9 +6875,9 @@ static int winddensity_cb( LUI_FIELD *field )
          }
       }
       else{
-         if (d < 0.5 || d > 2.0) {
-            if (d < 0.5) d = 0.5;
-            if (d > 2.0) d = 2.0;
+         if (d < MINSTREAMDENSITY || d > MAXSTREAMDENSITY) {
+            if (d < MINSTREAMDENSITY) d = MINSTREAMDENSITY;
+            if (d > MAXSTREAMDENSITY) d = MAXSTREAMDENSITY;
             LUI_FieldSetDouble( field, d );
          }
          vis5d_get_vstreamslice(index, gtx->cur_vstream, &VStreamDensity,
@@ -6911,9 +6985,14 @@ static void make_clone_window( int index )
    }            
 
    /* Scan the userfuncs directory for analysis functions */
-   if (gtx->funcpath[0]) {
+ //  if (gtx->funcpath[0]) {
+ //     /* search directory specified by -funcpath <path> */
+ //     n = find_analysis_functions( gtx->funcpath, FuncName[index] );
+ //  }
+ 
+   if (Vis5dFuncPath[0]) {
       /* search directory specified by -funcpath <path> */
-      n = find_analysis_functions( gtx->funcpath, FuncName[index] );
+    n = find_analysis_functions( Vis5dFuncPath, FuncName[index] );
    }
    else {
       /* search default directory */
@@ -7227,13 +7306,13 @@ static int stereo_cb( LUI_NEWBUTTON *pb )
 {
    int index = pb->context_index;
    GuiContext gtx = get_gui_gtx(index);
-   int	value;
+   int	value,value2;
    /* toggle stereo rendering */
    if (pb->mousebutton==Button1) {
-      vis5d_stereo_get(index,&value);
+      vis5d_stereo_get(index,&value,&value2);
       value = value ? 0 : 1;
-      vis5d_stereo_set(index,value);
-      vis5d_stereo_get(index,&value);
+      vis5d_stereo_set(index,value,value2);
+      vis5d_stereo_get(index,&value,&value2);
       LUI_ButtonSetState(pb,value);
       group_event(gtx->group_index, 200,value);
       /* stereo forces perspective view - so fetch current value */
@@ -7998,6 +8077,7 @@ static int colorbar_cb( LUI_COLORBAR *cb, int action )
                                        cb_chvvar[cb_dindex], &p);
          vis5d_get_color_table_address (index, VIS5D_CHSLICE, vindex,
                                         cb_chvvar[cb_dindex], &table );
+	 vis5d_other_table_init_params( index, VIS5D_CHSLICE, vindex, cb_chvvar[cb_dindex], p);
          vis5d_color_table_init_params( p, 1, 0 );
          vis5d_color_table_recompute( table, 256, p, 1, 0 );
          LUI_ColorBarRedraw( cb );
@@ -8009,6 +8089,7 @@ static int colorbar_cb( LUI_COLORBAR *cb, int action )
                                       cb_chvvar[cb_dindex], &p);
          vis5d_get_color_table_address( index, VIS5D_CHSLICE, vindex,
                                         cb_chvvar[cb_dindex], &table );
+	 vis5d_other_table_init_params( index, VIS5D_CHSLICE, vindex, cb_chvvar[cb_dindex], p);
          vis5d_color_table_init_params( p, 0, 1 );
          vis5d_color_table_recompute( table, 256, p, 0, 1 );
          LUI_ColorBarRedraw( cb );
@@ -8059,6 +8140,7 @@ static int colorbar_cb( LUI_COLORBAR *cb, int action )
          unsigned int *table;
          vis5d_get_color_table_params(index, VIS5D_CVSLICE, vindex, cb_vvar[cb_dindex], &p);
          vis5d_get_color_table_address( index, VIS5D_CVSLICE, vindex, cb_vvar[cb_dindex], &table );
+	 vis5d_other_table_init_params( index, VIS5D_CVSLICE, vindex, cb_vvar[cb_dindex], p);
          vis5d_color_table_init_params( p, 1, 0 );
          vis5d_color_table_recompute( table, 256, p, 1, 0 );
          vis5d_signal_redraw( index, 1 );
@@ -8072,6 +8154,7 @@ static int colorbar_cb( LUI_COLORBAR *cb, int action )
          int opacity;
          vis5d_get_color_table_params(index, VIS5D_CVSLICE, vindex, cb_vvar[cb_dindex], &p);
          vis5d_get_color_table_address( index, VIS5D_CVSLICE, vindex, cb_vvar[cb_dindex], &table );
+	 vis5d_other_table_init_params( index, VIS5D_CVSLICE, vindex, cb_vvar[cb_dindex], p);
          vis5d_color_table_init_params( p, 0, 1 );
          vis5d_color_table_recompute( table, 256, p, 0, 1 );
          LUI_ColorBarRedraw( cb );
@@ -8121,6 +8204,7 @@ static int colorbar_cb( LUI_COLORBAR *cb, int action )
          unsigned int *table;
          vis5d_get_color_table_params(index, VIS5D_VOLUME, vindex, cb_vvar[cb_dindex], &p);
          vis5d_get_color_table_address( index, VIS5D_VOLUME, vindex, cb_vvar[cb_dindex], &table );
+ 	 vis5d_other_table_init_params( index, VIS5D_VOLUME, vindex, cb_vvar[cb_dindex], p);
          vis5d_color_table_init_params( p, 1, 0 );
          vis5d_color_table_recompute( table, 256, p, 1, 0);
          vis5d_signal_redraw( index, 1 );
@@ -8133,8 +8217,9 @@ static int colorbar_cb( LUI_COLORBAR *cb, int action )
          unsigned int *table;
          vis5d_get_color_table_params(index, VIS5D_VOLUME, vindex, cb_vvar[cb_dindex], &p);
          vis5d_get_color_table_address( index, VIS5D_VOLUME, vindex, cb_vvar[cb_dindex], &table );
-         vis5d_color_table_set_alpha( p, -1 );
+ 	 vis5d_other_table_init_params( index, VIS5D_VOLUME, vindex, cb_vvar[cb_dindex], p);
          vis5d_color_table_init_params( p, 0, 1 );
+         vis5d_color_table_set_alpha( p, -1 );
          vis5d_color_table_recompute( table, 256, p, 0, 1);
          LUI_ColorBarRedraw( cb );
          vis5d_signal_redraw( index, 1 );
@@ -8635,12 +8720,12 @@ static void group_event( int gindex, int type, int status)
             }
             else if (type==200){
 				  if(status==0){
-					 vis5d_stereo_set(index, 0);
+				    vis5d_stereo_set(index, 0,0);
 					 gtx_table[index]->stereoBUTTON->state = 0;
 					 vis5d_invalidate_dtx_frames(index);
 				  }
 				  if(status==1){
-					 vis5d_stereo_set(index, 1);
+				    vis5d_stereo_set(index, 1,0);
 					 gtx_table[index]->stereoBUTTON->state = 1;
 					 vis5d_invalidate_dtx_frames(index);
 				  }
@@ -10589,7 +10674,7 @@ void create_widgets( int index, int volflag, char *programname )
    gtx->normalBUTTON->context_index = (index+1) * MM_MAX + MM_NORMAL;
    LUI_ButtonState( gtx->normalBUTTON, 1 ); 
 
-   if (gtx->total_ctx_numtimes>1 && gtx->how_many_regular_contexts > 0) {
+   if ((gtx->total_ctx_numtimes>1 || TRACEVERSION==TRACEAS) && gtx->how_many_regular_contexts > 0) {
       gtx->trajectoryBUTTON = LUI_ButtonCreateType( "Trajectory", 0,1, RADIOSIZE,
                             (index+1) * MM_MAX + MM_TRAJ, (LUI_FNCP) mode_cb );
       gtx->trajectoryBUTTON->context_index = (index+1) * MM_MAX + MM_TRAJ;
@@ -10916,15 +11001,17 @@ void create_widgets( int index, int volflag, char *programname )
 
          gtx->IsoWindow = LUI_CreateWindow( LUI_RootWindow, gtx->cpx, gtx->cpy );
 
-         gtx->IsoSlider = LUI_NewSliderCreate( gtx->IsoWindow, 2, 2, CP_WIDTH-37 );
+	 int buttonwidth=50;
+
+         gtx->IsoSlider = LUI_NewSliderCreate( gtx->IsoWindow, 2, 2, CP_WIDTH-buttonwidth );
          LUI_NewSliderCallback( gtx->IsoSlider, isosurface_cb );
          gtx->IsoSlider->context_index = gtx->context_index;
 
          gtx->IsosurfWidth = CP_WIDTH;
          gtx->IsosurfHeight = 40;
 
-         b = LUI_PushButtonCreate( gtx->IsoWindow, LUI_NEXT_X, LUI_SAME_Y, 30, 36,
-                                   "OK");
+         b = LUI_PushButtonCreate( gtx->IsoWindow, LUI_NEXT_X, LUI_SAME_Y, buttonwidth, 36,
+                                   "OKISO");
          LUI_ButtonCallback( b, newsurf_cb );
          b->context_index = gtx->context_index;
 
@@ -11333,8 +11420,8 @@ int map_fake_windows( int onlyrecolor)
                wstep = ((width-4) -(DCs*8)) / DCs;
                hstep = ((height-4) -(DRs*8))/ DRs;
             }
-            wstep = wstep > hstep ? hstep : wstep;
-            hstep = hstep > wstep ? wstep : hstep;
+         /*   wstep = wstep > hstep ? hstep : wstep;
+            hstep = hstep > wstep ? wstep : hstep;    */
             if (DRs == 1 && DCs == 1){
                gui_set_display_border_color(0, 0, 0, 0 );
             }

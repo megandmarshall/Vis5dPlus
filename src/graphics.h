@@ -492,7 +492,7 @@ extern void end_aa_pass( int n );
  *         listtype - one of GL_COMPILE or GL_COMPILE_AND_EXECUTE
  */
 extern void draw_isosurface( int n, uint_index *index,
-                             int_2 verts[][3], int_1 norms[][3], int	draw_triangles,
+                             int_vert2 verts[][3], int_1 norms[][3], int	draw_triangles,
                              unsigned int color, GLuint *list, int listtype );
 
 
@@ -509,7 +509,7 @@ extern void draw_isosurface( int n, uint_index *index,
  */
 extern void draw_colored_isosurface( int n,
                                      uint_index *index,
-                                     int_2 verts[][3],
+                                     int_vert2 verts[][3],
                                      int_1 norms[][3],
 												 int draw_triangles,
                                      uint_1 color_indexes[],
@@ -523,7 +523,7 @@ extern void draw_colored_isosurface( int n,
  *         color - the color
  */
 extern void draw_triangle_strip( int n,
-                                 int_2 verts[][3], int_1 norms[][3],
+                                 int_vert2 verts[][3], int_1 norms[][3],
                                  unsigned int color );
 
 
@@ -531,7 +531,7 @@ extern void draw_triangle_strip( int n,
  * Draw a lit triangle strip with per-vertex colors.
  */
 extern void draw_colored_triangle_strip( int n,
-                                         int_2 verts[][3], int_1 norms[][3],
+                                         int_vert2 verts[][3], int_1 norms[][3],
                                          uint_1 color_indexes[],
                                          unsigned int *color_table, int alpha );
 
@@ -549,7 +549,7 @@ void color_quadmesh_texture_object(GLuint *texture, GLubyte *color_table );
  *                           ignored if list is NULL
  */
 extern void draw_color_quadmesh( int rows, int columns,
-                                 int_2 verts[][3],
+                                 int_vert2 verts[][3],
                                  uint_1 color_indexes[],
                                  unsigned int color_table[],
 											int texture_method, 
@@ -583,20 +583,20 @@ extern void draw_lit_color_quadmesh( int rows, int columns,
  *         color - the color
  */
 extern void draw_wind_lines( int nvectors,
-                             int_2 verts[][3],
+                             int_vert2 verts[][3],
                              unsigned int color );
 
 
 
-void plot_strings( int n, char *str, int_2 verts[][3], unsigned int color, GLuint fontbase );
+void plot_strings( int n, char *str, int_vert2 verts[][3], unsigned int color, GLuint fontbase );
 
 /*
  * Draw a set of disjoint lines whose vertices are scaled 2-byte ints.
  * Input:  n - number of vertices, not lines
- *         verts - array [][3] of int_2 vertices
+ *         verts - array [][3] of int_vert2 vertices
  *         color - the color
  */
-extern void draw_disjoint_lines( int n, int_2 verts[][3],
+extern void draw_disjoint_lines( int n, int_vert2 verts[][3],
                                  unsigned int color , 
 											GLuint *list, int listtype);
 
@@ -604,17 +604,17 @@ extern void draw_disjoint_lines( int n, int_2 verts[][3],
 
 
 
-extern void draw_colored_disjoint_lines( int n, int_2 verts[][3],
+extern void draw_colored_disjoint_lines( int n, int_vert2 verts[][3],
                                     uint_1 color_indexes[],
                                     unsigned int color_table[] );
  
 /*
  * Draw a polyline whose vertices are scaled 2-byte ints.
  * Input:  n - number of vertices, not lines
- *         verts - array [][3] of int_2 vertices
+ *         verts - array [][3] of int_vert2 vertices
  *         color - the color
  */
-extern void draw_polylines( int n, int_2 verts[][3],
+extern void draw_polylines( int n, int_vert2 verts[][3],
                             unsigned int color );
 
 
@@ -622,7 +622,7 @@ extern void draw_polylines( int n, int_2 verts[][3],
  * Draw a polyline as above but colored per-vertex accordint to a value
  * in a color table.
  */
-extern void draw_colored_polylines( int n, int_2 verts[][3],
+extern void draw_colored_polylines( int n, int_vert2 verts[][3],
                                     uint_1 color_indexes[],
                                     unsigned int color_table[] );
 
@@ -707,10 +707,10 @@ extern int text_width( XFontStruct *font, char *str );
 
 /* JPE generate list functions */
 
-void generate_labels(int n, char *str, int_2 verts[][3], GLuint *list);
+void generate_labels(int n, char *str, int_vert2 verts[][3], GLuint *list);
 void generate_polyline( int n, float vert[][3], GLuint *list );
 
-void generate_isosurfaces(int n, uint_index *index,int_2 verts[][3],int_1 norms[][3],GLuint *list );
+void generate_isosurfaces(int n, uint_index *index,int_vert2 verts[][3],int_1 norms[][3],GLuint *list );
 
 void set_transparency( int alpha );
 

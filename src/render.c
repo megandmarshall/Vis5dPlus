@@ -275,60 +275,116 @@ char *return_var_plus_index( char *varname, int index )
 void plot_string( char *str, float startx, float starty, float startz,
                   float base[], float up[], int rjustify )
 {
-   static float zero[] = { 0,0, 0,.8, .4,.8, .4,0, 0,0 },
+  #define NUMSTRINGTYPES 20
+
+  #define STRINGZERO 0
+  #define STRINGONE  1
+  #define STRINGTWO 2
+  #define STRINGTHREE 3
+  #define STRINGFOUR 4
+  #define STRINGFIVE 5
+  #define STRINGSIX 6
+  #define STRINGSEVEN 7
+  #define STRINGEIGHT 8
+  #define STRINGNINE 9
+
+  #define STRINGDASH 10
+  #define STRINGPLUS 11
+  #define STRINGDOT 12
+
+  #define STRINGWEST 13
+  #define STRINGEAST 14
+  #define STRINGNORTH 15
+  #define STRINGSOUTH 16
+
+  #define STRINGXPOS 17
+  #define STRINGYPOS 18
+  #define STRINGZPOS 19
+
+   static float
+     zero[] = { 0,0, 0,.8, .4,.8, .4,0, 0,0 },
       one[] = { 0,0, 0,.8 },
       two[] = { .4,0, 0,0, 0,.4, .4,.4, .4,.8, 0,.8 },
       three[] = { 0,0, .4,0, .4,.4, 0,.4, .4,.4, .4,.8, 0,.8 },
       four[] = { 0,.8, 0,.4, .4,.4, .4,.8, .4,0 },
       five[] = { 0,0, .4,0, .4,.4, 0,.4, 0,.8, .4,.8 },
       six[] = { .4,.8, 0,.8, 0,0, .4,0, .4,.4, 0,.4 },
-      seven[] = { 0,.7, 0,.8, .4,.8, .4,0 },
+      seven[] = { 0,.7, 0,.8, .4,.8, .3,0 },
       eight[] = { 0,0, 0,.8, .4,.8, .4,0, 0,0, 0,.4, .4,.4 },
       nine[] = { .4,.4, 0,.4, 0,.8, .4,.8, .4,0 },
+
       dash[] = { 0,.4, .4,.4 },
+      plus[] = { 0,.4, .4,.4, 0.2,0.4, 0.2,0.8, 0.2,0  },
       dot[] = { 0,0, 0,.1, .1,.1, .1,0, 0,0 },
+
  /*MiB  03/2001 Longitudes*/
       west[] = {0.,0.8, 0.,0., 0.2,0.4, 0.4,0.0, 0.4,0.8},
       east[] = {0.4,0.8, 0.0,0.8, 0.0,0.4, 0.3,0.4, 0.0,0.4, 0.0,0.0, 0.4,0.0},
       north[] = {0.,0.0, 0.,0.8, 0.4,0.0, 0.4,0.8},
       south[] = {0.0,0.1, 0.1,0.0, 0.3,0.0, 0.4,0.1, 0.4,0.3, 
-		 0.0,0.5, 0.0,0.7, 0.1,0.8, 0.3,0.8, 0.4,0.7};
+		 0.0,0.5, 0.0,0.7, 0.1,0.8, 0.3,0.8, 0.4,0.7},
 
-   static float *index[16] = { zero, one, two, three, four, five, six,
-                               seven, eight, nine, dash, dot, west, east,
-				north, south};
+      xpos[] = { 0,.8, .4,0, 0.2,0.4, .4,0.8, 0,0 },
+      ypos[] = { 0,.8, 0.2,0.4, .4,0.8, 0.2,0.4, 0.2,0 },
+      zpos[] = { 0,.8, .4,.8, 0,0, .4,0 }
+      ;
 
-   static float width[16] = { 0.6, 0.2, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6,
-      0.6, 0.6, 0.6, 0.3, 0.6, 0.6 , 0.6, 0.6};
-   static int verts[16] = { 5, 2, 6, 7, 5, 6, 6, 4, 7, 5, 2, 5 ,5, 7, 4, 10};
+   static float *index[NUMSTRINGTYPES] =
+     { zero, one, two, three, four, five, six, seven, eight, nine
+       , dash, plus, dot
+       , west, east, north, south
+       , xpos, ypos, zpos};
+
+   static float width[NUMSTRINGTYPES] =
+     {
+       0.6, 0.2, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6, 0.6
+       ,0.6, 0.6, 0.3
+       ,0.6, 0.6 , 0.6, 0.6
+       ,0.6, 0.6, 0.6
+     };
+   static int verts[NUMSTRINGTYPES] =
+     {
+       5, 2, 6, 7, 5, 6, 6, 4, 7, 5
+       ,2, 5, 5
+       ,5, 7, 4, 10
+       ,5, 5, 4
+     };
 
 
    float *temp, plot[100][3];
    float cx, cy, cz;
    int i, j, k, len;
+   int ii;
 
    cx = startx;  cy = starty;  cz = startz;
    len = strlen(str);
 
+   for (ii=0;ii<len;ii++){
+     //   for (i=len-1; i>=0; i--) { // right
+     //      for (i=0; i<len; i++) { // left
+     if (rjustify) {
+       i=(len-1)-ii;
+     }
+     else{
+       i=ii;       
+     }
+     if (str[i]=='-') k = STRINGDASH;
+     else if (str[i]=='+') k = STRINGPLUS;
+     else if (str[i]=='.') k = STRINGDOT;
+     /*MiB*/
+     else if (str[i]=='W') k = STRINGWEST;
+     else if (str[i]=='E') k = STRINGEAST;
+     else if (str[i]=='N') k = STRINGNORTH;
+     /*MiB*/
+     else if (str[i]=='S') k = STRINGSOUTH;
+     else if (str[i]=='x') k = STRINGXPOS;
+     else if (str[i]=='y') k = STRINGYPOS;
+     else if (str[i]=='z') k = STRINGZPOS;
+     else if (str[i]>='0' && str[i]<='9') k = str[i] - '0';
+     else  continue;
+
    if (rjustify) {
       /* draw right justified text */
-      for (i=len-1; i>=0; i--) {
-         if (str[i]=='-')
-            k = 10;
-         else if (str[i]=='.')
-            k = 11;
-/*MiB*/  else if (str[i]=='W')
-            k = 12;
-         else if (str[i]=='E')
-            k = 13;
-         else if (str[i]=='N')
-            k = 14;
-         else if (str[i]=='S')
-/*MiB*/     k = 15;
-         else if (str[i]>='0' && str[i]<='9')
-            k = str[i] - '0';
-         else
-            continue;
          /* calculate position for this char */
          cx += width[k]*base[0];
          cy += width[k]*base[1];
@@ -345,27 +401,7 @@ void plot_string( char *str, float startx, float starty, float startz,
          }
          polyline( plot, verts[k] );
       }
-
-   }
-   else {
-      /* draw left justified text */
-      for (i=0; i<len; i++) {
-         if (str[i]=='-')
-            k = 10;
-         else if (str[i]=='.')
-            k = 11;
-/*MiB*/  else if (str[i]=='W')
-            k = 12;
-         else if (str[i]=='N')
-            k = 14;
-         else if (str[i]=='S')
-            k = 15;
-         else if (str[i]=='E')
-/*MiB*/     k = 13;
-         else if (str[i]>='0' && str[i]<='9')
-            k = str[i] - '0';
-         else
-            continue;
+     else{
          /* make the vertex array for this character */
          temp = index[k];
          for (j=0; j<verts[k]; j++) {
@@ -580,8 +616,8 @@ static void print_cursor_position( Display_Context dtx, int it )
    static float by[3] = { -0.035, 0.0, -0.035 },  uy[3] = { 0.0, 0.07, 0.0 };
    static float bz[3] = { -0.035, -0.035, 0.0 }, uz[3] = { 0.0, 0.0, 0.07 };
    float v[6][3];
-   float x, y, z, xx, yy;
-   char str[100], xdir1[8],ydir1[8];
+   float x, y, z, xx, yy, zz;
+   char str[100], xdir1[10],ydir1[10],zdir1[10];
 
    /* MJK 12.01.98 */
    float lat, lon, hgt, row, col, lev;
@@ -593,6 +629,8 @@ static void print_cursor_position( Display_Context dtx, int it )
    xdir1[1] = '\0';
    ydir1[0] = ' ';
    ydir1[1] = '\0';
+   zdir1[0] = ' ';
+   zdir1[1] = '\0';
 
    /* MJK 12.01.98 begin*/
    if ((dtx->DisplayProbe) || (dtx->DisplaySound)){
@@ -658,37 +696,64 @@ static void print_cursor_position( Display_Context dtx, int it )
 	     xx = -360. + xx;
          }
 /*MiB   03/2001 Define East/West  */
-         if (xx > 0.){
-	     	xdir1[0] = 'W';
+         if (SWITCHSIGNLABEL==0 || xx > 0.){
+	   strcpy(xdir1,WESTLABEL);
          } else {
-                xdir1[0] = 'E';
+	   strcpy(xdir1,EASTLABEL);
                 xx = xx *(-1.);
                 }
+
+	 if(SWITCHXAXES){
+	   xx=xx*(-1);
+	 }
+
 /*MiB   03/2001 Define North/South  */
 	 yy = y;
-         if (yy > 0.){
-	     	ydir1[0] = 'N';
+         if (SWITCHSIGNLABEL==0 || yy > 0.){
+	   strcpy(ydir1,NORTHLABEL);
          } else {
-                ydir1[0] = 'S';
+	   strcpy(ydir1,SOUTHLABEL);
                 yy = yy *(-1.);
                 }
+  
+	 if(SWITCHYAXES){
+	   yy=yy*(-1);
+	 }
+
+
+	 // JCM: up-down
+	 zz = z;
+         if (SWITCHSIGNLABEL==0 || zz > 0.){
+	   strcpy(zdir1,UPLABEL);
+         } else {
+	   strcpy(zdir1,DOWNLABEL);
+                zz = zz *(-1.);
+                }
+
+	 if(SWITCHZAXES){
+	   zz=zz*(-1);
+	 }
   
 
       /* MJK 12.01.98 */                        
       float2string(dtx, 0, xx, str );
-/*MiB*/  strcat(str,xdir1);
+/*MiB*/
+      strcat(str,xdir1);
       plot_string( str, dtx->CursorX-0.04, dtx->Ymin-0.1,
                    dtx->Zmin-0.125, bx, ux, 0 );
+
       float2string(dtx, 1, yy, str );
-/*MiB*/  strcat(str,ydir1);
+/*MiB*/
+      strcat(str,ydir1);
       plot_string( str, dtx->Xmin-0.075, dtx->CursorY-0.02,
                    dtx->Zmin-0.075, by, uy, 1 );
+
       float2string(dtx, 2, z, str );
 
-
-      if (!dtx->DisplaySound)
-      plot_string( str, dtx->Xmin-0.07, dtx->Ymin-0.07,
-                   dtx->CursorZ+0.005, bz, uz, 1 );
+      if (!dtx->DisplaySound){
+	strcat(str,zdir1);
+	plot_string( str, dtx->Xmin-0.07, dtx->Ymin-0.07,dtx->CursorZ+0.005, bz, uz, 1 );
+      }
 
       set_depthcue( 0 );
    }
@@ -1137,7 +1202,7 @@ static void render_vslices( Context ctx, int time, int labels, int animflag )
          {
             if (check_view_side (ctx, VSLICE, var) < 0)
             {
-				  printf("flip the slice ?\n");
+				//  printf("flip the slice ?\n");
 				  flip_vslice_end_for_end (ctx, time, var);
             }
          }
@@ -1735,7 +1800,7 @@ static void render_trajectories( Context ctx, int it, int tf )
          if ( (tf && alpha==255) || (tf==0 && alpha<255) ) {
             start = t->start[it];
             len = t->len[it];
-            if (start!=0xffff && len>0) {
+            if (start!=BADSTART && len>0) {
                if (t->kind==0) {
                   /* draw as line segments */
                   int colorvar = t->colorvar;
@@ -2676,17 +2741,27 @@ void render_3d_only( Display_Context dtx, int animflag )
          }            
       }
 
+#if(MULTIVOLUMERENDER==1)
+      int CVO;
+      CVO = dtx->CurrentVolumeOwner;
+	
+      if (dtx->VolumeFlag==1 && CVO!=-1){
+	ctx = dtx->ctxpointerarray[return_ctx_index_pos(dtx,CVO)];
+	  
+	if (check_for_valid_time(ctx, dtx->CurTime)){
+	  draw_volume( ctx, ctx->CurTime,dtx->ColorTable[VIS5D_VOLUME_CT]->Colors );
+	}// end if valid time
+      }// end if regular check
+#else
       if (dtx->VolumeFlag==1 && dtx->CurrentVolume!=-1){
-         ctx = dtx->ctxpointerarray[return_ctx_index_pos(dtx,
-                                    dtx->CurrentVolumeOwner)];
+	ctx = dtx->ctxpointerarray[return_ctx_index_pos(dtx,dtx->CurrentVolumeOwner)];
          
          if (check_for_valid_time(ctx, dtx->CurTime)){                     
-            draw_volume( ctx, ctx->CurTime, dtx->CurrentVolume,
-                      dtx->ColorTable[VIS5D_VOLUME_CT]->Colors[ctx->context_index*MAXVARS+
-                       dtx->CurrentVolume] );
+	  // JCM ,0, below is for accessing 0th element of Volume[MAXVARS]           
+	  draw_volume( ctx, ctx->CurTime, dtx->ColorTable[VIS5D_VOLUME_CT]->Colors);
          }
       }
-
+#endif
       end_aa_pass(i);
 
    } /* aa passes */
@@ -2807,96 +2882,102 @@ void render_everything( Display_Context dtx, int animflag )
    /*** Draw 3-D Objects ***/
    set_3d( dtx->GfxProjection, dtx->FrntClip,
            dtx->Zoom, (float*) dtx->CTM);
+   //   if(dtx->StereoOn){ // JCM: want to be able to output stereo to files without 3D stereo hardware
+
+
+
+
+   /* Stereo mode */
+   /*
+    * The set_3d call should have set the model matrix and the
+    * projection matrix correctly.  The stereo_set_3d_perspective
+    * call just changes the projection matrix slightly.
+    */
+
+   int eyes,eyechoice;
+   
+   // loop over eyes (avoid redundant code)
+   for(eyes=0;eyes<=1;eyes++){
+
+     //     fprintf(stderr,"eyes=%d\n",eyes); fflush(stderr);
+
+
+     if(eyes==0){
+       /* left eye */
+       eyechoice=VIS5D_STEREO_LEFT;
+
+       if(dtx->StereoOn){
+	 stereo_set_3d_perspective(eyechoice,dtx->FrntClip);
+	 stereo_set_buff(eyechoice);
+       }
+       else{
+	 // JCM: 
+	 if(dtx->FakeStereoEye>0){
+	   // FakeStereoEye is one of:
+	   // VIS5D_STEREO_LEFT
+	   // VIS5D_STEREO_RIGHT
+	   stereo_set_3d_perspective(dtx->FakeStereoEye,dtx->FrntClip);
+	   //       stereo_set_buff(VIS5D_STEREO_BOTH); // not necessary to set since doesn't change
+	 }
+	 // otherwise use normal camera
+       }
+	 
+
+     }
+     else if(eyes==1){
+       /* right eye */
+       if(dtx->StereoOn){
+	 eyechoice=VIS5D_STEREO_RIGHT;
+       }
+       else{
+	 // avoid this for Mono
+	 continue;
+       }
+     }
+
+
+     ////////////////
+     //       
+     // non-eye specific operations
+
+     //clear_background(dtx); // JCM: was in 
+     /*
+      * The clear_3d_window call was moved out of vis5d_draw_frame and moved
+      * down into this function so stereo and mono rendering loops can both
+      * work with the same higher level api function.
+      */
+
+     clear_3d_window();
+     clear_color (dtx->BgColor);
+
+     if (dtx->DisplayBox){
+       int i;
+       for (i=0; i < (dtx->PrettyFlag ? AA_PASSES : 1); i++) {
+	 start_aa_pass(i);
+	 draw_box(dtx, dtx->CurTime);
+	 /* draw_tick_marks( dtx ); */
+	 end_aa_pass(i);
+       }
+     }
+       
+     clipping_on();
+     render_3d_only( dtx, animflag );
+     clipping_off();
+       
+     if (dtx->DisplayClips){
+       render_vclips( dtx, animflag );
+       render_hclips( dtx, animflag );
+     }
+   }// end over eyes
+
+
+   
    if(dtx->StereoOn){
-      /*
-       * The set_3d call should have set the model matrix and the
-       * projection matrix correctly.  The stereo_set_3d_perspective
-       * call just changes the projection matrix slightly.
-       */
+     /* reset to default draw buffer */
+     stereo_set_buff(VIS5D_STEREO_BOTH);
+   }
 
-      /* left eye */
-      stereo_set_3d_perspective(VIS5D_STEREO_LEFT,dtx->FrntClip);
-      stereo_set_buff(VIS5D_STEREO_LEFT);
-      clear_background(dtx);
-      clear_3d_window();
-
-      if (dtx->DisplayBox){
-         int i;
-         for (i=0; i < (dtx->PrettyFlag ? AA_PASSES : 1); i++) {
-            start_aa_pass(i);
-            draw_box(dtx, dtx->CurTime);
-            /* draw_tick_marks( dtx ); */
-            end_aa_pass(i);
-         }
-      }
-
-      clipping_on();
-      render_3d_only( dtx, animflag );
-      clipping_off();
-   
-      if (dtx->DisplayClips){
-         render_vclips( dtx, animflag );
-         render_hclips( dtx, animflag );
-      }
-
-      /* right eye */
-      stereo_set_3d_perspective(VIS5D_STEREO_RIGHT,dtx->FrntClip);
-      stereo_set_buff(VIS5D_STEREO_RIGHT);
-      clear_background(dtx);
-      clear_3d_window();
-
-      if (dtx->DisplayBox){
-         int i;
-         for (i=0; i < (dtx->PrettyFlag ? AA_PASSES : 1); i++) {
-            start_aa_pass(i);
-            draw_box(dtx, dtx->CurTime);
-            /* draw_tick_marks( dtx ); */
-            end_aa_pass(i);
-         }
-      }
-
-      clipping_on();
-      render_3d_only( dtx, animflag );
-      clipping_off();
-   
-      if (dtx->DisplayClips){
-         render_vclips( dtx, animflag );
-         render_hclips( dtx, animflag );
-      }
-
-      /* reset to default draw buffer */
-      stereo_set_buff(VIS5D_STEREO_BOTH);
-   }else{
-
-		 /*
-		  * The clear_3d_window call was moved out of vis5d_draw_frame and moved
-		  * down into this function so stereo and mono rendering loops can both
-		  * work with the same higher level api function.
-		  */
-		 clear_background(dtx);
-		 clear_3d_window();
-		 
-		 if (dtx->DisplayBox){
-			int i, listflag=0;
-			  
-			  for (i=0; i < (dtx->PrettyFlag ? AA_PASSES : 1); i++) {
-				 start_aa_pass(i);
-				 draw_box(dtx, dtx->CurTime); 
-				 /* draw_tick_marks( dtx ); */
-				 end_aa_pass(i);
-			  }
-		 }
-
-		 clipping_on();
-		 render_3d_only( dtx, animflag );
-
-		 clipping_off();
-
-		 if (dtx->DisplayClips){
-			render_vclips( dtx, animflag );
-			render_hclips( dtx, animflag );
-		 }
-	  }
+     
 
    /*** Draw 2-D objects ***/
    set_2d();

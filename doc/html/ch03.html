@@ -1,0 +1,2060 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Putting Your Data Into Vis5D </TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="PREVIOUS"
+TITLE="Installing Vis5D"
+HREF="ch02sec2.html"><LINK
+REL="NEXT"
+TITLE="Map Projections and Vertical Coordinate Systems"
+HREF="ch03sec2.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch02sec2.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch03sec2.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="CH03"
+>Putting Your Data Into Vis5D </A
+></H1
+><P
+>	Vis5D can work with data organized as a 5-D rectangle.  The
+first 3 dimensions are spatial:  rows, columns, and levels (or
+latitutude, longitude, and height).  The 4th dimension is time.  The
+5th dimension is the enumeration of multiple physical variables such
+as temperature, pressure, water content, etc.</P
+><P
+>	In addition to the data itself, there are a number of
+parameters needed to describe a Vis5D dataset:  the sizes of the five
+dimensions (number of rows, columns, levels, timesteps, and
+variables), geographic position and orientation of the data (map
+projection), the names of the variables, the actual times and dates
+associated with each timestep, etc. </P
+><P
+>      The Vis5d visualization program accepts two standard file
+formats: v5d files and comp5d files.  Both store 3-D data in a
+compressed format which vis5d can use quickly and efficiently. Comp5d
+files are those which were produced by the comp5d program in previous
+versions of Vis5D.  The v5d file format is the new, and prefered, file
+format used in version 4.0 and later of Vis5D.  It is intended to be a
+replacement for the comp5d format because it more flexible and may be
+extended in the future.</P
+><P
+>      Vis5d can also accept a user defined file format. A user can
+create a new file format and the functions to read this format. See
+<A
+HREF="ch03sec4.html"
+>section 3.4</A
+> below. </P
+><P
+>      To view your data with vis5d you will typically write a
+conversion program to convert your data files to v5d format.  To help
+you do this we've included four sample conversion programs to guide
+you. Basically, you just add the instructions to read your file
+format, we provide the instructions to write the v5d file. See 
+<A
+HREF="ch03.html#CH03SEC1"
+>section 3.1</A
+> below.  
+You then link your program with 
+<TT
+CLASS="PARAMETER"
+><I
+>-lv5d</I
+></TT
+> (the installed <TT
+CLASS="FILENAME"
+>libv5d</TT
+>
+ library). </P
+><P
+>      If you have used Vis5D in the past, you may continue to
+convert your data to McIDAS format and use comp5d to make a compressed
+file.  However, to take full advantage of the new map projections and
+vertical coordinate system in version 4.0 and higher, you should write
+a new conversion program to make v5d files. </P
+><P
+>Another option for getting your data into Vis5D is the <B
+CLASS="COMMAND"
+>v5dimport</B
+>
+utility. <B
+CLASS="COMMAND"
+>v5dimport</B
+> is a program for file conversion, combining,
+and resampling.  It reads a number of different file formats and can
+be extended to read new formats. See 
+<A
+HREF="ch07.html"
+>chapter 7</A
+> for more details. </P
+><P
+>If your data is in <A
+HREF="http://hdf.ncsa.uiuc.edu/HDF5/"
+TARGET="_top"
+>HDF5</A
+> format, you may find
+the <B
+CLASS="COMMAND"
+>h5tov5d</B
+> conversion program useful; it is
+available as part of the free <A
+HREF="http://ab-initio.mit.edu/h5utils/"
+TARGET="_top"
+>h5utils</A
+>
+package.</P
+><P
+>      Vis5D can also work with non-gridded data.  This type of data is
+stored as records.  Each record has a geographic location and a set of
+variables containing character or numerical data.  Vis5D does not have
+it's own file format for this irregular data.  The two methods for
+getting irregular data into Vis5D are using the current irregular
+import program to read certain NetCDF files, or creating a new import
+process using calls from the 
+<TT
+CLASS="FILENAME"
+>irregular_v5d</TT
+> library.  See 
+<A
+HREF="ch03sec5.html"
+>section 3.5</A
+> for more details.</P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH03SEC1"
+>Converting Your Data to v5d Format</A
+></H1
+><P
+>	Files in the v5d format are created with functions from the
+v5d library. We've included four sample conversion programs which
+outline how to make a v5d file.  They are located in the convert/
+subdirectory.  You can choose which one to use as a template for your
+data converter:
+<DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN497"
+></A
+><P
+></P
+><TABLE
+BORDER="1"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><TT
+CLASS="FILENAME"
+>foo_to_v5d.f</TT
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>              A Fortran program which assumes a rectangular
+	      lat/lon map projection and equally spaced linear
+	      vertical coordinate system.</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><TT
+CLASS="FILENAME"
+>foo2_to_v5d.f</TT
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>              A Fortran program which allows any map projection
+	      and vertical coordinate system as well as a different
+	      number of vertical levels for each variable.</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><TT
+CLASS="FILENAME"
+>foo_to_v5d.c</TT
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>              A C program which assumes a rectangular lat/lon
+	      map projection and equally spaced linear vertical
+	      coordinate system.</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><TT
+CLASS="FILENAME"
+>foo2_to_v5d.c</TT
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>              A C program which allows any map projection and
+	      vertical coordinate system as well as a different number
+	      of vertical levels for each variable.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="./stylesheet-images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>The files in the <TT
+CLASS="FILENAME"
+>convert/</TT
+> subdirectory link
+directly with the object and header files in the
+<TT
+CLASS="FILENAME"
+>src/</TT
+> directory.  In your own program, you'll want
+to instead link with <TT
+CLASS="PARAMETER"
+><I
+>-lv5d</I
+></TT
+> (the installed
+<TT
+CLASS="FILENAME"
+>libv5d</TT
+> library) and include the installed headers
+via:</P
+><P
+>	<TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>#include &#60;vis5d/v5d.h&#62;</PRE
+></TD
+></TR
+></TABLE
+></P
+></TD
+></TR
+></TABLE
+></DIV
+><P
+>	In any case, each conversion program uses three functions to
+write the v5d file: <TT
+CLASS="FUNCTION"
+>v5dCreate</TT
+> (or <TT
+CLASS="FUNCTION"
+>v5dCreateSimple</TT
+>), <TT
+CLASS="FUNCTION"
+>v5dWrite</TT
+>, and
+<TT
+CLASS="FUNCTION"
+>v5dClose</TT
+>.  <TT
+CLASS="FUNCTION"
+>v5dCreateSimple</TT
+> is used to create v5d files that only
+specify the most basic parameters.  <TT
+CLASS="FUNCTION"
+>v5dCreate</TT
+> allows more complicated
+parameters.  There are versions of these functions for C and Fortran
+programs.</P
+><P
+>	Here are the descriptions of the <TT
+CLASS="FUNCTION"
+>v5dCreate</TT
+> and <TT
+CLASS="FUNCTION"
+>v5dCreateSimple</TT
+>
+functions in a format similar to man page documentation.  C
+programmers should note that in the argument descriptions we describe
+arrays by Fortran convention, i.e. <TT
+CLASS="COMPUTEROUTPUT"
+>A(1)</TT
+> is the first element of <TT
+CLASS="VARNAME"
+>A</TT
+>,
+whereas in C this would be <TT
+CLASS="COMPUTEROUTPUT"
+>A[0]</TT
+>.</P
+><P
+>Fortran-callable functions:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+> 
+	  integer function v5dcreatesimple( name, numtimes, numvars,
+	  nr, nc, nl, varname, timestamp, datestamp, northlat,
+	  latinc, westlon, loninc, bottomhgt, hgtinc )
+ 
+	  character* (*) name 
+	  integer numtimes 
+	  integer numvars 
+	  integer nr 
+	  integer nc
+	  integer nl 
+	  character*10 varname(MAXVARS) 
+	  integer timestamp(*) 
+	  integer datestamp(*) 
+	  real northlat 
+	  real latinc
+	  real westlon 
+	  real loninc 
+	  real bottomhgt 
+	  real hgtinc 
+	  
+	  integer function v5dcreate( name, numtimes, numvars, nr, nc, 
+	  nl, varname, timestamp, datestamp, compress, projection,
+	  proj_args, vertical, vert_args ) 
+
+	  character* (*) name 
+	  integer numtimes, numvars 
+	  integer nr 
+	  integer nc 
+	  integer nl(*)
+	  character*10 varname(MAXVARS) 
+	  integer timestamp(*) 
+	  integer datestamp(*) 
+	  integer compress 
+	  integer projection 
+	  real    proj_args(*) 
+	  integer vertical 
+	  real    vert_args(*)</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>C-callable functions:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+> 
+	  int v5dCreateSimple( name, numtimes, numvars, nr, nc,
+	  nl, varname, timestamp, datestamp, northlat, latinc,
+	  westlon, loninc, bottomhgt, hgtinc ) 
+	  
+	  char  *name; 
+	  int   numtimes; 
+	  int   numvars; 
+	  int   nr, nc, nl; 
+	  char  varname[MAXVARS][10]; 
+	  int   timestamp[], datestamp[]; 
+	  float northlat, latinc; 
+	  float westlon, loninc; float bottomhgt, hgtinc; 
+
+	  int v5dCreate( name, numtimes, numvars, nr, nc, nl,
+	  varname, timestamp, datestamp, compress, projection,
+	  proj_args, vertical, vert_args ) 
+
+	  char  *name; 
+	  int   numtimes, numvars; 
+	  int   nr, nc, nl[]; 
+	  char  varname[MAXVARS][10]; 
+	  int   timestamp[], datestamp[]; 
+	  int   compress; 
+	  int   projection;
+	  float proj_args[]; 
+	  int   vertical; 
+	  float vert_args[];</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><P
+><B
+>Arguments used by v5dCreate and v5dCreateSimple:</B
+></P
+><DL
+><DT
+><TT
+CLASS="VARNAME"
+>name</TT
+></DT
+><DD
+><P
+>The name of the v5d file to create</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>numtimes</TT
+></DT
+><DD
+><P
+>Number of timesteps (at least 1)</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>numvars</TT
+></DT
+><DD
+><P
+> Number of variables (at least 1)</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>nr</TT
+></DT
+><DD
+><P
+> Number of rows in all 3-D grids (at least 2)</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>nc</TT
+></DT
+><DD
+><P
+> 
+Number of columns in all 3-D grids (at least 2)</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>varname</TT
+></DT
+><DD
+><P
+>  
+                  <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>Array of variable names:</TD
+></TR
+><TR
+><TD
+>varname(1) = name of first variable</TD
+></TR
+><TR
+><TD
+>varname(2) = name of second variable</TD
+></TR
+><TR
+><TD
+>...</TD
+></TR
+><TR
+><TD
+>varname(numvars) = name of last variable</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>timestamp</TT
+></DT
+><DD
+><P
+>  
+                  <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>Array of time labels for the timesteps in
+		  HHMMSS format:</TD
+></TR
+><TR
+><TD
+>timestamp(1) = time of first timestep</TD
+></TR
+><TR
+><TD
+>timestamp(2) = time of second timestep</TD
+></TR
+><TR
+><TD
+>...</TD
+></TR
+><TR
+><TD
+>timestamp(numtimes) = time of last timestep</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>datestamp</TT
+></DT
+><DD
+><P
+> 
+                  <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>Array of date labels for the timesteps in
+		  YYDDD format</TD
+></TR
+><TR
+><TD
+>datestamp(1) = date of first timestep</TD
+></TR
+><TR
+><TD
+>datestamp(2) = date of second timestep</TD
+></TR
+><TR
+><TD
+>...</TD
+></TR
+><TR
+><TD
+>datestamp(numtimes) = date of last timestep</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></P
+></DD
+></DL
+></DIV
+></P
+><P
+>     
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><P
+><B
+>Arguments used only by v5dCreateSimple:</B
+></P
+><DL
+><DT
+><TT
+CLASS="VARNAME"
+>nl</TT
+></DT
+><DD
+><P
+>Number of levels in all 3-D grids (at least 1)
+     </P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>northlat</TT
+></DT
+><DD
+><P
+>Latitude of northern edge of box in degrees
+     </P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>latinc</TT
+></DT
+><DD
+><P
+>increment between rows in degrees  (positive)
+     </P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>westlon</TT
+></DT
+><DD
+><P
+>Longitude of western edge of box in degrees (positive
+		  Westlongitude)</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>loninc</TT
+></DT
+><DD
+><P
+>Increment between columns in degrees  (positive)
+     </P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>bottomhgt</TT
+></DT
+><DD
+><P
+>Bottom boundary of box in km</P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>hgtinc</TT
+></DT
+><DD
+><P
+>Increment between levels in km (positive)
+     </P
+></DD
+></DL
+></DIV
+></P
+><P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><P
+><B
+>Arguments used only by v5dCreate:</B
+></P
+><DL
+><DT
+><TT
+CLASS="VARNAME"
+>nl</TT
+></DT
+><DD
+><P
+>         <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>Number of levels in the 3-D grids per variable:</TD
+></TR
+><TR
+><TD
+>nl(1) = number of levels for first variable</TD
+></TR
+><TR
+><TD
+>nl(2) = number of levels for second variable</TD
+></TR
+><TR
+><TD
+> ...  </TD
+></TR
+><TR
+><TD
+>nl(numvars) = number of levels for last variable</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>compress</TT
+></DT
+><DD
+><P
+> 
+Compression mode (1, 2 or 4 bytes per grid point) </P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>projection </TT
+></DT
+><DD
+><P
+> 
+                  <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>Indicates type of map projection:</TD
+></TR
+><TR
+><TD
+>0 = linear, rectangular, generic units</TD
+></TR
+><TR
+><TD
+>1 = linear, rectangular, cylindrical-equidistant
+                  </TD
+></TR
+><TR
+><TD
+>2 = Lambert Conformal</TD
+></TR
+><TR
+><TD
+>3 = Stereographic 4 = Rotated</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>proj_args</TT
+></DT
+><DD
+><P
+> 
+    Projection arguments: 
+    <P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><P
+><B
+></B
+></P
+><DL
+><DT
+>if projection=0 then</DT
+><DD
+><P
+>       <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>proj_args(1) = North boundary of 3-D box</TD
+></TR
+><TR
+><TD
+>proj_args(2) = West boundary of 3-D box</TD
+></TR
+><TR
+><TD
+>proj_args(3) = Increment between rows</TD
+></TR
+><TR
+><TD
+>proj_args(4) = Increment between columns</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+       </P
+></DD
+><DT
+>else if projection=1 then</DT
+><DD
+><P
+>       <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>proj_args(1) = North Latitude bound of 3-D box</TD
+></TR
+><TR
+><TD
+>proj_args(2) = West Longitude bound of 3-D box</TD
+></TR
+><TR
+><TD
+>proj_args(3) = Increment between rows in degrees</TD
+></TR
+><TR
+><TD
+>proj_args(4) = Increment between cols in degrees</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+       </P
+></DD
+><DT
+>else if projection=2 then</DT
+><DD
+><P
+>       <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>proj_args(1) = Standard Latitude 1</TD
+></TR
+><TR
+><TD
+>proj_args(2) = Standard Latitude 2</TD
+></TR
+><TR
+><TD
+>proj_args(3) = Row of North/South pole</TD
+></TR
+><TR
+><TD
+>proj_args(4) = Column of North/South pole</TD
+></TR
+><TR
+><TD
+>proj_args(5) = Longitude parallel to columns</TD
+></TR
+><TR
+><TD
+>proj_args(6) = Increment between columns in km</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+       </P
+></DD
+><DT
+>else if projection=3 then</DT
+><DD
+><P
+>       <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>proj_args(1) = Latitude of center (degrees)</TD
+></TR
+><TR
+><TD
+>proj_args(2) = Longitude of center (degrees)</TD
+></TR
+><TR
+><TD
+>proj_args(3) = Row of center of projection</TD
+></TR
+><TR
+><TD
+>proj_args(4) = Column of center of projection</TD
+></TR
+><TR
+><TD
+>proj_args(5) = Spacing between columns at center</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+    </P
+></DD
+><DT
+>else if projection=4 then</DT
+><DD
+><P
+>       <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>proj_args(1) = North boundary on rotated sphere</TD
+></TR
+><TR
+><TD
+>proj_args(2) = West boundary on rotated sphere</TD
+></TR
+><TR
+><TD
+>proj_args(3) = Increment between rows</TD
+></TR
+><TR
+><TD
+>proj_args(4) = Increment between columns</TD
+></TR
+><TR
+><TD
+>proj_args(5) = Earth Latitude corresponding to (0,0)
+       </TD
+></TR
+><TR
+><TD
+>proj_args(6) = Earth Longitude corresponding to (0,0)
+       </TD
+></TR
+><TR
+><TD
+>proj_args(7) = Rotation angle</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+       </P
+></DD
+><DT
+>endif</DT
+><DD
+><P
+>    </P
+></DD
+></DL
+></DIV
+></P
+></DD
+><DT
+><TT
+CLASS="VARNAME"
+>vertical</TT
+></DT
+><DD
+><P
+>          <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>Indicates type of vertical coordinate system:</TD
+></TR
+><TR
+><TD
+>0 = equally spaced levels in generic units</TD
+></TR
+><TR
+><TD
+>1 = equally spaced levels in km</TD
+></TR
+><TR
+><TD
+>2 = unequally spaced levels in km</TD
+></TR
+><TR
+><TD
+>3 = unequally spaced levels in mb</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></P
+></DD
+></DL
+></DIV
+>
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><P
+><B
+></B
+></P
+><DL
+><DT
+><TT
+CLASS="VARNAME"
+>vert_args</TT
+></DT
+><DD
+><P
+> 
+     Vertical coordinate system arguments: 
+     <P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+>if vertical=0 then</DT
+><DD
+><P
+>       <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>vert_args(1) = height of bottom level</TD
+></TR
+><TR
+><TD
+>vert_args(2) = spacing between levels</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+     </P
+></DD
+><DT
+>else if vertical=1 then</DT
+><DD
+><P
+>       <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>vert_args(1) = height of bottom level in km</TD
+></TR
+><TR
+><TD
+>vert_args(2) = spacing between levels in km</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+     </P
+></DD
+><DT
+>else if vertical=2 then</DT
+><DD
+><P
+>       <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>        vert_args(1) = height (km) of grid level 1 (bottom)</TD
+></TR
+><TR
+><TD
+>vert_args(2) = height (km) of grid level 2</TD
+></TR
+><TR
+><TD
+>... </TD
+></TR
+><TR
+><TD
+>vert_args(N) = height (km) of grid level N (top)</TD
+></TR
+><TR
+><TD
+>where N is the maximum value in the nl array.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+     </P
+></DD
+><DT
+>else if vertical=3 then</DT
+><DD
+><P
+>       <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>        vert_args(1) = pressure (mb) of grid level 1 (bottom)</TD
+></TR
+><TR
+><TD
+>vert_args(2) = pressure (mb) of grid level 2</TD
+></TR
+><TR
+><TD
+>... </TD
+></TR
+><TR
+><TD
+>vert_args(N) = pressure (mb) of grid level N (top)
+        </TD
+></TR
+><TR
+><TD
+>where N is the maximum value in the nl array.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+     </P
+></DD
+><DT
+>endif</DT
+><DD
+><P
+></P
+></DD
+></DL
+></DIV
+></P
+></DD
+></DL
+></DIV
+></P
+><P
+>The v5dWrite function is used to write a single 3-D grid of data to a
+v5d file. The grid is identified by a timestep and physical
+variable number.  Here is the synopsis of v5dWrite:</P
+><P
+>Fortran-callable function:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+> integer function v5dwrite( time, var, data ) 
+	  integer time 
+	  integer var real data(*) </PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>C-callable function:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+> 
+	  int v5dWrite( time, var, data ) 
+	  int time; 
+	  int var;
+	  float data[]; </PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN799"
+></A
+><P
+><B
+>Table 1. Arguments descriptions:</B
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> time </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> A timestep number in the range
+		  [1..numtimes]</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> var </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> A variable number in the range
+		  [1..numvars]</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> data </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 3-D array of grid values; number of values =
+		  nr*nc*nl(var) ordered as data[row+nr*(col+nc*lev)]
+		  where row increases from North to South, col
+		  increases from West to East, and lev increases from
+		  bottom to top</TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></P
+><P
+>The v5dClose function closes the v5d file after the last grid has been
+	written. No arguments are needed.  Here is the synpsis of
+	v5dClose:</P
+><P
+>Fortran-callable function:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+> integer function v5dclose </PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>	C-callable function:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+> int v5dClose() </PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>	Each of the create functions returns 1 when successful and 0
+	when an error occurs.</P
+><P
+>	Looking at any of the example data conversion programs, you'll
+see that there are variables which directly correspond to the
+arguments to v5dCreate/v5dCreateSimple.  It is up to you to initialize
+these variables.  For example, you'll have to assign to numtimes the
+number of timesteps in your dataset, assign to numvars the number of
+variables in your dataset, etc.  After you've initialized all these
+variables, the v5dCreate (or v5dCreateSimple) call will create the v5d
+file. If you've failed to initialize any of the variables you will see
+an appropriate error message.</P
+><P
+>	Next, the conversion program will enter a nested loop inside
+of which you must insert the code to read your data for the
+appropriate time step and physical variable number.  Read your data
+into the array specified.  The v5dWrite call will then compress and
+write the data to the v5d file.  Finally, the v5dClose function will
+be called after all the data has been written.</P
+><P
+>	After you've written and compiled your file converter, you
+should test it with one of your data files then check that it worked
+by running the v5dinfo and v5dstats utility programs on the v5d file.
+If everything looks OK, try running vis5d.</P
+><P
+>	Here is an example of typical values that might be assigned to
+each variable if one were using the 
+<TT
+CLASS="FILENAME"
+>foo_to_v5d.f</TT
+> program:</P
+><P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN826"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><THEAD
+><TR
+><TH
+ALIGN="LEFT"
+VALIGN="TOP"
+> Assignment </TH
+><TH
+ALIGN="LEFT"
+VALIGN="TOP"
+> Comments </TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> numtimes = 5 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 5 time steps </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> numvars = 4 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 4 physical variables </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> nr = 30 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 30 rows in each 3-D grid </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> nc = 40 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 40 columns in each 3-D grid
+		</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> nl = 20 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 20 levels in each 3-D grid
+		</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> varname(1) = "U" </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> U (east/west) wind
+		  component </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> varname(2) = "V" </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> V (north/south) wind
+		  component </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> varname(3) = "T" </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Temperature </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> varname(4) = "P" </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Pressure </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> timestamp(1) = 140000 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 2:00:00 pm </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> timestamp(2) = 141500 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 2:15:00 pm </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> timestamp(3) = 143000 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 2:30:00 pm </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> timestamp(4) = 144500 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 2:45:00 pm </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> timestamp(5) = 150000 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 3:00:00 pm </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> datestamp(1) = 94036 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 36th day of 1994
+		  (February 5) </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> datestamp(2) = 94036 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>		  " </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> datestamp(3) = 94036 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>     "
+		</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> datestamp(4) = 94036 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>		  " </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> datestamp(5) = 94036 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>		  " </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> northlat = 60.0 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Northern boundary of box is at 30 degrees
+		  latitude </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> latinc = 1.0 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> There is 1 degree of latitude between each of
+		  the 30 rows </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> westlon = 100.0 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Western boundary of 3-D box is at 100 degrees
+		  longitude </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> loninc = 0.5 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 0.5 degree of longitude between each of the 40
+		  columns </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> bottomhgt = 0.0 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>    Bottom of box is at 0km (sea level)
+		</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> hgtinc = 1.0 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 1 km between each of the 20 grid levels (top
+		  at 19.0km) </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+><P
+>	The product of the number of rows, columns, levels, timesteps,
+and variables is the total number of data points.  In this example:
+30*40*20*5*4 = 480,000.  A real dataset may be 100 rows by 100 columns
+by 20 levels, have 50 timesteps, and 10 variables for a total of
+100,000,000 data points.</P
+><P
+>	The difference between the foo_to_v5d program (which uses
+v5dCreateSimple), and the foo2_to_v5d program (which uses v5dCreate),
+is the later allows you to specify any map projection, vertical
+coordinate system, a different number of grid levels for each physical
+variable, and to control data compression.  To specify a map
+projection, you must set the value of projection to 0,1,2 or 3 to
+indicate which projection, then specify the projection-dependent
+parameters in the proj_args arrray.  Specifying the vertical
+coordinate system is done similarly.</P
+><P
+>	It is sometimes useful to specify a different number of grid
+levels for each variable.  For example, suppose most of your variables
+have 30 grid levels but a some variables have fewer grid levels,
+perhaps only one.  Prior to version 4.0 of Vis5D, you would have had
+to fill in the extra levels with redundant, missing or dummy data
+values.  With the v5dCreate function you can specify how many grid
+levels are present for each individual physical variable with the nl
+array parameter.  Be aware that the amount of data passed to the
+v5dWrite call will depend on which variable you're writing.  For
+example, if your grid has C columns and R rows then the number of
+values in the data array passed to v5dWrite for variable V must equal
+C*R*nl(V).</P
+><P
+>	By default, the bottom-most grid level of each variable is
+displayed at the bottom of the 3-D box; each grid extends upward for
+how ever many levels are present.  Sometimes, however, the bottom-most
+grid level of a particular variable should be positioned higher up. An
+example of this is a combined ocean/atmosphere dataset.  There may be
+a total of 18 grid levels: the bottom 8 grid levels being ocean data
+and the top 10 grid levels being atmospheric data.  In this case, the
+bottom of the atmospheric data should be offset or shifted upward by 8
+grid levels.</P
+><P
+>	Elaborating on the ocean/atmosphere example, suppose we have 2
+ocean variables named S (salinity) and T (temperature) and 2
+atmosphere variables named P (pressure) and T1 (temperature). There
+are 8 layers of ocean data and 10 layers of atmospheric data.  Here is
+a summary showing how the lowlev array is the solution to this
+situation:</P
+><P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN914"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><THEAD
+><TR
+><TH
+ALIGN="LEFT"
+VALIGN="TOP"
+> varnum </TH
+><TH
+ALIGN="LEFT"
+VALIGN="TOP"
+> varname(varnum) </TH
+><TH
+ALIGN="LEFT"
+VALIGN="TOP"
+> nl(varnum) </TH
+><TH
+ALIGN="LEFT"
+VALIGN="TOP"
+> lowlev(varnum) </TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 1 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> S </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 8 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 0 </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 2 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> T </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 8 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 0 </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 3 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> P </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 10 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 8 </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 4 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> T1 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 10 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> 8 </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+>       </P
+><P
+>	The lowlev array is not specified in the v5dCreate function
+	because it was developed after the v5dCreate function was well
+	established.  Instead, the new v5dSetLowLev function is called
+	with the lowlev array.  This separate function was added to
+	extend the functionality of v5dCreate without changing its
+	calling sequence.  Here is the synopsis of v5dSetLowLev:</P
+><P
+>Fortran-callable function:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+> 
+	  integer function v5dsetlowlev( lowlev )
+	  integer lowlev(*) </PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>C-callable function:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+> 
+	  int v5dSetLowLev( lowlev ) 
+	  int lowlev[];</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>	Argument description:</P
+><P
+>	lowlev: Specifies the vertical offset, in grid levels, for
+	each variable. </P
+><P
+>	lowlev(1) = offset for first variable </P
+><P
+>	lowlev(2) = offset for second variable ...  = ...
+	lowlev(numvars) = offset for last variable</P
+><P
+>	v5dSetLowLev may be called at any point between v5dCreate and
+	v5dClose.</P
+><P
+>	The v5dCreate and v5dcreate functions allow you to control how
+the grid data are compressed.  The default is for grid values to be
+linearly scaled to one byte integers.  This works very well for most
+data sets, since the scaling factors are chosen independently for each
+combination of time step, variable and vertical level.  Furthermore,
+the compression to one byte per grid point enables Vis5D's high degree
+of interactivity, since compression allows entire data sets to be
+resident in memory. However, the compress argument of the v5dCreate
+and v5dcreate functions lets you pick whether grid point values are
+scaled to 1-byte integers, scaled to 2-byte integers, or left as
+4-byte floating point values (no compression).  </P
+><P
+><DIV
+CLASS="TIP"
+><P
+></P
+><TABLE
+CLASS="TIP"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="./stylesheet-images/tip.gif"
+HSPACE="5"
+ALT="Tip"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>  We recommend that you try compression to 1-byte integers
+  first,  and only use 2 or 4 bytes if you have precision problems at
+  1-byte.
+  </P
+></TD
+></TR
+></TABLE
+></DIV
+></P
+><P
+>	Vis5D version 4.2 and later allow you to specify the physical
+units for each variable in your dataset.  The v5dSetUnits() function
+takes two arguments: a variable number and a units character string.
+If the first variable in your file is P and the units are millibars
+then you can specify that with:</P
+><P
+>	C:  v5dSetUnits( 1, "millibars" ) </P
+><P
+>	Fortran: call v5dsetunits( 1, "millibars" )</P
+><P
+>	The units will be displayed by the v5dinfo program and in
+Vis5D when using the probe.</P
+><P
+>	To compile your program which uses v5dCreate, v5dWrite, and
+v5dClose you must link with the 
+<TT
+CLASS="FILENAME"
+>src/v5d.o</TT
+> and <TT
+CLASS="FILENAME"
+>src/binio.o</TT
+> files.
+Alternatively, link with <TT
+CLASS="PARAMETER"
+><I
+>-lv5d</I
+></TT
+> to link with the 
+installed <TT
+CLASS="FILENAME"
+>libv5d</TT
+> library.  
+See the makefiles in the convert/ directory for examples.</P
+><P
+>	Finally, if your data is generated by an atmospheric or
+oceanic model, you may want to consider modifying your model to
+generate v5d files directly using the v5dCreate, v5dWrite, and
+v5dClose functions.  Look at the sample data conversion programs for
+ideas.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch02sec2.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch03sec2.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Installing Vis5D</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Map Projections and Vertical Coordinate Systems</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

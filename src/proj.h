@@ -99,19 +99,19 @@ extern void gridPRIME_to_xyzPRIME( Display_Context dtx, int time, int var, int n
 
 
 extern void xyz_to_compXYZ( Display_Context dtx, int n, float x[], float y[],
-                     float z[], int_2 xyz[][3] );
+                     float z[], int_vert2 xyz[][3] );
 
 extern void gridPRIME_to_compXYZPRIMEcheck( Display_Context, int time, int var, int *N,
                              float r[], float c[], float l[],
-                             int_2 xyz[][3] );
+                             int_vert2 xyz[][3] );
 
 extern void gridPRIME_to_compXYZPRIME( Display_Context, int time, int var, int n,
                              float r[], float c[], float l[],
-                             int_2 xyz[][3] );
+                             int_vert2 xyz[][3] );
 
 extern void grid_to_compXYZ( Context ctx, int time, int var, int n,
                              float r[], float c[], float l[],
-                             int_2 xyz[][3] );
+                             int_vert2 xyz[][3] );
 
 
 extern void geo_to_xyz( Context ctx, int time, int var, int n,

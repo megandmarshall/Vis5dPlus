@@ -1,0 +1,194 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Isosurfaces</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Using Vis5D to Visualize Your Data"
+HREF="ch06.html"><LINK
+REL="PREVIOUS"
+TITLE="Viewing Modes"
+HREF="ch06sec4.html"><LINK
+REL="NEXT"
+TITLE="Slices"
+HREF="ch06sec6.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch06sec4.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Using Vis5D to Visualize Your Data</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch06sec6.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH06SEC5"
+>Isosurfaces</A
+></H1
+><P
+>     An isosurface (3-D contour surface) shows the 3-D volume bounded by a
+particular isovalue.  The isosurface has the specified iso-level, the volume
+inside contains values greater (or less) than the isovalue.  The volume outside
+contains values less (or greater) than the isovalue.</P
+><P
+>     The first column of buttons in the control panel's button matrix controls
+isosurfaces.  Clicking on one of these buttons with the left mouse button causes
+a pop-up window with a slider and OK button to appear below.  Select an isovalue
+on the slider and click on the OK button to generate an isosurface for all time
+steps.</P
+><P
+>     Toggling ANIMATE on will let you watch the time dynamics of the iso-level
+contour surfaces.  Note that the surfaces are generated asynchronously with the
+animation, so you may not see the surfaces for all the time steps as the clock
+hand makes it revolution.  The new surfaces will appear on successive clock
+revolutions.</P
+><P
+>     Clicking on an isosurface button with the middle mouse button will summon
+the pop-up window without toggling the surface on or off.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="CH06SEC5.1"
+>Isosurface Color</A
+></H2
+><P
+>     An isosurface may either be drawn entirely in one color or colored
+according to the values of another physical variable.</P
+><P
+>     To change the color of an isosurface, click on the appropriate isosurface
+button with the right mouse button.  A window will appear with a column of
+variable names (first button labeled "monocolor") and four sliders labeled red,
+green, blue, and transparency.</P
+><P
+>     By default, monocoloring is used.  To change the isosurfaces's color just
+move the red, green, and blue sliders.</P
+><P
+>     If you click on a button other than "monocolor" you will tell vis5d to draw
+the isosurface according to another physical variable.  The red,green,blue
+sliders will be replaced with a color table editor.  You can change the color
+table (which maps data values to colors) by drawing new curves with the mouse or
+by pressing the up, down, left, and right cursor keys on your keyboard.</P
+><P
+>     As an example, suppose you're viewing the LAMPS.v5d data set.
+Make an isosurface of wind speed at 40 m/s.  The isosurface should be
+blue.  Click on the SPD isosurface button with your right mouse
+button.  The color window appears.  Click on the T button in that
+window and the isosurface will now be colored according to
+temperature.  You can modify the mapping from temperature values to
+colors by "drawing" the red, green, and blue curves in the color table
+window with the mouse buttons or by pressing the cursor keys. Changing
+the color table is explained more below in the section about colored
+slices.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch06sec4.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch06sec6.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Viewing Modes</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ch06.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Slices</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

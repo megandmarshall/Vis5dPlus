@@ -417,7 +417,7 @@ static void vrml_polylines_float(int n,
 	bl();fprintf(fp, "} # End of Shape\n"); 
 }
 
-static void vrml_polylines( int n, int_2 verts[][3], unsigned int color)
+static void vrml_polylines( int n, int_vert2 verts[][3], unsigned int color)
 {
 	int	i;
 	float	r, g, b, a;
@@ -483,7 +483,7 @@ static void vrml_polylines( int n, int_2 verts[][3], unsigned int color)
 	bl();fprintf(fp, "} # End of Shape\n");
 }
 
-static void vrml_colored_polylines(int n, int_2 verts[][3],
+static void vrml_colored_polylines(int n, int_vert2 verts[][3],
 	                   uint_1 color_indexes[],
 	                   unsigned int color_table[])
 {
@@ -672,7 +672,7 @@ static void vrml_multi_lines( int n, float verts[][3], unsigned int color)
 }
 
 static void vrml_wind_lines(int nvectors,
-		     int_2 verts[][3],
+		     int_vert2 verts[][3],
 		     unsigned int color)
 {
 	int	i, j;
@@ -789,7 +789,7 @@ static void vrml_wind_lines(int nvectors,
 
 void vrml_disjoint_lines(
 			int		n,
-			int_2		verts[][3],
+			int_vert2	verts[][3],
 			unsigned int	color
 )
 {
@@ -868,7 +868,7 @@ void vrml_disjoint_lines(
 }
 
 static void vrml_colored_quadmesh(int rows, int columns,
-			int_2 verts[][3],
+			int_vert2 verts[][3],
 			uint_1 color_indexes[],
 			unsigned int color_table[],
 		        int alphavalue)
@@ -1168,13 +1168,8 @@ static void vrml_colored_topomesh(
 	bl();fprintf(fp, "} # End of topo Shape.\n");
 }
 
-#ifdef BIG_GFX
-static void vrml_isosurface(int n, uint_4 *index, int_2 verts[][3],
+static void vrml_isosurface(int n, uint_vert2 *index, int_vert2 verts[][3],
 			int_1 norms[][3], unsigned int color)
-#else
-static void vrml_isosurface(int n, uint_2 *index, int_2 verts[][3],
-			int_1 norms[][3], unsigned int color)
-#endif
 {
 	int		i, count, maxvert;
 	int		i1, i2, i3;
@@ -1372,12 +1367,8 @@ static void vrml_isosurface(int n, uint_2 *index, int_2 verts[][3],
 }
 
 static void vrml_colored_isosurface( int n,
-#ifdef BIG_GFX
-		uint_4 *index,
-#else
-		uint_2 *index,
-#endif
-		int_2 verts[][3],
+		uint_vert2 *index,
+		int_vert2 verts[][3],
 		int_1 norms[][3],
 		uint_1 color_indexes[],
 		unsigned int color_table[],

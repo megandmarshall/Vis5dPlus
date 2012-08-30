@@ -101,6 +101,7 @@ static void make_square_box( Display_Context dtx )
    ADD_VERTEX( dtx->Xmin, dtx->Ymax, dtx->Zmin );
    END_OF_LINE;
 
+   if(DRAWBOXARROW){
    /* arrow */
    ADD_VERTEX(  0.025, dtx->Ymax+0.05, dtx->Zmin );
    ADD_VERTEX(  0.0,   dtx->Ymax+0.1,  dtx->Zmin );
@@ -109,14 +110,18 @@ static void make_square_box( Display_Context dtx )
    ADD_VERTEX(  0.0,   dtx->Ymax,      dtx->Zmin );
    ADD_VERTEX(  0.0,   dtx->Ymax+0.1,  dtx->Zmin );
    END_OF_LINE;
+   }
 
-   /* N */
+   if(DRAWBOXNORTH){
+     /* N */ // JCM North
    ADD_VERTEX( -0.025, dtx->Ymax+0.15, dtx->Zmin );
    ADD_VERTEX( -0.025, dtx->Ymax+0.25, dtx->Zmin );
    ADD_VERTEX(  0.025, dtx->Ymax+0.15, dtx->Zmin );
    ADD_VERTEX(  0.025, dtx->Ymax+0.25, dtx->Zmin );
    END_OF_LINE;
+   }
 
+   if(DRAWBOXTICKS){
    if (dtx->Projection==PROJ_GENERIC || dtx->Projection==PROJ_LINEAR
        /* ZLB */ || dtx->Projection==PROJ_GENERIC_NONEQUAL) {
       /* East tick mark */
@@ -147,6 +152,7 @@ static void make_square_box( Display_Context dtx )
    }
    else {
       dtx->TickMarks = 0;
+   }
    }
 }
 
@@ -697,20 +703,23 @@ void draw_box( Display_Context dtx, int it )
 {
    /* base and up vectors for text drawn along x,y,z axes. */
    static float bx[3] = { 0.05, 0.0, 0.0 },      ux[3] = { 0.0, 0.05, 0.05 };
+  //   static float bx[3] = { 0.035, 0.0, 0.0 },      ux[3] = { 0.0, 0.07, 0.07 };
    static float by[3] = { -0.035, 0.0, -0.035 },  uy[3] = { 0.0, 0.07, 0.0 };
    static float bz[3] = { -0.035, -0.035, 0.0 }, uz[3] = { 0.0, 0.0, 0.07 };
    float x1, y1, z1, x2, y2, z2;
-   char str[100], xdir1[8], xdir2[8], ydir1[8], ydir2[8];
+  char str[100], xdir1[10], xdir2[10], ydir1[10], ydir2[10], zdir1[10], zdir2[10];
+  float ftemp;
+
 
    /* set depth cueing & line color */
-/* MJK 3.29.99 */
+  /* MJK 3.29.99 */
    if (dtx->Reversed){
       set_color( PACK_COLOR(0,0,0,255) );
    }
    else{
       set_color( dtx->BoxColor );
    }
-/*MiB*/
+  /*MiB*/
    xdir1[0] = ' ';
    xdir2[0] = ' ';
    xdir1[1] = '\0';
@@ -719,6 +728,11 @@ void draw_box( Display_Context dtx, int it )
    ydir2[0] = ' ';
    ydir1[1] = '\0';
    ydir2[1] = '\0';
+
+  zdir1[0] = ' ';
+  zdir2[0] = ' ';
+  zdir1[1] = '\0';
+  zdir2[1] = '\0';
 
    set_depthcue( dtx->DepthCue );
 	
@@ -749,7 +763,8 @@ void draw_box( Display_Context dtx, int it )
          y1 = dtx->NorthBound;
          y2 = dtx->SouthBound;
 
-/*MiB   03/2001 limit range to -180, 180 */
+
+      /*MiB   03/2001 limit range to -180, 180 */
          if (x1 < -180.){
 	     x1 = 360. + x1;
          }
@@ -762,33 +777,47 @@ void draw_box( Display_Context dtx, int it )
          if (x2 > 180.){
 	     x2 = -360. + x2;
          }
-/*MiB   03/2001 Define East/West  */
+      /*MiB   03/2001 Define East/West  */
          if (x1 > 0.){
-	     	xdir1[0] = 'W';
+	strcpy(xdir1,WESTLABEL);
          } else {
-                xdir1[0] = 'E';
-                x1 = x1 *(-1.);
+	strcpy(xdir1,EASTLABEL);
+	if(SWITCHSIGNLABEL) x1 = x1 *(-1.);
                 }
+
          if (x2 > 0.){
-	     	xdir2[0] = 'W';
+	strcpy(xdir2,WESTLABEL);
          } else {
-                xdir2[0] = 'E';
-                x2 = x2 *(-1.);
+	strcpy(xdir2,EASTLABEL);
+	if(SWITCHSIGNLABEL) x2 = x2 *(-1.);
          } 
-/*MiB   03/2001 Define North/South  */
+      /*MiB   03/2001 Define North/South  */
          if (y1 > 0.){
-	     	ydir1[0] = 'N';
+	strcpy(ydir1,NORTHLABEL);
          } else {
-                ydir1[0] = 'S';
-                y1 = y1 *(-1.);
+	strcpy(ydir1,SOUTHLABEL);
+	if(SWITCHSIGNLABEL) y1 = y1 *(-1.);
                 }
          if (y2 > 0.){
-	     	ydir2[0] = 'N';
+	strcpy(ydir2,NORTHLABEL);
          } else {
-                ydir2[0] = 'S';
-                y2 = y2 *(-1.);
+	strcpy(ydir2,SOUTHLABEL);
+	if(SWITCHSIGNLABEL) y2 = y2 *(-1.);
+      } 
+
+
+
+      if(SWITCHXAXES==1){
+	ftemp=x1;
+	x1=x2;
+	x2=ftemp;
          } 
 
+      if(SWITCHYAXES==1){
+      	ftemp=y1;
+	y1=y2;
+      	y2=ftemp;
+      }
 
 #ifdef LEVELTYPES
          z1 = dtx->BottomCoordinate;
@@ -799,48 +828,87 @@ void draw_box( Display_Context dtx, int it )
 #endif
          z1 = VERT(z1);
          z2 = VERT(z2);
+
+      
+
+      // JCM: Define up/down
+      if (z1 > 0.){
+	strcpy(zdir1,UPLABEL);
+      } else {
+	strcpy(zdir1,DOWNLABEL);
+	if(SWITCHSIGNLABEL) z1 = z1 *(-1.);
+      }
+      if (z2 > 0.){
+	strcpy(zdir2,UPLABEL);
+      } else {
+	strcpy(zdir2,DOWNLABEL);
+	if(SWITCHSIGNLABEL) z2 = z2 *(-1.);
+      } 
+
+      if(SWITCHZAXES==1){
+      	ftemp=z1;
+	z1=z2;
+      	z2=ftemp;
+      }
+      
+
       }
 
       if (dtx->CursorX - dtx->Xmin > 0.1 || dtx->DisplayCursor==0) {
          /* MJK 12.02.98 */
          float2string (dtx, 0, x1, str);
-/*MiB*/  strcat(str,xdir1);
+      /*MiB*/  strcat(str,xdir1);
          plot_string( str, dtx->Xmin-0.02, dtx->Ymin-0.1, dtx->Zmin-0.125, bx, ux, 0 );
       }
 
       if (dtx->Xmax - dtx->CursorX > 0.1 || dtx->DisplayCursor==0) {
          /* MJK 12.02.98 */
          float2string (dtx, 0, x2, str);
-/*MiB*/  strcat(str,xdir2);
+      /*MiB*/  strcat(str,xdir2);
          plot_string( str, dtx->Xmax-0.05, dtx->Ymin-0.1, dtx->Zmin-0.125, bx, ux, 0 );
       }
 
-      if (dtx->Ymax - dtx->CursorY > 0.1 || dtx->DisplayCursor==0) {
+    if (
+	(COORDHAND==COORDLEFTHAND)&&(dtx->Ymax - dtx->CursorY > 0.1 || dtx->DisplayCursor==0)
+	|| (COORDHAND==COORDRIGHTHAND)&&(dtx->CursorY - dtx->Ymin > 0.1 || dtx->DisplayCursor==0)
+	) {
          /* MJK 12.02.98 */
          float2string (dtx, 1, y1, str);
-/*MiB*/  strcat(str,ydir1);
-         plot_string( str, dtx->Xmin-0.075, dtx->Ymax-0.03, dtx->Zmin-0.075, by, uy, 1 );
+      /*MiB*/  strcat(str,ydir1);
+      if(SWITCHYAXES==0) plot_string( str, dtx->Xmin-0.075, dtx->Ymax-0.03, dtx->Zmin-0.075, by, uy, 1 );
+      else plot_string( str, dtx->Xmin-0.075, dtx->Ymin-0.03, dtx->Zmin-0.075, by, uy, 1 );
       }
 
-      if (dtx->CursorY-dtx->Ymin > 0.1 || dtx->DisplayCursor==0) {
+    if (
+	(COORDHAND==COORDLEFTHAND)&&(dtx->CursorY-dtx->Ymin > 0.1 || dtx->DisplayCursor==0)
+	||(COORDHAND==COORDRIGHTHAND)&&(dtx->Ymax - dtx->CursorY > 0.1 || dtx->DisplayCursor==0)
+	){
          /* MJK 12.02.98 */
-         float2string (dtx, 2, y2, str);
-/*MiB*/  strcat(str,ydir2);
-         plot_string( str, dtx->Xmin-0.075, dtx->Ymin-0.02, dtx->Zmin-0.075, by, uy, 1 );
+      float2string (dtx, 1, y2, str);
+      /*MiB*/  strcat(str,ydir2);
+      if(SWITCHYAXES==0) plot_string( str, dtx->Xmin-0.075, dtx->Ymin-0.02, dtx->Zmin-0.075, by, uy, 1 );
+      else  plot_string( str, dtx->Xmin-0.075, dtx->Ymax+0.02, dtx->Zmin-0.075, by, uy, 1 );
       }
 
       if (dtx->CursorZ-dtx->Zmin > 0.1 || dtx->DisplayCursor==0) {
          /* MJK 12.02.98 */
          float2string (dtx, 2, z1, str);
+      strcat(str,zdir1);
          plot_string( str, dtx->Xmin-0.07, dtx->Ymin-0.07, dtx->Zmin+0.005, bz, uz, 1 );
       }
 
       if (dtx->Zmax-dtx->CursorZ > 0.1 || dtx->DisplayCursor==0) {
          /* MJK 12.02.98 */
          float2string(dtx, 2, z2, str);
+      strcat(str,zdir2);
          plot_string( str, dtx->Xmin-0.07, dtx->Ymin-0.07, dtx->Zmax+0.005, bz, uz, 1 );
       }
+
+    // DEBUG:
+    //    fprintf(stderr,"XYZmin=%g %g %g max: %g %g %g\n",dtx->Xmin,dtx->Ymin,dtx->Zmin,dtx->Xmax,dtx->Ymax,dtx->Zmax);
+
    }
+
 
    set_depthcue( 0 );
 
@@ -952,6 +1020,8 @@ void draw_logo( Display_Context dtx, unsigned int c )
    short p[30][2];
    int j;
    float factor;
+
+   if(DODRAWLOGO==0) return;
 
    factor = dtx->LogoSize;
    set_color( c );

@@ -1,0 +1,53 @@
+2012-08-30  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* codeset.m4: Upgrade to gettext-0.18.
+	* fcntl-o.m4: New file, from gettext-0.18.
+	* glibc2.m4: New file, from gettext-0.18.
+	* glibc21.m4: Upgrade to gettext-0.18.
+	* intdiv0.m4: New file, from gettext-0.18.
+	* intl.m4: New file, from gettext-0.18.
+	* intldir.m4: New file, from gettext-0.18.
+	* intlmacosx.m4: New file, from gettext-0.18.
+	* intmax.m4: New file, from gettext-0.18.
+	* inttypes_h.m4: New file, from gettext-0.18.
+	* inttypes-pri.m4: New file, from gettext-0.18.
+	* lcmessage.m4: Upgrade to gettext-0.18.
+	* lock.m4: New file, from gettext-0.18.
+	* longlong.m4: New file, from gettext-0.18.
+	* printf-posix.m4: New file, from gettext-0.18.
+	* size_max.m4: New file, from gettext-0.18.
+	* stdint_h.m4: New file, from gettext-0.18.
+	* threadlib.m4: New file, from gettext-0.18.
+	* uintmax_t.m4: New file, from gettext-0.18.
+	* visibility.m4: New file, from gettext-0.18.
+	* wchar_t.m4: New file, from gettext-0.18.
+	* wint_t.m4: New file, from gettext-0.18.
+	* xsize.m4: New file, from gettext-0.18.
+	* Makefile.am (EXTRA_DIST): Add the new files.
+
+2012-08-30  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* gettext.m4: Upgrade to gettext-0.18.
+	* iconv.m4: Upgrade to gettext-0.18.
+	* lib-ld.m4: Upgrade to gettext-0.18.
+	* lib-link.m4: Upgrade to gettext-0.18.
+	* lib-prefix.m4: Upgrade to gettext-0.18.
+	* nls.m4: New file, from gettext-0.18.
+	* po.m4: New file, from gettext-0.18.
+	* progtest.m4: Upgrade to gettext-0.18.
+	* Makefile.am (EXTRA_DIST): Add the new files.
+
+2002-03-20  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* codeset.m4: New file, from gettext-0.11.1.
+	* gettext.m4: New file, from gettext-0.11.1.
+	* glibc21.m4: New file, from gettext-0.11.1.
+	* iconv.m4: New file, from gettext-0.11.1.
+	* isc-posix.m4: New file, from gettext-0.11.1.
+	* lcmessage.m4: New file, from gettext-0.11.1.
+	* lib-ld.m4: New file, from gettext-0.11.1.
+	* lib-link.m4: New file, from gettext-0.11.1.
+	* lib-prefix.m4: New file, from gettext-0.11.1.
+	* progtest.m4: New file, from gettext-0.11.1.
+	* Makefile.am: New file.
+

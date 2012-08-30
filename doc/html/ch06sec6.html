@@ -1,0 +1,403 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Slices</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Using Vis5D to Visualize Your Data"
+HREF="ch06.html"><LINK
+REL="PREVIOUS"
+TITLE="Isosurfaces"
+HREF="ch06sec5.html"><LINK
+REL="NEXT"
+TITLE="Volume Rendering"
+HREF="ch06sec7.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch06sec5.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Using Vis5D to Visualize Your Data</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch06sec7.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH06SEC6"
+>Slices</A
+></H1
+><P
+>     Slices allow you to look at planar cross sections of data in the 3-D box.
+These slices can be oriented either horizontally or vertically and may depict
+either contour lines, colored slices, wind vectors, or wind stream lines.</P
+><P
+>     As described in 
+<A
+HREF="ch06sec2.html"
+>section 6.2</A
+>, 
+the last group of buttons on the control panel
+is a matrix of buttons, the second through fifth columns of which control
+slices.  There is a column of buttons for horizontal contour slices, vertical
+contour slices, horizontal colored slices and vertical colored slices,
+respectively.  If your data set contains U, V, and W variables, there will also
+be a row of wind vector slice buttons as described in 6.2.  There are two
+buttons for horizontal wind slices and two buttons for vertical wind slices.</P
+><P
+>     To activate/turn on a slice, click on the appropriate widget button with
+the left mouse button.  The initial position for slices is the middle of the
+box.  The exact slice location in terms of latitude, longitude or elevation is
+given by a small numeric labels near the one corner of each slice.  To print the
+numbers as grid coordinates instead of geographic coordinates, toggle the "GRID
+#s" widget button on the control panel.</P
+><P
+>     The position of slices can be changed interactively using the mouse.  To do
+so you must first be in SLICE mode by selecting the SLICE radio button.  To move
+any slice, simply point at the slice's corner with the mouse, press the right
+mouse button and drag it to a new position.  Vertical slices may also be moved
+in a perpendicular motion by "grabbing" the middle of the top or bottom edge and
+dragging it.  A slice may be moved while in animation mode, however, some
+jumpiness may occur because new slices are computed asynchronously.</P
+><P
+>     Slices may also be linked in a chain.  When slices are linked, the state
+and movement of all the linked slices are synchronized.  Horizontal and vertical
+slices can not be linked.  Slices can be linked by using the API function call
+'vis5d_link_slices' and 'vis5d_unlink_slice' from a script or via the 'INTERP'
+button in the control panel.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="CH06SEC6.1"
+>Contour Line Slices</A
+></H2
+><P
+>     When viewing a horizontal or vertical contour line slice (button columns
+two and three) a small control window will appear as well.  In this pop-up
+window you can enter the interval to
+use between contour lines.  Just type in a new number to change the interval.
+Decreasing the interval will cause denser contour lines to be generated,
+increasing the interval will result in sparser lines.</P
+><P
+>     If you enter a negative interval then all contour lines with a negative
+value will be drawn with dashed lines while positive values will be drawn with
+solid lines.</P
+><P
+>     Optionally, after the interval value you may specify a range of values
+(a,b) which will cause only contour values between a and b to be drawn.  
+For example, suppose you enter</P
+><P
+>     -10 (-30,20)</P
+><P
+>This will result in contour lines for values between -30 and 20 at intervals of
+10 with negative lines drawn as dashed lines.</P
+><P
+>     The "CONT #s" button on the control panel toggles the display of the
+contour numbers within the slice.</P
+><P
+>     The SFC button will cause the horizontal slice data to be sampled from the
+topography surface then displayed on top of the topograhpy.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="CH06SEC6.2"
+>Colored Slices</A
+></H2
+><P
+>     When a viewing a horizontal or vertical colored slice (button columns four
+and five) a color table window will appear.  In this pop-up window you can
+change the mapping from data values to colors.  If the LEGENDS control panel
+button is selected the color table will also be displayed in the 3-D viewing
+window.</P
+><P
+>     The window shows graphs of red, green, and blue over the range of data
+values.  To change the red, green, or blue function press the left, middle, or
+right mouse button, respectively, and drag the mouse to draw a new function.  By
+default, low data values are mapped to blue and high data values are mapped to
+red.</P
+><P
+>     Instead of using the mouse you can use the keyboard cursor (arrow) keys to
+modify the shape and position of the default function curves.  Press the
+left/right keys to move the curves left or right.  Press the up/down keys to
+change the shape of the curves.</P
+><P
+>     You may also change the transparency of the slice as a function of the data
+values.  Press and hold the SHIFT key while using the mouse or up/down keys to
+change the transparency.</P
+><P
+>There are a number of other keyboard controls for the color table window:</P
+><P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2190"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><B
+CLASS="KEYCAP"
+>r</B
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>reset red, green and blue values </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><B
+CLASS="KEYCAP"
+>R</B
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>reset transparency values </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><B
+CLASS="KEYCAP"
+>c</B
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>copy color to an off-screen clipboard </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><B
+CLASS="KEYCAP"
+>p</B
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>paste colors from the off-screen clipboard </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><B
+CLASS="KEYCAP"
+>s</B
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>save color values to a file, enter filename 
+                  in your shell window
+		   </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><B
+CLASS="KEYCAP"
+>l</B
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>load color values from a file, enter filename
+                  in your shell window </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="CH06SEC6.3"
+>Wind Vector Slices</A
+></H2
+><P
+>     Wind vector slices are displayed with the buttons near the center
+of the control panel labeled HWIND-1, VWIND-1, HWIND-2 and VWIND-2.
+The pop-up window for these graphics contains two type-in fields to
+control the density and scaling of the wind vectors.  The scale
+parameter is used to multiply the length of vectors drawn.  If you
+want to double the length of all vectors, enter 2.0.  If you want to
+halve the lengths, enter 0.5.  The density parameter controls how many
+wind vectors are displayed.  This value can only be between zero and
+one.  To make one-half the number of vectors, enter 0.5, for
+one-fourth enter 0.25, etc.  The default values for both parameters is
+1.0.</P
+><P
+>     The SFC button for horizontal wind slices will cause the slice data to be
+sampled from the topography surface then displayed on top of the topograhpy.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="CH06SEC6.4"
+>Wind Stream Slices</A
+></H2
+><P
+>     Wind stream slices show the path of wind as connected line segments.  The
+pop-up control window contains a type-in widget to control the density of
+streamlines (note that the scale parameter is not used).  The density parameter
+controls how many streamlines are displayed.  This value can only be between 0.5
+and 2.0.  To make one-half the number of streamlines, enter 0.5, to make twice
+the number of streamlines, enter 2.0, etc.  The default density is 1.0.</P
+><P
+>     The SFC button will cause the horizontal slice data to be sampled from the
+topography surface then displayed on top of the topograhpy.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="CH06SEC6.5"
+>Slice colors</A
+></H2
+><P
+>     The color of a slice's control button matches that of the slice
+itself (except for colored slices for which the slice's tick mark
+matches the slice's button.)  To change the color of a slice click on
+the slice's button with the right mouse button.  A window with red,
+green, and blue sliders will appear.  Move the sliders to change the
+color.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch06sec5.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch06sec7.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Isosurfaces</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ch06.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Volume Rendering</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

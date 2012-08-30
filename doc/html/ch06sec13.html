@@ -1,0 +1,772 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Making New Variables</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Using Vis5D to Visualize Your Data"
+HREF="ch06.html"><LINK
+REL="PREVIOUS"
+TITLE="Vertical Sounding and SkewT"
+HREF="ch06sec12.html"><LINK
+REL="NEXT"
+TITLE="Saving Image Files and Printing"
+HREF="ch06sec14.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch06sec12.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Using Vis5D to Visualize Your Data</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch06sec14.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH06SEC13"
+>Making New Variables</A
+></H1
+><P
+>     The NEW VAR button on the control panel is used to add new physical
+variables to the button matrix.  There are three kinds of new variables you can
+add:</P
+><P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>     Cloned variables:  these are copies of existing variables.  You can use
+a cloned variable to make two different isosurfaces of the same variable
+simultaneously, for example.</P
+></LI
+><LI
+><P
+>     External function variables:  you can invoke an external function (which
+you write) to compute a new variable as a function of existing variables.</P
+></LI
+><LI
+><P
+>     Computed variables:  you can compute a new variable by typing in a
+formula involving values of existing variables.</P
+></LI
+></OL
+></P
+><P
+>     When you click on the NEW VAR button a window appears which lists the
+variables that you can clone, lists the external functions that you can invoke,
+and lets you type in a formula for computing a new variable.  After a new
+variable has been created a new row of buttons will be added to the control
+panel for the new variable.  You can then make isosurfaces, contour slices, etc.
+of the that variable like any other.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="CH06SEC13.1"
+>Cloned Variables</A
+></H2
+><P
+>     Suppose you want to clone the U wind component variable so that you can
+make both +20 and -20 isosurfaces of it.  First, click on NEW VAR and then
+select U from the pop-up window.  The cloned variable will be named U'.  You can
+then treat U' as any other variable and make an isosurface of it.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="CH06SEC13.2"
+>Type-in Formulas</A
+></H2
+><P
+>     Type-in formulas let you type in mathematical expressions to compute new
+variables as a function of existing variables.  For example, to compute wind
+speed from U, V, and W you would enter the formula:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>     SPD3D = SQRT( U*U + V*V + W*W )</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>To compute the ration of the dew point (TD) to the temperature you would enter
+the formula:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>     RATIO = TD / T</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>     Formulas may use the names of existing variables, numbers, the arithmetic
+operations +, -, *, / and ** (exponentiation), and the functions SQRT, EXP, LOG,
+SIN, COS, TAN, ATAN (arc tangent), ABS (absolute value), MIN and MAX.  MIN and
+MAX take two arguments, while the other functions all take one argument.</P
+><P
+>     There is a special operator 'time'.  This will allow one to choose the grid
+values for a certain time step relative to the current time step.  The format is
+'time(var, time_step_change).  If the var is subsituted with the word 'time'
+then the grid will be a constant value, the number of second since the first
+time step.  For example in order to create a time derivative of U of the type:</P
+><P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2332"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+> U(t+1) - U(t-1) </TD
+></TR
+><TR
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+> ------------------- </TD
+></TR
+><TR
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+> Time(t+1) - Time(t-1) </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+><P
+>you would enter the formula:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>     dUdt = ( time(U,1) - time(U,-1) ) / ( time(time,1) - time(time,-1) )</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>     Click on the OK button to compute the new variable or CANCEL to discard the
+formula.  You can edit the formula later by selecting it again from the NEW VAR
+pop-up window.</P
+><P
+>     When multiple data sets are being viewed in one display a period and data
+context index number must be appended to the end of each variable in the
+formula.  For example the above formula might instead look like:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>     SPD3D.2 = SQRT(U.0*U.0 + V.2*V.2 + W.2*W.2)</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>To compute the difference of two seperate variables you would enter the formula:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>     DIFFT.0 = T.0 - T.1</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>If there are multiple data sets but no index number appended then it will be
+assumed that the variable belongs to the first data set (i.e., index 0)
+deposited into the display.  In some cases the time steps for two different
+variables will not coincide.  When this happens the variable is computed
+according to the time steps of the data set which the new variable belongs to.
+Time steps will be matched as close as possible and time steps out of range from
+one other will be void of data.  For example, in the formula "DIFFT.0 = T.0 -
+T.1", if the time steps were such:</P
+><P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN2353"
+></A
+><P
+><B
+>Table 1. Data Context 0</B
+></P
+><TABLE
+BORDER="1"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><THEAD
+><TR
+><TH
+ALIGN="CENTER"
+VALIGN="TOP"
+>&nbsp;</TH
+><TH
+ALIGN="CENTER"
+VALIGN="TOP"
+>Date(YYDDD) </TH
+><TH
+ALIGN="CENTER"
+VALIGN="TOP"
+>Time(HH:MM:SS) </TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>Time 0 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>82091 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>0:00:00 </TD
+></TR
+><TR
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>Time 1 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>82091 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>2:00:00 </TD
+></TR
+><TR
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>Time 2 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>82091 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>4:00:00 </TD
+></TR
+><TR
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>Time 3 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>82091 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>6:00:00 </TD
+></TR
+><TR
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>Time 4 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>82091 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>8:00:00 </TD
+></TR
+><TR
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>Time 5 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>82091 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>10:00:00 </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></P
+><P
+><DIV
+CLASS="TABLE"
+><A
+NAME="AEN2387"
+></A
+><P
+><B
+>Table 2. Data Context 1</B
+></P
+><TABLE
+BORDER="1"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><THEAD
+><TR
+><TH
+ALIGN="CENTER"
+VALIGN="TOP"
+>&nbsp;</TH
+><TH
+ALIGN="CENTER"
+VALIGN="TOP"
+> Date(YYDDD) </TH
+><TH
+ALIGN="CENTER"
+VALIGN="TOP"
+> Time(HH:MM:SS) </TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>Time 0 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>82091 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>2:30:00 </TD
+></TR
+><TR
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>Time 1 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>82091 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>4:30:00 </TD
+></TR
+><TR
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>Time 2 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>82091 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>6:30:00 </TD
+></TR
+><TR
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>Time 3 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>82091 </TD
+><TD
+ALIGN="CENTER"
+VALIGN="TOP"
+>8:30:00 </TD
+></TR
+></TBODY
+></TABLE
+></DIV
+></P
+><P
+>The resulting variable "DIFFT.0" would contain the data:</P
+><P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2414"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Time 0 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>No Data </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Time 1 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>No Data </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Time 2 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>T.0(time=2) - T.1(time=1) </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Time 3 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>T.0(time=3) - T.1(time=2) </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Time 4 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>T.0(time=4) - T.1(time=3) </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Time 5 </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>No Data </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="CH06SEC13.3"
+>External Analysis Functions</A
+></H2
+><P
+>     External analysis functions are an advanced feature, so new Vis5D users may
+want to skip this section for now.</P
+><P
+>     An external analysis function is a function written by you in FORTRAN which
+is called by Vis5D to produce a new variable as a function of the existing
+variables.  As an example, there is included a function SPD3D which computes
+wind velocity as:  SPD3D = SQRT( U*U + V*V + W*W ).  Be aware that the external
+function feature is intended for experienced Vis5D users who are also proficient
+FORTRAN programmers.</P
+><P
+>     All external functions must be placed in a directory named "userfuncs"
+(this may be changed in the 
+<TT
+CLASS="FILENAME"
+>vis5d.h</TT
+> file).  This is relative to the current
+directory when you run vis5d.  For example, suppose you always run vis5d while
+in "/usr/jones/data", then your analysis functions must be in
+"/usr/jones/data/userfuncs".  Also, this directory contains a script "externf"
+which is used to compile your function.</P
+><P
+>     To write an external function it's best to copy one of the supplied
+examples and then modify it.  The included "userfuncs/example.f" is fully
+commented for this purpose.  Later, when you call your function from within
+vis5d, the function will be invoked once for each time step.  The arguments
+passed to the function include (the data set is the first data set in the
+display associated with the current control panel):</P
+><P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>     the number of physical variables in the data set</P
+></LI
+><LI
+><P
+>     the name of each variable</P
+></LI
+><LI
+><P
+>     the size of the 3-D grid</P
+></LI
+><LI
+><P
+>     the date and time of the time step</P
+></LI
+><LI
+><P
+>     map projection and vertical coordinate system information</P
+></LI
+><LI
+><P
+>     the actual 3-D grids of data for each physical variable</P
+></LI
+></OL
+></P
+><P
+>     Your function will have to scan the list of variable names to find the ones
+it needs for the computation.  Then it must do the actual computation,
+generating a new grid of data to return to vis5d.  The examples we've included
+demonstrate how to do this.  Specifically, you should look at example.f which
+has detailed documentation of the function arguments.  The map projection and
+vertical coordinate system arguments work in exactly the same way as the
+v5dCreate library call discussed in 
+<A
+HREF="ch03.html#CH03SEC1"
+>section 3.1</A
+> .</P
+><P
+>     Suppose you want your function to be named "delta".  Then the name of the
+FORTRAN program must be "delta.f".  You would compile the function by typing
+"externf delta".  If there are no errors, an executable file "delta" will be
+written.  Then in vis5d when you select NEW VAR, "delta" should appear in the
+list of functions in the pop-up window.</P
+><P
+>     There are two places for vis5d to get the grid data which it passes to your
+external function:  from the original, uncompressed McIDAS file or the
+compressed v5d/comp5d file.  The uncompressed McIDAS data is better because it
+has more precision.  If the McIDAS file can't be found, then the compressed data
+which vis5d has in memory will be passed to your external function.  Note that
+this has no bearing whatsoever on the construction of your external function.</P
+><P
+>     You can retrieve the position and values of the data probe from within your
+function.  To get the position of the probe use:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>     CALL PROBEPOS( ROW, COL, LEV, LAT, LON, HGT )</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>The position in grid coordinates will be returned in ROW, COLumn, and LEVel.
+The position in geographic coordinates will be returned in LATitude, LONgitude,
+and HeiGhT.</P
+><P
+>To get the value of any physical variable at the current probe position and
+current time step use:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>     VALUE = PROBEVAL( VAR )</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>where VAR specifies which physical variable you want.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch06sec12.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch06sec14.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Vertical Sounding and SkewT</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ch06.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Saving Image Files and Printing</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

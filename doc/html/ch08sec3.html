@@ -1,0 +1,249 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Example McIDAS files and utilities</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Sample Data Sets"
+HREF="ch08.html"><LINK
+REL="PREVIOUS"
+TITLE=" LAMPS model"
+HREF="ch08sec2.html"><LINK
+REL="NEXT"
+TITLE="Version History"
+HREF="ch09.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch08sec2.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Sample Data Sets</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch09.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH08SEC3"
+>Example McIDAS files and utilities</A
+></H1
+><P
+>     The Schlesinger and LAMPS data sets are also available as the 3D McIDAS
+grid files named <TT
+CLASS="FILENAME"
+>GR3D0001</TT
+> and <TT
+CLASS="FILENAME"
+>GR3D0002</TT
+>.  They are available on the 
+<A
+HREF="ftp://www.ssec.wisc.edu/pub/vis5d-5.2/"
+TARGET="_top"
+>Vis5D ftp site</A
+>.
+See <A
+HREF="ch02.html"
+>chapter 2</A
+> for more information.</P
+><P
+>To list the grids in <TT
+CLASS="FILENAME"
+>GR3D0001</TT
+> and to see statistics about them, enter the
+commands:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>igg3d list 1 190 -gr3df 1
+igg3d info 1 190 -gr3df 1</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>The <TT
+CLASS="FILENAME"
+>SCHL.v5d</TT
+> file was made from the <TT
+CLASS="FILENAME"
+>GR3D0001</TT
+> file with the command:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>gr3d_to_v5d 1 1 SCHL.v5d</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>To list the grids in <TT
+CLASS="FILENAME"
+>GR3D0002</TT
+> and to see statistics about them, enter the
+commands:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>igg3d list 1 189 -gr3df 2
+igg3d info 1 189 -gr3df 2</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>The <TT
+CLASS="FILENAME"
+>LAMPS.v5d</TT
+> file was made from the <TT
+CLASS="FILENAME"
+>GR3D0002</TT
+> file with the command:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>gr3d_to_v5d 2 1 LAMPS.v5d</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>A variety of other sample datasets are available on the 
+<A
+HREF="ftp://www.ssec.wisc.edu/pub/vis5d-5.2/"
+TARGET="_top"
+>ftp site</A
+>
+or upon request.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch08sec2.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch09.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>LAMPS model</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ch08.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Version History</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,350 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>System Requirements and Installation</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="PREVIOUS"
+TITLE="Vis5D Documentation on the Web"
+HREF="ch01sec2.html"><LINK
+REL="NEXT"
+TITLE="Installing Vis5D"
+HREF="ch02sec2.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch01sec2.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch02sec2.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="CH02"
+>System Requirements and Installation</A
+></H1
+><P
+>      In the following sections we describe the hardware and software
+      required to run Vis5D and detail how to install Vis5D on your
+      system.</P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH02SEC1"
+>System Requirements</A
+></H1
+><P
+>Vis5d+ should, in principle, run on any system with X windows, OpenGL
+libraries, and at least an 8-bit color display.  32MB of RAM is
+recommended, and an ANSI C compiler is required to build the program.
+It is known for certain to run on the following systems:</P
+><P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+><I
+CLASS="EMPHASIS"
+>Silicon Graphics:</I
+>
+	      IRIX version 4.0.1 or higher;
+	      Multiple processors are used when present; IrisGL is not
+	      supported
+	    </P
+></LI
+><LI
+><P
+><I
+CLASS="EMPHASIS"
+>IBM RS/6000:</I
+>
+	      Model 320H or higher;
+	      AIX version 3 or later;
+	      3-D graphics hardware is supported through OpenGL    </P
+></LI
+><LI
+><P
+><I
+CLASS="EMPHASIS"
+>HP series 7000 or 9000 workstations:</I
+>
+	      HP-UX A.09.01 or later;
+	      PEX optional</P
+></LI
+><LI
+><P
+><I
+CLASS="EMPHASIS"
+>Sun SPARC:</I
+>
+SunOS 5.x or later
+<DIV
+CLASS="IMPORTANT"
+><P
+></P
+><TABLE
+CLASS="IMPORTANT"
+WIDTH="90%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="./stylesheet-images/important.gif"
+HSPACE="5"
+ALT="Important"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="CENTER"
+><B
+>IMPORTANT NOTE FOR SunOS 5 USERS</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>The X shared memory extension may not work
+correctly.  If Vis5D prints an error message to the effect of "Shared
+memory error" then you'll have to append the following three lines to
+	      the end of your 
+              <TT
+CLASS="FILENAME"
+>/etc/system</TT
+> file then reboot:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>set shmsys:shminfo_shmmax = 0x2000000
+set shmsys:shminfo_shmmni = 0x1000
+set shmsys:shminfo_shmseg = 0x100</PRE
+></TD
+></TR
+></TABLE
+></P
+></TD
+></TR
+></TABLE
+></DIV
+></P
+></LI
+><LI
+><P
+><I
+CLASS="EMPHASIS"
+>Compaq Alpha:</I
+>
+	      OSF/1 V1.3 or later;
+	      Kubota Denali Graphics hardware supported with KWS V1.3.3 or
+	      later and NPGL Run-time license
+<DIV
+CLASS="IMPORTANT"
+><P
+></P
+><TABLE
+CLASS="IMPORTANT"
+WIDTH="90%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="./stylesheet-images/important.gif"
+HSPACE="5"
+ALT="Important"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="CENTER"
+><B
+>IMPORTANT NOTE FOR OSF USERS</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>      you need to run 'limit stacksize 32m' before you run Vis5D    </P
+></TD
+></TR
+></TABLE
+></DIV
+></P
+></LI
+><LI
+><P
+><I
+CLASS="EMPHASIS"
+>Linux:</I
+>
+x86, PowerPC, and Alpha Linux systems have been tested.  A 75MHz
+Pentium CPU or faster is recommended.  gcc 2.95.2 on PowerPC has
+a bug that causes problems; be sure to get a version with the latest
+developer patches.</P
+></LI
+></OL
+></P
+><P
+><DIV
+CLASS="NOTE"
+><P
+></P
+><TABLE
+CLASS="NOTE"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="./stylesheet-images/note.gif"
+HSPACE="5"
+ALT="Note"></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>Note that on systems which don't have 3-D graphics hardware or OpenGL,
+all 3-D rendering is done in software using Mesa (an OpenGL
+work-alike).  3-D graphics hardware is recommended for high-end use.
+If you do not have Mesa, you must download and install it as described
+below.</P
+></TD
+></TR
+></TABLE
+></DIV
+></P
+><P
+>	If you would like to port Vis5D to a new graphics system or
+workstation read the PORTING file which gives more information.  If
+you succeed, please inform us so that we may add your work to the
+distribution.  With the new autoconf-based installation procedure,
+porting to new machines should be considerably easier than before (and
+may often work with no modifications at all).</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch01sec2.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch02sec2.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Vis5D Documentation on the Web</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Installing Vis5D</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

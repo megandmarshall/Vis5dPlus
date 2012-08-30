@@ -47,6 +47,8 @@
  */
 #include "v5d.h"
 
+#include <stdio.h>
+
 /* SGJ: use extern "C" if included from a C++ file: */
 #ifdef __cplusplus
 extern "C" {
@@ -262,9 +264,12 @@ typedef enum{
 #define BIAS     1
 #define ALPHAPOW 2
 #define ALPHAVAL 3
-#define DRAWFLAG 4
-#define MINALPHA 5
-#define MAXALPHA 6
+#define DRAWFLAG 4 // up to this point, same as lui5/colorbar.c
+#define MINALPHA 5 // not read-in
+#define MAXALPHA 6 // not read-in
+#define MINFUNC 7
+#define MAXFUNC 8
+
 #define MAX_TABLE 1000
 
   /* JPE: adding a new font to this list *should* do most of the work
@@ -280,6 +285,7 @@ typedef enum{
 
 /* MJK 11.19.98 */
 extern int off_screen_rendering;
+extern int very_off_screen_rendering; // JCM
 
 extern int REVERSE_POLES;
 
@@ -289,6 +295,9 @@ extern int in_the_init_stage;
 #ifndef V5D_MAXSTRLEN
 #  define V5D_MAXSTRLEN 1000
 #endif
+
+
+extern char framebuffername[V5D_MAXSTRLEN]; // JCM
 
 /* MJK 4.27.99 */
 extern char Vis5dDataPath[V5D_MAXSTRLEN];
@@ -687,6 +696,18 @@ extern int vis5d_check_dtx_volume( int index, int *volflag );
 extern int vis5d_set_volume( int index, int currentvolumeowner, int current_volume );
 
 extern int vis5d_get_volume( int index, int *currentvolumeowner, int *current_voluem );
+
+//JCM:
+extern int vis5d_remove_volume( int index, int CurrentVolumeOwner, int CurrentVolume );
+extern int vis5d_add_volume( int index, int CurrentVolumeOwner, int CurrentVolume );
+extern int vis5d_resetcurrent_volume( int index, int *CurrentVolumeOwner, int *CurrentVolume );
+extern int vis5d_is_volume( int index, int CurrentVolume );
+extern int vis5d_printtcl_volume(FILE *f, int index, int CurrentVolumeOwner, int CurrentVolume, int cwhichones);
+extern int vis5d_is_check_volume( int index, int CurrentVolumeOwner, int CurrentVolume, int check );
+extern int output_params(FILE *f, char *varname, float *params);
+  //extern int vis5d_getminmax_var_graphics( int index, int var, float *min, float *max );
+extern int vis5d_other_table_init_params( int index, int graphic, int varowner, int var,float *params );
+extern void renew_volume_memory(int index, int display_index);
 
 extern int vis5d_get_graphics_color_address( int index, int type,
                                        int number, unsigned int **color );
@@ -1259,8 +1280,8 @@ extern int vis5d_var_graphics_options(int index, int type, int number, int what,
 extern int vis5d_get_current_grajset( int index, int *trajset);
 
 extern int vis5d_stereo_enabled(int index, int *enabled);
-extern int vis5d_stereo_set(int index, int stereo);
-extern int vis5d_stereo_get(int index, int *stereo);
+extern int vis5d_stereo_set(int index, int stereo, int fakestereo);
+extern int vis5d_stereo_get(int index, int *stereo, int *fakestereo);
 extern int vis5d_save_right_window(const char *filename, int format);
 
 extern int vis5d_get_scene_formats(int *formats);
@@ -1273,6 +1294,8 @@ int vis5d_get_vstride(int index, int *vstride);
 
 time_t vis5d_time2ctime(int daystamp, int timestamp);
 
+
+extern void check_opendisplay(int which, Display **testdpy); // JCM
 
 
 #ifdef __cplusplus

@@ -187,6 +187,11 @@ static void usage( void )
    P("   -offscreen\n");
    P("       Do off screen rendering, used in conjunction with -script command\n");
 #endif
+   // JCM
+   P("   -framebuffer name\n");
+   P("      Specify framebuffer to be used if no display found (name limited to 2000 characters).\n");
+   P("      Example:  vis5d LAMPS.v5d -framebuffer ki-rh42.slac.stanford.edu:2\n");
+   // end JCM
    P("   -path pathname\n");
    P("      Specify directory to search for map and topograpy files.\n");
    P("      Example:  vis5d LAMPS.v5d -path /usr3/data\n");
@@ -571,12 +576,10 @@ static int make_snd_window(int index, char *title, Window scw,
    int xpos, ypos, height, width, scrwidth, scrheight;
    Display *dpy;
    int scr;
+   extern void check_opendisplay(int which, Display **testdpy);
    
    dpy = XOpenDisplay( NULL );
-   if (!dpy) {
-      printf("Unable to open default display\n");
-      exit(1);
-   }
+   check_opendisplay(2,&dpy); // JCM
 
    scr = DefaultScreen( dpy );
 
@@ -607,13 +610,19 @@ static int make_gfx_window(  char *title, char *geom_str)
    int scrwidth, scrheight;
    Display *dpy;
    int scr;
+   char display_name[200];
+   extern void check_opendisplay(int which, Display **testdpy);
 
    dpy = XOpenDisplay( NULL );
-   if (!dpy) {
-      printf("Unable to open default display\n");
-      exit(1);
-   }
+   check_opendisplay(1,&dpy); // JCM
 
+   if(very_off_screen_rendering==1){
+     // fake:
+     height = width = 420;
+     xpos = 410;
+     ypos = 10;
+   }
+   else{
    scr = DefaultScreen( dpy );
 
    scrwidth = DisplayWidth( dpy, scr );
@@ -633,14 +642,14 @@ static int make_gfx_window(  char *title, char *geom_str)
    if (xpos < 0) xpos = scrwidth - width;
    if (ypos < 0) ypos = scrheight - height;
   
-/* MJK 4.14.99 */
+     /* MJK 4.14.99 */
    if (StaticWin){
       StaticWinXPos = xpos;
       StaticWinYPos = ypos;
       StaticWinWidth = width;
       StaticWinHeight = height;
    }
-
+   }
    return vis5d_init_window( title, xpos, ypos, width, height );
 }
 /* MJK 12.07.98 end */
@@ -1226,6 +1235,10 @@ main( int argc, char *argv[] )
         legendx[filepointer] = atoi(argv[i+3]);
         legendy[filepointer] = atoi(argv[i+4]);
         i += 4;
+      }
+      else if (strcmp(argv[i],"-framebuffer")==0 && i+1<argc) {
+         strcpy(framebuffername, argv[i+1]);
+         i++;
       }
       else if (strcmp(argv[i],"-path")==0 && i+1<argc) {
          /* MJK 4.27.99

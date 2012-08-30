@@ -1,0 +1,2625 @@
+<html><head><title>Vis5D scripting</title></head><body>
+
+<h1><p align="center">Vis5D Scripting</p></h1>
+
+
+Last updated: March 23, 1999<p>
+
+
+</p><h2>Contents</h2>
+
+<ol>
+<li><a href="#Section1">Introduction</a>
+</li><li><a href="#Section2">Setting up full Tcl support</a>
+</li><li><a href="#Section3">The built-in interpreter</a>
+</li><li><a href="#Section4">Accessing the Tcl interface in Vis5D</a>
+</li><li><a href="#Section5">Examples of basic Vis5D Tcl commands</a>
+</li><li><a href="#Section6">Basic Tcl syntax</a>
+</li><li><a href="#Section7">Vis5D Tcl command structure</a>
+</li><li><a href="#Section8">Command reference</a>
+</li><li><a href="#Section9">Example scripts</a>
+</li></ol>
+
+
+<br>
+<br>
+<a name="Section1">
+</a><h2><a name="Section1">1. Introduction</a></h2>
+
+<a name="Section1">Vis5D 5.1 features a Tcl interface for automation of Vis5D with scripts.
+</a><a href="http://www.scriptics.com/">Tcl</a>
+(Tool command language, pronounced "tickle")
+is a free, popular, interpreted scripting language designed by
+John Ousterhout.  Example uses of scripts include automatically setting
+colors, computing graphics, and making off-line animations.<p>
+
+While Tcl experience is recommended for writing Vis5D scripts, some short
+but useful scripts can be written without any real Tcl knowledge.</p><p>
+
+Note that the Tcl package <em>does not</em> have to be installed on
+your computer in order to use Vis5D's script interface.  If it is
+not installed, Vis5D uses a small, built-in
+interpreter which can execute very simple Tcl scripts.  However, if
+you want to take full advantage of Vis5D's Tcl interface you should
+install Tcl on your computer.</p><p>
+
+
+
+<br>
+<br>
+<br>
+<a name="Section2">
+</a></p><h2><a name="Section2">2. Setting up full Tcl support</a></h2>
+
+<a name="Section2">If you do not have Tcl installed on your computer and only plan to use
+simple Vis5D Tcl scripts you may skip this section.</a><p>
+
+<a name="Section2">To obtain and install Tcl see the instructions on the
+</a><a href="http://www.sunlabs.com/research/tcl/">Tcl page</a>.
+<b>We recommend using Tcl version 7.4 at this time since version 7.5
+has a bug which effects Vis5D.</b>
+</p><p>
+
+After Tcl has been installed you can enable the full Tcl support in Vis5D
+by following these instructions:</p><p>
+
+</p><ul>
+<li>Determine where the <code>tcl.h</code> include file and the
+    <code>libtcl.a</code> library file are located.  /usr/local/include
+    and /usr/local/lib are common.<p>
+
+</p></li><li>You may have to create a few symbolic links such as
+    <code>ln -s tcl7.4.h tcl.h</code> and
+    <code>ln -s libtcl7.4.a libtcl.a</code> if this wasn't done when Tcl
+    was installed.<p>
+
+</p></li><li>From in the vis5d-5.1 directory, use your text editor to edit
+    <code>src/Makefile</code> as follows<p>
+
+</p></li><li>Look for the following text:
+
+    <pre>    #Tcl support:  uncomment and edit to enable
+    #TCL_INCLUDE = -DTCL -I/usr/local/include
+    #TCL_LIB = -L/usr/local/lib -ltcl
+    </pre>
+
+    Remove the leading <code>#</code> on the 2nd and 3rd lines and change
+    the /usr/local/include and /usr/local/lib
+    parts to reflect the location of Tcl on your computer.  You should
+    have something like this:<p>
+
+    </p><pre>    #Tcl support:  uncomment and edit to enable
+    TCL_INCLUDE = -DTCL -I/usr/local/include
+    TCL_LIB = -L/usr/local/lib -ltcl
+    </pre>
+
+
+</li><li>Save your changes and exit the editor.<p>
+
+</p></li><li>Recompile Vis5D by typing <code>make</code> followed by your operating
+    system configuration.  Type <code>make</code> alone to see a list of
+    possibilities.<p>
+
+</p></li></ul>
+
+If all goes well vis5d will compile and link with Tcl support.  If
+there are errors be sure that you've correctly specified the location
+of the include and library files described above.<p>
+
+
+
+<br>
+<br>
+<br>
+<a name="Section3">
+</a></p><h2><a name="Section3">3. The built-in interpreter</a></h2>
+
+<a name="Section3">When Tcl is not installed Vis5D uses a simple built-in interpreter.  It
+only understands the Tcl <em>set</em> and <em>source</em> commands,
+the Vis5D-specific commands, variable substitution and comments.</a><p>
+
+<a name="Section3">The <em>set</em> command assigns a value to a variable.  Its syntax is:
+
+</a></p><pre><a name="Section3">   set <em>var</em> <em>value</em>
+</a></pre>
+
+<a name="Section3">Where <em>var</em> is a variable name and <em>value</em> is
+a number or a character string.  Examples:</a><p>
+
+</p><pre><a name="Section3">   set temperature 280.0
+   set month February
+   set message "Press any key"
+</a></pre>
+
+<a name="Section3">Note that multi-word strings must be surrounded by double-quotation marks.</a><p>
+
+<a name="Section3">The value of a variable is obtained by preceding the name with a $ sign.
+Example:
+
+</a></p><pre><a name="Section3">   set time 4
+   vis5d_set_timestep $dtx $time
+</a></pre>
+
+<a name="Section3">The <em>source</em> command reads Tcl commands from another file.
+Its syntax is:
+
+</a><pre><a name="Section3">   source <em>file</em>
+</a></pre>
+
+<a name="Section3">Where <em>file</em> is the name of another Tcl file.</a><p>
+
+
+<a name="Section3">Lines which start with the # symbol are considered to be comments and
+ignored.</a></p><p>
+
+<a name="Section3">The built-in interpeter cannot evaluate mathematical expressions or
+execute control structures like loops, conditionals or subroutines.  The
+Tcl package must be installed to execute scripts with those constructs.</a></p><p>
+
+
+<a name="Section3"><br>
+<br>
+<br>
+</a><a name="Section4">
+</a></p><h2><a name="Section4">4. Accessing the Tcl interface in Vis5D</a></h2>
+
+<a name="Section4">On Vis5D's control panel there are two buttons labeld <em>SCRIPT..</em>
+and <em>INTERP..</em>.  The first button is used to execute a Tcl script
+from a file and the second button is used to interactively type in
+Tcl commands.
+
+</a><h3><a name="Section4">Script files</a></h3>
+
+<a name="Section4">When you click on the <em>SCRIPT..</em> button a file selector
+window will appear.  Select the Tcl script you want to execute
+and click on <em>OK</em>.  If an error occurs while executing
+the script a pop-up window will tell you
+so.  Also, look in your shell window for error messages.</a><p>
+
+<a name="Section4">You may also execute a script file when you start vis5d with the
+<code>-script</code> command line option.  For example
+</a></p><pre><a name="Section4">   vis5d LAMPS.v5d -script foo.tcl
+</a></pre>
+<a name="Section4">executes <code>foo.tcl</code> automatically upon startup.</a><p>
+
+
+</p><h3><a name="Section4">Interactive Tcl commands</a></h3>
+
+<a name="Section4">When you click on the <em>INTERP..</em> button Vis5D will halt.  In your
+shell window the <code>vis5d&gt;</code> prompt will appear.  You can now
+type in Tcl commands.  Type <code>exit</code> when finished.</a><p>
+
+<a name="Section4">If it exists, the startup file <code>vis5d.tcl</code> is
+automatically executed before you get the <code>vis5d&gt;</code> prompt.
+One use of this file is to load macros or functions that you always use.</a></p><p>
+
+
+
+<a name="Section4"><br>
+<br>
+<br>
+</a><a name="Section5">
+</a></p><h2><a name="Section5">5. Examples of basic Vis5D Tcl commands</a></h2>
+
+<a name="Section5">We begin with some simple examples which could be executed either from
+a script file or typed in by hand.</a><p>
+
+</p><h3><a name="Section5">Example 1</a></h3>
+
+<a name="Section5">Suppose we have an isosurface of temperature (variable name "T")
+displayed in vis5d and we want to color it red.  The following Tcl
+command will do that:</a><p>
+
+</p><pre><a name="Section5">   vis5d_set_color $dtx VIS5D_ISOSURF $ctx "T" 1.0 0.0 0.0 1.0</a><p>
+</p></pre>
+
+
+<a name="Section5">The command name is <code>vis5d_set_color</code>.  The arguments are:</a><p>
+
+</p><ul>
+<li><code><a name="Section5">$dtx</a></code><a name="Section5"> - this specifies the display context.  Don't worry
+    about its meaning now, it will be explained more later.
+</a></li><li><code><a name="Section5">VIS5D_ISOSURFACE</a></code><a name="Section5"> - this identifies what kind of graphic
+    to color.
+</a></li><li><code><a name="Section5">$ctx</a></code><a name="Section5"> - this specifies the data context.  Don't worry
+    about its meaning now, it will be explained more later.
+</a></li><li><code><a name="Section5">"T"</a></code><a name="Section5"> - this specified which isosurface to color
+</a></li><li><code><a name="Section5">1.0 0.0 0.0 1.0</a></code><a name="Section5"> - this is the RGBA color of the isosurface.
+    Each number is in the range 0.0 to 1.0.  The first three numbers are
+    the red, green, and blue color components and the last number is the
+    opacity or transparency where 0.0 is completely transparent and 1.0
+    is completely opaque.
+</a></li></ul>
+
+
+<h3><a name="Section5">Example 2</a></h3>
+
+<a name="Section5">Suppose we simply want to set the currently displayed timestep to be
+the fourth in the dataset.</a><p>
+
+</p><pre><a name="Section5">   vis5d_set_timestep $dtx 3
+</a></pre>
+
+<a name="Section5">This command should be self explanatory except for the fact that we
+specified 3 instead of perhaps 4.  The reason is Vis5D begins counting
+timesteps starting at zero, not one.  Therefore timestep number 3 is
+actually the fourth timestep.</a><p>
+
+
+</p><h3><a name="Section5">Example 3</a></h3>
+
+<a name="Section5">Suppose we want to compute and display a horizontal colored slice
+of wind speed (variable name "SPD") at vertical grid level 2.  The
+following commands will do that.</a><p>
+
+</p><pre><a name="Section5">   vis5d_set_chslice $ctx "SPD" 2.0
+   vis5d_make_chslice $ctx VIS5D_ALL_TIMES "SPD"
+   vis5d_enable_graphics $ctx VIS5D_CHSLICE "SPD" VIS5D_ON
+</a></pre>
+
+<a name="Section5">The first command sets the position of the colored slice to grid level 2.0</a><p>
+
+<a name="Section5">The second command tells vis5d to actually compute the horizontal colored
+slice graphic of "SPD" for all time steps.</a></p><p>
+
+<a name="Section5">The third command tells vis5d to actually display the colored slice.</a></p><p>
+
+
+</p><h3><a name="Section5">Example 4</a></h3>
+
+<a name="Section5">To print the current parameters of the horizontal contour slice of SPD:
+</a><p>
+
+</p><pre><a name="Section5">   puts [ vis5d_get_hslice $ctx "SPD" ]
+</a></pre>
+
+
+
+<a name="Section5"><br>
+<br>
+<br>
+</a><a name="Section6">
+</a><h2><a name="Section6">6. Basic Tcl syntax</a></h2>
+
+<a name="Section6">This section gives examples of basic Tcl language constructs by comparing
+them to C and Fortran syntax.  See a Tcl language reference for more
+information.</a><p>
+
+
+</p><h3><a name="Section6">Comments</a></h3>
+<a name="Section6">C:  </a><pre><a name="Section6">  /* this is a comment */  </a></pre>
+<a name="Section6">Fortran:  </a><pre><a name="Section6">  C this is a comment  </a></pre>
+<a name="Section6">Tcl:  </a><pre><a name="Section6">  # this is a comment  </a></pre>
+
+<h3><a name="Section6">Assigments</a></h3>
+<a name="Section6">C:  </a><pre><a name="Section6">  x = 1.0; </a></pre>
+<a name="Section6">Fortran:  </a><pre><a name="Section6">  x = 1.0 </a></pre>
+<a name="Section6">Tcl:  </a><pre><a name="Section6">  set x 1.0 </a></pre>
+
+<h3><a name="Section6">Expressions and assignments</a></h3>
+<a name="Section6">C:  </a><pre><a name="Section6">  average = (a+b)/2.0; </a></pre>
+<a name="Section6">Fortran:  </a><pre><a name="Section6">  average = (a+b)/2.0  </a></pre>
+<a name="Section6">Tcl:  </a><pre><a name="Section6">  set average [ expr ($a+$b)/2.0 ] </a></pre>
+
+<h3><a name="Section6">For Loops</a></h3>
+<a name="Section6">C:
+</a><pre><a name="Section6">    for (i=1;i&lt;=10;i++) {
+        body of loop
+    }
+</a></pre>
+<a name="Section6">Fortran:
+</a><pre><a name="Section6">    do i=1,10
+        body of loop
+    enddo
+</a></pre>
+<a name="Section6">Tcl:
+</a><pre><a name="Section6">    for {set i 1} {$i &lt;= 10} { set i [expr $i+1] } {
+        body of loop
+    }
+</a></pre>
+
+<h3><a name="Section6">Conditionals</a></h3>
+<a name="Section6">C:
+</a><pre><a name="Section6">    if (x&lt;0.0) {
+        y = 0.0;
+    }
+    else if (x&gt;100.0) {
+        y = 100.0;
+    }
+    else {
+        y = x;
+    }
+</a></pre>
+<a name="Section6">Fortran:
+</a><pre><a name="Section6">    if x .lt. 0 then
+        y = 0.0
+    else if x .gt. 100 then
+        y = 100.0
+    else
+        y = x
+    end if
+</a></pre>
+<a name="Section6">Tcl:
+</a><pre><a name="Section6">    if {$x&lt;0.0} {
+        set y 0.0
+    } elseif {$x&gt;100.0} {
+        set y 100.0
+    } else {
+        set y $x
+    }
+</a></pre>
+
+
+<h3><a name="Section6">Printing</a></h3>
+<a name="Section6">C:
+</a><pre><a name="Section6">    puts( "Hello world!\n" );   /* string */
+    printf( "i=%d\n", i );      /* integer */
+    printf( "x=%f\n", x );      /* real (float) */
+</a></pre>
+<a name="Section6">Fortran:
+</a><pre><a name="Section6">    print *,"Hello world!"
+    print *,i
+    print *,x
+</a></pre>
+<a name="Section6">Tcl:
+</a><pre><a name="Section6">    puts "Hello world!"
+    puts $i
+    puts $x
+</a></pre>
+
+
+
+
+<a name="Section6"><br>
+<br>
+<br>
+</a><a name="Section7">
+</a><h2><a name="Section7">7. Vis5D Tcl command structure</a></h2>
+
+<a name="Section7">All of the Vis5D Tcl commands start with the prefix <code>vis5d_</code>
+ or <code> vis5d_gui_</code> and all of the Vis5D Tcl constants start with the prefix
+<code>VIS5D_</code>.  This makes it easy to spot Vis5D-specific
+commands in a script and prevents confusion with other Tcl identifiers.</a><p>
+
+<a name="Section7">Vis5D Tcl commands are of the form:</a></p><p>
+
+<a name="Section7"><em>vis5d_command</em> $ctx/$itx/$dtx/$grp <em>arguments</em></a></p><p>
+
+<a name="Section7"><em>vis5d_gui_command</em> $ctx/$dtx/$grp <em>arguments</em></a></p><p>
+
+<a name="Section7">That is, a command name followed by one context variable, followed by zero
+or more arguments.</a></p><p>
+
+</p><h3><a name="Section7">A note on $ctx/$itx/$dtx/$grp and Vis5D contexts</a></h3>
+
+<a name="Section7">Vis5D's internal core supports multiple contexts of four different types.
+The $ctx represents the data context. The $ctx can be thought of as a Vis5D
+file read into memory plus all the associated graphics. The $itx represents
+the irregular data context, similar to the $ctx but the data is non-gridded.
+The $dtx is the display context, it contains information on how the data from
+$ctxs and $itxs are
+displayed on the 3-D graphics window. The $grp represents the group context.
+The $grp contains information about $dtxs that are linked together. In
+many cases there may be multiple contexts of any one type. For example,
+two Vis5d files can be viewed in one 3D graphics window, two $ctxs and
+one $dtx. One could also view four Vis5d files in four different graphics
+windows, four $ctxs and four $dtxs. With multiple contexts the nomenclature
+would change, it might be $ctx1, $ctx2, etc.
+<br>Note: In cases where only one Vis5d file is used, $ctx can be used
+in place of $dtx.
+
+
+</a><h3><a name="Section7">A note on variable and timestep numbers</a></h3>
+
+<a name="Section7">Many of the Vis5D Tcl commands take timestep and/or physical variable
+parameters.  Be aware that timesteps are numbered starting at 0.  Similarly,
+variables are numbered starting with 0.  Also, wherever a physical variable
+argument is expected you may supply either a number or a name.</a><p>
+
+
+
+<a name="Section7"><br>
+<br>
+<br>
+</a><a name="Section8">
+</a></p><h2><a name="Section8">8. Command reference</a></h2>
+
+<a name="Section8">In this section we document each of the Vis5D Tcl commands.  Programmers
+should note that the Vis5D Tcl commands are a subset of the Vis5D API
+functions described in the Vis5D API document.  More of the API functions
+may be made available as Tcl commands in the future.  There are also serveral
+vis5d GUI functions documented here which are not part of the API, they are specific
+to the standard GUI distributed with Vis5D.</a><p>
+
+
+</p><h3><a name="Section8">General Commands</a></h3>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_terminate</b></a></code>
+</dt><dd><a name="Section8">Exit Vis5D.
+</a></dd></dl>
+
+
+
+<h3><a name="Section8">Timestep Commands</a></h3>
+<a name="Section8"><i>When there are multiple $ctxs attached to a $dtx the time steps are
+merged in such a way that a $dtx time step contains one time step from
+each data context. The same is true when multiple data contexts are attached
+to a group context.</i>
+
+</a><dl>
+<dt><code><a name="Section8"><b>vis5d_get_ctx_numtimes</b> data_context</a></code></dt>
+<dd><a name="Section8"> Returns the number of timesteps in the given data_context.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_itx_numtimes</b> irregular_data_context</a></code></dt>
+<dd><a name="Section8"> Returns the number of timesteps in the given irregular_data_context.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_dtx_numtimes</b> display_context</a></code></dt>
+<dd><a name="Section8"> Returns the number of timesteps in the given display_context.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_grp_numtimes</b> group_context</a></code></dt>
+<dd><a name="Section8"> Returns the number of timesteps in the given group_context.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_ctx_time_stamp</b> data_context timestep</a></code></dt>
+<dd><a name="Section8"> Returns the date and time associated with the given timestep as a list
+of two elements: {YYDDD HHMMSS}. Timestep 0 is the first timestep.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_itx_time_stamp</b> irregular_data_context timestep</a></code></dt>
+<dd><a name="Section8"> Returns the date and time associated with the given timestep as a list
+of two elements: {YYDDD HHMMSS}. Timestep 0 is the first timestep.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_dtx_time_stamp</b> display_context timestep</a></code></dt>
+<dd><a name="Section8"> Returns the date and time associated with the given timestep as a list
+of two elements: {YYDDD HHMMSS}. Timestep 0 is the first timestep.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_ctx_time_stamp</b> data_context timestep data time</a></code></dt>
+<dd><a name="Section8"> Sets the date (YYDDD) and time (HHMMSS) associated with a timestep.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_dtx_timestep</b> display_context timestep</a></code></dt>
+<dd><a name="Section8"> Sets the current timestep. The first timestep is number zero.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_grp_timestep</b> group_context timestep</a></code></dt>
+<dd><a name="Section8"> Sets the current timestep. The first timestep is number zero.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_ctx_timestep</b> data_context</a></code></dt>
+<dd><a name="Section8"> Returns the number of the current timestep, starting at zero.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_itx_timestep</b> irregular_data_context</a></code></dt>
+<dd><a name="Section8"> Returns the number of the current timestep, starting at zero.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_dtx_timestep</b> display_context</a></code></dt>
+<dd><a name="Section8"> Returns the number of the current timestep, starting at zero.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_grp_timestep</b> group_context</a></code></dt>
+<dd><a name="Section8"> Returns the number of the current timestep, starting at zero.
+</a></dd></dl>
+
+<h3>
+<a name="Section8">File Commands</a></h3>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_v5dfilename</b> data_context</a></code></dt>
+<dd><a name="Section8"> Returns the file name for the given vis5d context.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_context_name</b> data_context</a></code></dt>
+<dd><a name="Section8"> Return the context name for the given vis5d context.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_load_v5dfile</b> display_context memory filename ctxname</a></code></dt>
+<dd><a name="Section8"> Load a v5dfile named <i>filename</i> into vis5d.  <i>memory</i> is the
+     amount of memory (in megabytes) to allocate for this file.  <i>ctxname</i> is the
+     name of the $ctx.  The number of the $ctx is returned if all goes well, else
+     VIS5D_FAIL is returned.
+</a></dd></dl><a name="Section8"> 
+     
+</a><dl>
+<dt><code><a name="Section8"><b>vis5d_load_irregular_v5dfile</b> display_context memory filename itxname</a></code></dt>
+<dd><a name="Section8"> Load an irregular v5dfile named <i>filename</i> into vis5d.  <i>memory</i> is the
+     amount of memory (in megabytes) to allocate for this file.  <i>itxname</i> is the
+     name of the $itx.  The number of the $itx is returned if all goes well, else
+     VIS5D_FAIL is returned.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_destroy_data_context</b> data_context</a></code></dt>
+<dd><a name="Section8"> Remove a data context (data set).
+</a></dd></dl><a name="Section8"> 
+
+</a><dl>
+<dt><code><a name="Section8"><b>vis5d_save_to_v5dfile</b> data_context filename</a></code></dt>
+<dd><a name="Section8"> Save a data set which has been loaded, to a v5d file.  This
+     is useful when new variables have been created
+</a></dd></dl>
+
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_user_data_flag</b> data_context flag</a></code></dt>
+<dd><a name="Section8"> Set the flag to indicate that user-provided functions are to be
+     used to read gridded data. If flag is 1 then implement the user-provided
+     functions, if flag is 0 use default loading of v5d files.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_user_flags </b>display_context topo_flag map_flag</a></code></dt>
+<dd><a name="Section8"> Set flags to indicate that user-provided functions are to be used
+     to read map and/or topography data.  If flag is 1 then implement the user-provided
+     functions, if flag is 0 use default loading of files.
+</a></dd></dl>
+<a name="Section8">     
+</a><dl>
+<dt><code><a name="Section8"><b>vis5d_open_gridfile</b> data_context filename readflag</a></code>
+</dt><dd><a name="Section8">Loads a Vis5D data set from the file named 'filename'.  readflag
+    indicates whether or not data should immediately be read from the file (1)
+    or if data should be read as needed later (0).
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_open_recordfile</b> irregular_data_context filename datasetname readflag</a></code>
+</dt><dd><a name="Section8">Loads an irregular Vis5D data set from the file named 'filename'.  readflag
+    indicates whether or not data should immediately be read from the file (1)
+    or if data should be read as needed later (0). datasetname is what the data set is to
+    be named.
+</a></dd></dl>
+
+
+<h3>
+<a name="Section8">Physical Variable Commands</a></h3>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_ctx_numvars</b> data_context</a></code></dt>
+<dd><a name="Section8"> Returns the number of physical variables in the given data_context.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_itx_numvars</b> irregular_data_context</a></code></dt>
+<dd><a name="Section8"> Returns the number of physical variables in the given irregular_data_context.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_ctx_var_name</b> data_context varnum</a></code></dt>
+<dd><a name="Section8"> Returns the name of a physical variable. varnum is an integer where zero
+is the first variable.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_itx_var_name</b> irregular_data_context varnum</a></code></dt>
+<dd><a name="Section8"> Returns the name of a physical variable. varnum is an integer where zero
+is the first variable.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_var_units</b> data_context varnum</a></code></dt>
+<dd><a name="Section8"> Returns the physical units of a variable. For example, the units typically
+associated with "U" is "m/s" (meters per second).
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_var_type</b> data_context var</a></code></dt>
+<dd><a name="Section8"> Returns the type of the given variable. var may be a variable name or number.
+Possible types are VIS5D_REGULAR, VIS5D_CLONE, VIS5D_EXT_FUNC, and VIS5D_EXPRESSION.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_ctx_var_range</b> data_context var</a></code></dt>
+<dd><a name="Section8"> Returns the min and max values for the specified variable. var may be a
+name or number. The min and max values are returned as a list of two numbers.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_itx_var_range</b> irregular_data_context var</a></code></dt>
+<dd><a name="Section8"> Returns the min and max values for the specified variable. var may be a
+name or number. The min and max values are returned as a list of two numbers.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_var_range</b> data_context var min max</a></code></dt>
+<dd><a name="Section8"> Set the min and max values for the specified variable. var may be a name
+or number. min and max may specify any range.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_sound_vars</b> display_context temp dewpt
+uwind vwind var1 var2 var3</a></code></dt>
+<dd><a name="Section8"> Sets the variables used in the sounding window. temp and dewpt are the
+temperature and dew point used in the skew-t plot. uwind and vwind are
+the the U and V components of the wind, used in plotting the wind barbs.
+var1, var2, and var3 are the variables used for the vertical plots.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_sound_vars</b> display_context</a></code></dt>
+<dd><a name="Section8"> Returns the variables used in the sounding window.
+The output will be: temp dewpt uwind
+vwind var1 var2 var3. temp and dewpt are
+the temperature and dew point used in the skew-t plot. uwind and vwind
+are the the U and V components of the wind, used in plotting the wind barbs.
+var1, var2, and var3 are the variables used for the vertical plots.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_sound_vars_and_owners</b> display_context tempctx temp dewptctx dewpt
+uwindctx uwind vwindctx vwind var1ctx var1 var2ctx var2 var3ctx var3</a></code></dt>
+<dd><a name="Section8"> Sets the variables used in the sounding window. temp and dewpt are the
+temperature and dew point used in the skew-t plot. uwind and vwind are
+the the U and V components of the wind, used in plotting the wind barbs.
+var1, var2, and var3 are the variables used for the vertical plots. Since
+mutlpile $ctxs are possible, tempctx, dewptctx,..var3ctx represent which
+$ctx the variable is from.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_sound_vars_and_owners</b> display_context</a></code></dt>
+<dd><a name="Section8"> Returns the variables used in the sounding window and the $ctxs where they
+come from. The output will be: tempctx temp dewptctx dewpt uwindctx uwind
+vwindctx vwind var1ctx var1 var2ctx var2 var3ctx var3. temp and dewpt are
+the temperature and dew point used in the skew-t plot. uwind and vwind
+are the the U and V components of the wind, used in plotting the wind barbs.
+var1, var2, and var3 are the variables used for the vertical plots.
+</a></dd></dl>
+
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_wind_vars_and_owners</b> display_context uvarctx uvar vvarctx vvar wvarctx
+wvar u2varctx u2var v2varctx v2var w2varctx w2var trjuctx trju trjvctx
+trjv trjwctx trjw</a></code></dt>
+<dd><a name="Section8"> Sets the variables used to compute the two sets of wind slices and trajectories.
+The first three names( uvar, vvar, wvar ) are the U,V, and W components
+for the first wind slice set. The second three names( u2var, v2var, w2var
+) are the U,V, and W components used for the second wind slice. The third
+set of three names( trju, trjv, trjw ) are those used for computing wind
+trajectories. The names uvarctx, vvarctx,..trjwctx represent which $ctx
+the variable is from.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_wind_vars_and_owners</b> display_context</a></code></dt>
+<dd><a name="Section8"> Returns a list of variable names used to compute the two sets of wind
+slices and trajectories. The output will be: uvararctx uvar vvarctx vvar wvarctx
+wvar u2varctx u2var v2varctx v2var w2varctx w2var trjuctx trju trjvctx
+trjv trjwctx trjw. The first three names( uvar, vvar, wvar ) are the U,V,
+and W components for the first wind slice set. The second three names(
+u2var, v2var, w2var ) are the U, V, and W compnents used for the second
+wind slice. The third set of three names( trju, trjv, trjw ) are those
+used for computing wind trajectories. The variables uvarctx, vvarctx,..trjwctx
+represent which $ctx the variable is from.
+</a></dd></dl>
+
+
+<h3><a name="Section8">Group Commands</a></h3>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_display_group</b> display_context group_context</a></code></dt>
+<dd><a name="Section8"> Attaches the given display context($dtx) to the group context($grp). group_context is 
+     a number [1..9]  To ungroup a $dtx set group_context to -1.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_display_group</b> display_context</a></code></dt>
+<dd><a name="Section8"> Return the group number ($grp) which the $dtx belongs to.  If the
+     $dtx is not attached to a group then -1 is returned.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_num_of_dtxs_in_group</b> group_context</a></code>
+</dt><dd><a name="Section8"> Return the number of $dtxs attached to a group. A list of the $dtx index numbers
+     will be displayed after that.
+</a></dd></dl>
+
+
+<h3><a name="Section8">Linking Commands</a></h3>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_link_slices</b> data_context1 type1 var 1 data_context2 type2 var2</a></code>
+</dt><dd><a name="Section8"> This will link two slices together including any links to other slices.
+     The movement and state of the linked slices will then be synchronized.
+     Horizontal and vertical slices can not be linked.
+     </a><ul>
+<a name="Section8">     </a><li><a name="Section8">ctx_index1 - the data set which slice 1 belongs to
+     </a></li><li><a name="Section8">type1 - one of
+          </a><ul>
+<a name="Section8">          </a><li><a name="Section8">VIS5D_HSLICE
+          </a></li><li><a name="Section8">VIS5D_CHSLICE
+          </a></li><li><a name="Section8">VIS5D_VSLICE
+          </a></li><li><a name="Section8">VIS5D_CVSLICE
+          </a></li><li><a name="Section8">VIS5D_HWIND
+          </a></li><li><a name="Section8">VIS5D_HSTREAM
+          </a></li><li><a name="Section8">VIS5D_VWIND
+          </a></li><li><a name="Section8">VIS5D_VSTREAM
+          </a></li></ul>
+<a name="Section8">     </a></li><li><a name="Section8">var1 - the variable number or wind slice number
+     </a></li><li><a name="Section8">ctx_index2 - the data set which slice 2 belongs to
+     </a></li><li><a name="Section8">type2 - one of
+          </a><ul>
+<a name="Section8">          </a><li><a name="Section8">VIS5D_HSLICE
+          </a></li><li><a name="Section8">VIS5D_CHSLICE
+          </a></li><li><a name="Section8">VIS5D_VSLICE
+          </a></li><li><a name="Section8">VIS5D_CVSLICE
+          </a></li><li><a name="Section8">VIS5D_HWIND
+          </a></li><li><a name="Section8">VIS5D_HSTREAM
+          </a></li><li><a name="Section8">VIS5D_VWIND
+          </a></li><li><a name="Section8">VIS5D_VSTREAM
+          </a></li></ul>
+<a name="Section8">     </a></li><li><a name="Section8">var2 - the variable number or wind slice number
+     </a></li></ul>
+</dd></dl>
+
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_unlink_slice</b> data_context type var</a></code>
+</dt><dd><a name="Section8"> This removes the slice from a chain of linked slices.
+     </a><ul>
+<a name="Section8">     </a><li><a name="Section8">ctx_index - the data set which slice belongs to
+     </a></li><li><a name="Section8">type - one of
+          </a><ul>
+<a name="Section8">          </a><li><a name="Section8">VIS5D_HSLICE
+          </a></li><li><a name="Section8">VIS5D_CHSLICE
+          </a></li><li><a name="Section8">VIS5D_VSLICE
+          </a></li><li><a name="Section8">VIS5D_CVSLICE
+          </a></li><li><a name="Section8">VIS5D_HWIND
+          </a></li><li><a name="Section8">VIS5D_HSTREAM
+          </a></li><li><a name="Section8">VIS5D_VWIND
+          </a></li><li><a name="Section8">VIS5D_VSTREAM
+          </a></li></ul>
+<a name="Section8">     </a></li><li><a name="Section8">var - the variable number or wind slice number
+     </a></li></ul>
+</dd></dl>
+
+<h3><a name="Section8">Display Functions</a></h3>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_display_matrix</b> rows columns</a></code></dt>
+<dd><a name="Section8"> Set size of matrix of 3-D displays - no larger than 4 x 4.
+</a></dd></dl>
+<a name="Section8">    
+</a><dl>
+<dt><code><a name="Section8"><b>vis5d_get_display_matrix</b></a></code></dt>
+<dd><a name="Section8"> Get numbers of rows and columns in matrix of 3-D displays.
+</a></dd></dl>
+<a name="Section8">    
+</a><dl>
+<dt><code><a name="Section8"><b>vis5d_assign_display_to_data</b> data_context display_context</a></code></dt>
+<dd><a name="Section8"> Attach the $ctx given by 'data_context' to the $dtx given by display_context.
+</a></dd></dl>
+<a name="Section8">    
+</a><dl>
+<dt><code><a name="Section8"><b>vis5d_assign_display_to_irregular_data</b> irregular_data_context display_context</a></code></dt>
+<dd><a name="Section8"> Attach the $itx given by 'irregular_data_context' to the $dtx given by display_context.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_num_of_ctxs_in_display</b> display_context</a></code>
+</dt><dd><a name="Section8"> Return the number of $ctxs attached to a display. A list of the $ctx index numbers
+     will be displayed after that.
+</a></dd></dl><a name="Section8">  
+      
+</a><dl>
+<dt><code><a name="Section8"><b>vis5d_get_num_of_itxs_in_display</b> display_context</a></code>
+</dt><dd><a name="Section8"> Return the number of $itxs attached to a display. A list of the $itx index numbers
+     will be displayed after that.
+</a></dd></dl>
+
+<h3><a name="Section8">Grid Commands</a></h3>
+<a name="Section8"><i>The display grid or 'virtual' grid
+defines the 3-D space where the graphics are mapped to. The values defining the
+display grid may be changed where as the data grids remains static.
+</i>
+
+</a><dl>
+<dt><code><a name="Section8"><b>vis5d_get_ctx_grid_rows</b> data_context</a></code>
+</dt><dd><a name="Section8">Returns the number of rows in the each 3-D data grid. 
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_dtx_grid_rows</b> display_context</a></code>
+</dt><dd><a name="Section8">Returns the number of rows in the 3-D display grid. 
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_ctx_grid_columns</b> data_context</a></code>
+</dt><dd><a name="Section8">Returns the number of columns in each 3-D data grid.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_dtx_grid_columns</b> display_context</a></code>
+</dt><dd><a name="Section8">Returns the number of columns in the 3-D display grid.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_ctx_grid_levels</b> data_context var</a></code>
+</dt><dd><a name="Section8">Returns the number of levels in each 3-D data grid for a particular
+    physical variable.  The number of levels in a 3-D grid can vary from
+    variable to variable.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_dtx_grid_levels</b> display_context</a></code>
+</dt><dd><a name="Section8">Returns the number of levels in the 3-D display grid.  The
+    display grid is the same for all variables and time steps.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_dtx_grid_rows</b> display_context numrows</a></code>
+</dt><dd><a name="Section8">Sets the number of rows in the 3-D display grid.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_dtx_grid_columns</b> display_context numcols</a></code>
+</dt><dd><a name="Section8">Sets the number of columns in the 3-D display grid.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_dtx_grid_levels</b> display_context numlevs</a></code>
+</dt><dd><a name="Section8">Sets the number of levels in the 3-D display grid.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_verylarge_mode</b> data_context flag</a></code>
+</dt><dd><a name="Section8">flag is either VIS5D_ON, VIS5D_OFF, VIS5D_TOGGLE, or VIS5D_GET.
+    This command sets or tests the status of the <em>verylarge</em>
+    mode flag.  When set, graphical elements from a particular data
+    context are computed on demand,
+    not in advance, in an effort to minimize memory usage so larger
+    datasets can be visualized.</a><p>
+<a name="Section8">    Return value is either VIS5D_ON or VIS5D_OFF indicating the current
+    status of the mode flag.
+</a></p></dd></dl>
+
+
+<h3><a name="Section8">Map projection and vertical coordinate system commands</a></h3>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_ctx_projection</b> data_context</a></code>
+</dt><dd><a name="Section8">This command returns the type and parameters of the current map
+    projection associated with the data context.
+    An example result is:  <em>PROJ_LINEAR 90.0 10.0 2.0 2.5</em>
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_dtx_projection</b> display_context</a></code>
+</dt><dd><a name="Section8">This command returns the type and parameters of the current map
+    projection associated with the display context.
+    An example result is:  <em>PROJ_LINEAR 90.0 10.0 2.0 2.5</em>
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_ctx_vertical</b> data_context</a></code>
+</dt><dd><a name="Section8">This command returns the type and parameters of the current vertical
+    coordinate system associated with the data context.
+    An example result is:  <em>VERT_EQUAL_KM 0.0 1.5</em>
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_dtx_vertical</b> display_context</a></code>
+</dt><dd><a name="Section8">This command returns the type and parameters of the current vertical
+    coordinate system associated with the display context.
+    An example result is:  <em>VERT_EQUAL_KM 0.0 1.5</em>
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_dtx_projection_and_vertical</b> display_context proj_arg proj_value level</a></code>
+</dt><dd><a name="Section8">This sets anyone of the values which define a map projection or vertical
+    coordinate system associated with the $dtx.  ***NOTE***, a call to 
+    SET_PROJ_Done is needed after altering any parameters.</a><p>
+<a name="Section8">    </a></p><ul>
+<a name="Section8">    </a><li><a name="Section8">proj_arg - one of
+        </a><ul>
+<a name="Section8">         </a><li><a name="Section8">SET_PROJ_Projection,
+            </a><ul>
+<a name="Section8">            </a><li><a name="Section8">proj_value -one of
+                </a><ul>
+<a name="Section8">                </a><li><a name="Section8">PROJ_GENERIC
+                </a></li><li><a name="Section8">PROJ_LINEAR
+                </a></li><li><a name="Section8">PROJ_STEREO
+                </a></li><li><a name="Section8">PROJ_ROTATED
+                </a></li><li><a name="Section8">PROJ_CYLINDRICAL
+                </a></li><li><a name="Section8">PROJ_SPHERICAL
+                </a></li></ul>
+<a name="Section8">            </a></li></ul>
+<a name="Section8">         </a></li><li><a name="Section8">SET_PROJ_NorthBound,
+         </a></li><li><a name="Section8">SET_PROJ_WestBound, 
+         </a></li><li><a name="Section8">SET_PRO_RowInc,
+         </a></li><li><a name="Section8">SET_PROJ_ColInc,
+         </a></li><li><a name="Section8">SET_PROJ_Lat1, 
+         </a></li><li><a name="Section8">SET_PROJ_Lat2,
+         </a></li><li><a name="Section8">SET_PROJ_PoleRow,
+         </a></li><li><a name="Section8">SET_PROJ_PoleCol,
+         </a></li><li><a name="Section8">SET_PROJ_CentralLat,
+         </a></li><li><a name="Section8">SET_PROJ_CentralLon,
+         </a></li><li><a name="Section8">SET_PROJ_CentralRow,
+         </a></li><li><a name="Section8">SET_PROJ_CentralCol,
+         </a></li><li><a name="Section8">SET_PROJ_Rotation, 
+         </a></li><li><a name="Section8">SET_PROJ_CylinderScale
+         </a></li><li><a name="Section8">SET_PROJ_VerticalSystem,
+            </a><ul>
+<a name="Section8">            </a><li><a name="Section8">proj_value -one of
+                </a><ul>
+<a name="Section8">                </a><li><a name="Section8">VERT_GENERIC
+                </a></li><li><a name="Section8">VERT_EQUAL_KM
+                </a></li><li><a name="Section8">VERT_NONEQUAL_KM
+                </a></li><li><a name="Section8">VERT_NONEQUAL_MB
+                </a></li></ul>
+<a name="Section8">            </a></li></ul>
+<a name="Section8">         </a></li><li><a name="Section8">SET_PROJ_LevInc,
+         </a></li><li><a name="Section8">SET_PROJ_BottomBound,
+         </a></li><li><a name="Section8">SET_PROJ_Height.
+         </a></li><li><a name="Section8">SET_PROJ_Done.
+        </a></li></ul>
+<a name="Section8">    </a></li><li><a name="Section8">proj_value - this is the value that proj_arg is set to.
+    </a></li><li><a name="Section8">level - specifies the grid level (0..MaxGridLevels-1) when proj_arg = SET_PROJ_Height
+        and heights are unegually spaced.  NOTE: this is omitted otherwise.
+    </a></li></ul>
+</dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_curved</b> display_context</a></code>
+</dt><dd><a name="Section8">Returns whether or not the current map projection associated with the
+    display context results in the
+    display of a curved or rectangular 3-D bounding box.  Returns VIS5D_ON
+    if curved and VIS5D_OFF if rectangular.
+</a></dd></dl>
+
+
+<h3><a name="Section8">Topography, Map and Texture Commands</a></h3>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_check_topo</b> display_context</a></code>
+</dt><dd><a name="Section8">Returns VIS5D_ON if a topography is available for display, otherwise
+    returns VIS5D_OFF.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_topo_base</b> display_context state level</a></code>
+</dt><dd><a name="Section8"> Turn on or off the topography base and set the level for the base.
+    </a><ul>
+<a name="Section8">    </a><li><a name="Section8">state - 1 enable topo base, 0 disable topo base(defualt = 0)
+    </a></li><li><a name="Section8">level - level at which the topography base extends below ground, gridlevel [0..Nl-1]
+    </a></li></ul>
+</dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_check_map</b> display_context</a></code>
+</dt><dd><a name="Section8">Returns VIS5D_ON if a map outline is available for display, otherwise
+    returns VIS5D_OFF.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_flatmap_level</b> display_context level </a></code>
+</dt><dd><a name="Section8"> Set the level where the (non-surface) map is located.
+    </a><ul>
+<a name="Section8">    </a><li><a name="Section8">level - grid level [0..Nl-1]
+    </a></li></ul>
+</dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_flatmap_level</b> display_context  </a></code>
+</dt><dd><a name="Section8"> Get the grid level where the (non-surface) map is located.
+</a></dd></dl>
+
+
+
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_check_textureo</b> display_context</a></code>
+</dt><dd><a name="Section8">Returns VIS5D_ON if a topography texture map(s) is available for
+     display, otherwise returns VIS5D_OFF.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_topo_range</b> display_context</a></code>
+</dt><dd><a name="Section8">Returns a two element list indicating the min and max topography
+    heights in the display grid domain.  Values are in km.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_reset_topo_colors</b>  display_context</a></code>
+</dt><dd><a name="Section8">Reset the topography color ramp to the default.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_topo_color_var_and_owner</b> display_context varctx var</a></code>
+</dt><dd><a name="Section8"> Specity the variable used to color the topography.  'varctx' is the
+     $ctx where the variable is from.  If var = -1
+    then the topography is colored according to height, the default.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_init_map</b> display_context mapfilename</a></code>
+</dt><dd><a name="Section8">Load a map from mapfilename into a display.  Vis5D map files
+    can be created using util/makemap.c.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_init_topo</b> display_context topofilename</a></code>
+</dt><dd><a name="Section8">Load topography from topofilename into a display.  Vis5D topo files
+    can be created using util/maketopo.c.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_init_texture</b> display_context texturefilename</a></code>
+</dt><dd><a name="Section8">Load a texture from an SGI RGB file named texturefilename into a
+    display.  This is texture mapped onto the topography.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_init_firstarea</b> display_context area_number</a></code>
+</dt><dd><a name="Section8">Load a sequence of McIDAS area files, starting at area_number
+    one for each time step, into a display.  These are texture mapped
+    onto the topography.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_init_sequence</b> display_context sequencefilename</a></code>
+</dt><dd><a name="Section8">Load a sequence of images, one for each time step, from sequencefilename.
+    These are texture mapped onto the topography.  These files contain a
+    header of three integers giving (1) the number of images in the sequence,
+    (2) the height (# lines) of each image, and (3) the width (# pixels per
+    line).  After that each image consists of height*width unsigned characters.
+</a></dd></dl>
+
+
+
+<h3><a name="Section8">Cloning, External Functions and Expression Commands</a></h3>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_make_clone_variable</b> data_context clonename var</a></code>
+</dt><dd><a name="Section8">Make a clone of an existing variable.  clonename is the new for the
+    clone and var is the number or name of the variable to copy.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_compute_ext_func</b> display_context funcname</a></code>
+</dt><dd>
+<a name="Section8">	Invoke an external Fortran function named <em>funcname</em>
+	to compute a new variable.  <em>funcname</em> is a Unix file path/name.
+	The name of the resulting new variable will be the <em>funcname</em>
+	without the leading directory specification.  The $ctx which this
+        new variable belongs to will be the first $ctx attached to the
+        $dtx.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_make_expr_var</b> display_context expression</a></code>
+</dt><dd><a name="Section8">Evaluate a simple expression, resulting in a new variable.  Expressions
+    are of the form:  "var.# = expression" 
+    An example expression might be:
+       <em>diffU.1 = U.1 - U.2</em>
+    The variable '<em>diffU</em>' belongs to $ctx number 1, along with the first
+    '<em>U</em>' variable.
+    The second '<em>U</em>' variable belongs to $ctx number 2.  If the number of
+    the $ctx is omitted from the end of the variable, it is assumed that the variable
+    belongs to the first $ctx attacted to the $dtx.
+</a></dd></dl>
+
+
+
+<h3><a name="Section8">Rendering Commands</a></h3>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_draw_frame</b> display_context</a></code>
+</dt><dd><a name="Section8"> Redraw the window image for the current dtx timestep.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_draw_3d_only</b> display_context animflag</a></code>
+</dt><dd><a name="Section8">Draw the 3-D elements of the scene only.  animflag controls
+    whether or not contour numbers are displayed.  Zero means
+    draw the numbers, non-zero means do not draw contour numbers.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_draw_sounding_only</b> display_context redraw_background</a></code>
+</dt><dd><a name="Section8">Draw the elements in the sounding window only. redraw_background
+    controls whether or not the constant pixmap graphics such
+    as tick marks or theta lines should be redrawn (in case Sounding
+    window is resized or graphics enables change). Zero means do not
+    redraw, and one means redraw.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>int vis5d_init_samescale</b> display_context</a></code>
+</dt><dd><a name="Section8"> This will normalize the scale to which the 3 vertical plot variables will
+     be drawn to.
+</a></dd></dl>
+
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_map_sndwindow</b> display_context show</a></code>
+</dt><dd><a name="Section8">Map/Unmap the sounding window to the graphics display. If show is
+    1 then map the sounding window to the graphics display, it show
+    is 0 then unmap the sounding window to the graphics display.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_invalidate_dtx_frames</b> display_context</a></code>
+</dt><dd><a name="Section8">Invalidate any cached image frames belonging to the display context.
+    Only useful on systems
+    with slow 3-D graphics.
+</a></dd></dl>
+
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_graphics_mode</b> display_context graphic mode</a></code>
+</dt><dd><a name="Section8"> Enable/disable drawing of a Vis5D graphic.
+     </a><ul>
+<a name="Section8">     </a><li><a name="Section8">graphic - one of
+         </a><ul>
+<a name="Section8">         </a><li><a name="Section8">VIS5D_BOX = the 3-D box
+	 </a></li><li><a name="Section8">VIS5D_CLOCK = the clock
+	 </a></li><li><a name="Section8">VIS5D_MAP = the map lines
+	 </a></li><li><a name="Section8">VIS5D_TOPO = the topography
+	 </a></li><li><a name="Section8">VIS5D_PERSPECTIVE = perspective rendering
+	 </a></li><li><a name="Section8">VIS5D_CONTOUR_NUMBERS = display of contour numbers in slices
+             NOTE this is reversed so you must set this to VIS5D_OFF to
+                  see contour numbers
+	 </a></li><li><a name="Section8">VIS5D_GRID_COORDS = display grid coords instead of geographic
+             coords
+	 </a></li><li><a name="Section8">VIS5D_PRETTY = pretty rendering mode
+	 </a></li><li><a name="Section8">VIS5D_INFO = information display
+	 </a></li><li><a name="Section8">VIS5D_PROBE = the probe values
+	 </a></li><li><a name="Section8">VIS5D_CURSOR = the 3-D cursor
+	 </a></li><li><a name="Section8">VIS5D_ANIMRECORD = stored frame animation
+	 </a></li><li><a name="Section8">VIS5D_TEXTURE = texture mapping on topography
+	 </a></li><li><a name="Section8">VIS5D_DEPTHCUE = depth cuing of 3-D box
+	 </a></li><li><a name="Section8">VIS5D_BARBS = use wind barbs rather than arrows
+	 </a></li><li><a name="Section8">VIS5D_JULIAN = use yyddd rather than dd month yy in clock
+	 </a></li><li><a name="Section8">VIS5D_SND_THTA = display theta lines
+	 </a></li><li><a name="Section8">VIS5D_SND_THTE = display theta-e lines      
+	 </a></li><li><a name="Section8">VIS5D_SND_W = display constant mixing ratio (w) lines       
+	 </a></li><li><a name="Section8">VIS5D_SND_TICKS = display horz. &amp; vert. tick lines  
+	 </a></li><li><a name="Section8">VIS5D_REVERSE = reverse video (exchange black and white)
+         </a></li><li><a name="Section8">VIS5D_ALPHAMODE = specifies alpha blending
+         </a></li><li><a name="Section8">VIS5D_HIRESTOPO = hi-res topo
+         </a></li><li><a name="Section8">VIS5D_SAMESCALE = same vertical plot scale in sounding window
+	 </a></li></ul>
+<a name="Section8">    </a></li><li><a name="Section8">mode - one of
+	 </a><ul>
+<a name="Section8">	 </a><li><a name="Section8">VIS5D_ON = turn on the graphic
+	 </a></li><li><a name="Section8">VIS5D_OFF = turn off the graphic
+	 </a></li><li><a name="Section8">VIS5D_TOGGLE = toggle the graphics display state
+	 </a></li><li><a name="Section8">VIS5D_GET = just return current setting
+	 </a></li></ul>
+<a name="Section8">    </a></li></ul>
+<a name="Section8">    Returns 1 if graphic is displayed, 0 if graphic is not displayed or an
+    error message if any parameters are invalid.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_enable_irregular_graphics</b> irregular_data_context graphic mode</a></code>
+</dt><dd><a name="Section8"> Enable/disable drawing of a Vis5D graphic.
+     </a><ul>
+<a name="Section8">     </a><li><a name="Section8">graphic - one of
+         </a><ul>
+<a name="Section8">         </a><li><a name="Section8">VIS5D_TEXTPLOT = text plot
+         </a></li></ul>
+<a name="Section8">    </a></li><li><a name="Section8">mode - one of
+         </a><ul>
+<a name="Section8">         </a><li><a name="Section8">VIS5D_ON = turn on the graphic
+         </a></li><li><a name="Section8">VIS5D_OFF = turn off the graphic
+         </a></li><li><a name="Section8">VIS5D_TOGGLE = toggle the graphics display state
+         </a></li><li><a name="Section8">VIS5D_GET = just return current setting
+         </a></li></ul>
+<a name="Section8">    </a></li></ul>
+<a name="Section8">    Returns 1 if graphic is displayed, 0 if graphic is not displayed or an
+    error message if any parameters are invalid.
+</a></dd></dl>
+
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_enable_graphics</b> data_context graphic number mode</a></code>
+</dt><dd><a name="Section8"> Enable/disable drawing of a Vis5D graphic.
+     </a><ul>
+<a name="Section8">     </a><li><a name="Section8">graphic - one of
+         </a><ul>
+<a name="Section8">         </a><li><a name="Section8">VIS5D_ISOSURF = isosurface
+         </a></li><li><a name="Section8">VIS5D_HSLICE = horizontal contour line slice
+         </a></li><li><a name="Section8">VIS5D_VSLICE = vertical contour line slice
+         </a></li><li><a name="Section8">VIS5D_CHSLICE = horizontal colored slice
+         </a></li><li><a name="Section8">VIS5D_CVSLICE = vertical colored slice
+         </a></li><li><a name="Section8">VIS5D_VOLUME = volume rendering
+         </a></li><li><a name="Section8">VIS5D_TRAJ = wind trajectory set
+         </a></li><li><a name="Section8">VIS5D_HWIND = horizontal wind slice
+         </a></li><li><a name="Section8">VIS5D_VWIND = vertical wind slice
+         </a></li><li><a name="Section8">VIS5D_HSTREAM = horizontal streamline slice
+         </a></li><li><a name="Section8">VIS5D_VSTREAM = vertical streamline slice
+	 </a></li></ul>
+<a name="Section8">    </a></li><li><a name="Section8">number - depends on value of graphic:
+	</a><ul>
+<a name="Section8">        </a><li><a name="Section8">variable number, if graphic = VIS5D_ISOSURF, VIS5D_HSLICE,
+            VIS5D_VSLICE, VIS5D_CHSLICE, VIS5D_CVSLICE or VIS5D_VOLUME
+        </a></li><li><a name="Section8">trajectory set if graphic = VIS5D_TRAJ
+        </a></li><li><a name="Section8">slice number if graphic = VIS5D_HWIND, VIS5D_VWIND,
+            VIS5D_HSTREAM or VIS5D_VSTREAM
+        </a></li><li><a name="Section8">ignored otherwise
+        </a></li></ul>
+<a name="Section8">    </a></li><li><a name="Section8">mode - one of
+	 </a><ul>
+<a name="Section8">	 </a><li><a name="Section8">VIS5D_ON = turn on the graphic
+	 </a></li><li><a name="Section8">VIS5D_OFF = turn off the graphic
+	 </a></li><li><a name="Section8">VIS5D_TOGGLE = toggle the graphics display state
+	 </a></li><li><a name="Section8">VIS5D_GET = just return current setting
+	 </a></li></ul>
+<a name="Section8">    </a></li></ul>
+<a name="Section8">    Returns 1 if graphic is displayed, 0 if graphic is not displayed or an
+    error message if any parameters are invalid.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_enable_sfc_graphics</b> data_context graphic number mode</a></code>
+</dt><dd><a name="Section8"> Enable/disable drawing of a Vis5D surface graphic.
+     </a><ul>
+<a name="Section8">     </a><li><a name="Section8">graphic - one of
+         </a><ul>
+<a name="Section8">         </a><li><a name="Section8">VIS5D_HSLICE = horizontal contour line slice
+         </a></li><li><a name="Section8">VIS5D_HWIND = horizontal wind slice
+         </a></li><li><a name="Section8">VIS5D_HSTREAM = horizontal streamline slice
+         </a></li><li><a name="Section8">VIS5D_MAP = map
+         </a></li></ul>
+<a name="Section8">    </a></li><li><a name="Section8">number - depends on value of graphic:
+        </a><ul>
+<a name="Section8">        </a><li><a name="Section8">variable number, if graphic = VIS5D_HSLICE
+        </a></li><li><a name="Section8">slice number if graphic = VIS5D_HWIND, VIS5D_HSTREAM
+        </a></li><li><a name="Section8">ignored otherwise
+        </a></li></ul>
+<a name="Section8">    </a></li><li><a name="Section8">mode - one of
+         </a><ul>
+<a name="Section8">         </a><li><a name="Section8">VIS5D_ON = turn on the surface graphic
+         </a></li><li><a name="Section8">VIS5D_OFF = turn off the surface graphic
+         </a></li><li><a name="Section8">VIS5D_TOGGLE = toggle the surface graphics display state
+         </a></li><li><a name="Section8">VIS5D_GET = just return current setting
+         </a></li></ul>
+<a name="Section8">    </a></li></ul>
+<a name="Section8">    Returns 1 if graphic is displayed, 0 if graphic is not displayed or an
+    error message if any parameters are invalid.
+</a></dd></dl>
+
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_volume_and_owner</b> display_context</a></code>
+</dt><dd><a name="Section8"> Returns two variables, varctx and var.  var is the variable
+    number of the currently displayed volume or -1
+     if none is currently displayed.  varctx is the $ctx number where
+     the var belongs.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_volume_and_owner</b> display_context varctx var</a></code>
+</dt><dd><a name="Section8"> Set the currently displayed volume.  var is a variable number or name
+     indicating the variable to display.  If var is -1, disable volume display.
+     varctx is the $ctx number where the var belongs to.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_init_clock</b> display_context flag</a></code>
+</dt><dd><a name="Section8"> Specify if a circle should be drawn around the clock.  If flag is 0
+     then no circle is draw, if flag is 1 then the circle is drawn
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_color</b> display_context graphic numberctx number red green blue alpha</a></code>
+</dt><dd><a name="Section8">or
+</a></dd><dt><code><a name="Section8"><b>vis5d_set_color</b> display_context graphic number red green blue alpha</a></code>
+</dt><dd><a name="Section8"> Set the color of a Vis5D graphic such as an isosurface, slice or
+     trajectory.
+     </a><ul>
+<a name="Section8">     </a><li><a name="Section8">graphic - one of
+         </a><ul>
+<a name="Section8">         </a><li><a name="Section8">VIS5D_ISOSURF = isosurface
+         </a></li><li><a name="Section8">VIS5D_HSLICE = horizontal contour line slice
+         </a></li><li><a name="Section8">VIS5D_VSLICE = vertical contour line slice
+         </a></li><li><a name="Section8">VIS5D_CHSLICE = horizontal colored slice
+         </a></li><li><a name="Section8">VIS5D_CVSLICE = vertical colored slice
+         </a></li><li><a name="Section8">VIS5D_VOLUME = volume rendering
+         </a></li><li><a name="Section8">VIS5D_TRAJ = wind trajectory set
+         </a></li><li><a name="Section8">VIS5D_HWIND = horizontal wind slice
+         </a></li><li><a name="Section8">VIS5D_VWIND = vertical wind slice
+         </a></li><li><a name="Section8">VIS5D_HSTREAM = horizontal streamline slice
+         </a></li><li><a name="Section8">VIS5D_VSTREAM = horizontal streamline slice
+         </a></li><li><a name="Section8">VIS5D_BOX = the 3-D box
+         </a></li><li><a name="Section8">VIS5D_BACKGROUND = window background color
+         </a></li><li><a name="Section8">VIS5D_LABEL = color of text labels
+         </a></li><li><a name="Section8">VIS5D_MAP = color of map lines
+         </a></li></ul>
+<a name="Section8">    </a></li><li><a name="Section8">numberctx - if number represents a variable then this is
+        the $ctx number where the variable belongs to
+         (if not present, use display_context), ignored otherwise
+    </a></li><li><a name="Section8">number - meaning depends on value of graphic argument
+	</a><ul>
+<a name="Section8">        </a><li><a name="Section8">variable number, if graphic = VIS5D_ISOSURF, VIS5D_HSLICE,
+            VIS5D_VSLICE, VIS5D_CHSLICE or VIS5D_CVSLICE
+        </a></li><li><a name="Section8">trajectory set if graphic = VIS5D_TRAJ
+        </a></li><li><a name="Section8">slice number if graphic = VIS5D_HWIND, VIS5D_VWIND,
+            VIS5D_HSTREAM or VIS5D_VSTREAM
+        </a></li><li><a name="Section8">ignored otherwise
+        </a></li></ul>
+<a name="Section8">    </a></li><li><a name="Section8">red, green, blue - the color components as floating point
+         numbers in the interval [0,1]
+    </a></li><li><a name="Section8">alpha - the transparency where 0 is completely transparent and 1 is
+        completely opaque
+    </a></li></ul>
+</dd></dl>
+
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_color</b> display_context graphic numberctx number</a></code>
+</dt><dd><a name="Section8">or
+</a></dd><dt><code><a name="Section8"><b>vis5d_get_color</b> display_context graphic number</a></code>
+</dt><dd><a name="Section8"> Return the colors of a Vis5D graphic such as an isosurface, slice or
+     trajectory.
+     </a><ul>
+<a name="Section8">     </a><li><a name="Section8">graphic - one of
+         </a><ul>
+<a name="Section8">         </a><li><a name="Section8">VIS5D_ISOSURF = isosurface
+         </a></li><li><a name="Section8">VIS5D_HSLICE = horizontal contour line slice
+         </a></li><li><a name="Section8">VIS5D_VSLICE = vertical contour line slice
+         </a></li><li><a name="Section8">VIS5D_CHSLICE = horizontal colored slice
+         </a></li><li><a name="Section8">VIS5D_CVSLICE = vertical colored slice
+         </a></li><li><a name="Section8">VIS5D_VOLUME = volume rendering
+         </a></li><li><a name="Section8">VIS5D_TRAJ = wind trajectory set
+         </a></li><li><a name="Section8">VIS5D_HWIND = horizontal wind slice
+         </a></li><li><a name="Section8">VIS5D_VWIND = vertical wind slice
+         </a></li><li><a name="Section8">VIS5D_HSTREAM = horizontal streamline slice
+         </a></li><li><a name="Section8">VIS5D_VSTREAM = horizontal streamline slice
+         </a></li><li><a name="Section8">VIS5D_BOX = the 3-D box
+         </a></li><li><a name="Section8">VIS5D_BACKGROUND = window background color
+         </a></li><li><a name="Section8">VIS5D_LABEL = color of text labels
+         </a></li><li><a name="Section8">VIS5D_MAP = color of map lines
+         </a></li></ul>
+<a name="Section8">    </a></li><li><a name="Section8">numberctx - if number represents a variable then this is
+        the $ctx number where the variable belongs to
+         (if not present, use display_context), ignored otherwise
+    </a></li><li><a name="Section8">number - meaning depends on value of graphic argument
+        </a><ul>
+<a name="Section8">        </a><li><a name="Section8">variable number, if graphic = VIS5D_ISOSURF, VIS5D_HSLICE,
+            VIS5D_VSLICE, VIS5D_CHSLICE or VIS5D_CVSLICE
+        </a></li><li><a name="Section8">trajectory set if graphic = VIS5D_TRAJ
+        </a></li><li><a name="Section8">slice number if graphic = VIS5D_HWIND, VIS5D_VWIND,
+            VIS5D_HSTREAM or VIS5D_VSTREAM
+        </a></li><li><a name="Section8">ignored otherwise
+        </a></li></ul>
+<a name="Section8">    </a></li></ul>
+</dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_color_table_entry</b> display_context graphic varctx var entry r g b a</a></code>
+</dt><dd><a name="Section8">or
+</a></dd><dt><code><a name="Section8"><b>vis5d_set_color_table_entry</b> display_context graphic var entry r g b a</a></code>
+</dt><dd><a name="Section8"> Set one entry in a color lookup table.  To setup a whole color table will
+     typically require 256 calls to this function.  One call per color table
+     entry.
+     </a><ul>
+<a name="Section8">     </a><li><a name="Section8">graphic - one of
+         </a><ul>
+<a name="Section8">         </a><li><a name="Section8">VIS5D_ISOSURF = an isosurface's color table
+         </a></li><li><a name="Section8">VIS5D_CHSLICE = a horizontal colored slice's color table
+         </a></li><li><a name="Section8">VIS5D_CVSLICE = a vertical colored slice's color table
+         </a></li><li><a name="Section8">VIS5D_TRAJ = a trajectory set's color table
+         </a></li><li><a name="Section8">VIS5D_VOLUME = a volume's color table
+	 </a></li></ul>
+<a name="Section8">     </a></li><li><a name="Section8">varctx - which $ctx the var belongs to (if not present, use display_context)
+     </a></li><li><a name="Section8">var - which variable
+     </a></li><li><a name="Section8">entry - which color table entry, must be between 0 and 255.
+     </a></li><li><a name="Section8">r, g, b, a - the red, green, blue, and alpha values in [0,255]
+     </a></li></ul>
+</dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_legends</b> display_context position size</a></code>
+</dt><dd><a name="Section8"> Set the positon and size of the color legends.
+     </a><ul>
+<a name="Section8">     </a><li><a name="Section8">position -one of
+        </a><ul>
+<a name="Section8">        </a><li><a name="Section8">VIS5D_TOP
+        </a></li><li><a name="Section8">VIS5D_BOTTOM
+        </a></li><li><a name="Section8">VIS5D_RIGHT
+        </a></li><li><a name="Section8">VIS5D_LEFT
+        </a></li></ul>
+<a name="Section8">     </a></li><li><a name="Section8">size - size of lengend
+     </a></li></ul>
+</dd></dl>
+
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_logo_size</b> display_context size</a></code>
+</dt><dd><a name="Section8"> Set the size of the 'Vis5D' logo. The logo is reduced by a factor <i>size</i>
+</a></dd></dl>
+
+
+
+<a name="Section8"> 
+</a><dl>
+<dt><code><a name="Section8"><b>vis5d_alpha_mode</b> display_context mode</a></code>
+</dt><dd><a name="Section8">Sets the alpha (transparency) mode for a display context.  If mode is zero then
+    "screen-door" transparency is used.  If mode is one then alpha blending
+    is used to render transparent surfaces.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_font</b> display_context fontname [size]</a></code>
+</dt><dd><a name="Section8">Specifies the font used for drawing text labels and the clock.  fontname
+    is the name of a GL or X font.  If using GL fonts, size is the height
+    of the font to use where 72 equals one inch.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_font_height</b> display_context</a></code>
+</dt><dd><a name="Section8">Return the font height used for drawing text labels and the clock.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_linewidth</b> display_context width</a></code>
+</dt><dd><a name="Section8">Specifies the width of line segments in pixels.  Default is 1.0.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_resize_contour_font</b> data_context sizefactorx sizefactory</a></code>
+</dt><dd><a name="Section8">Increase the width/height size of the contour numbers by a factor of 'sizefactorx',
+    and 'sizefactory'.
+     Default value of 'sizefactorx'and 'sizefactory' is 0.
+</a></dd></dl>
+
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_probe_vars</b> data_context numvars varlist</a></code>
+</dt><dd><a name="Section8">Specifie which variables to display when using the probe.
+     </a><ul>
+<a name="Section8">     </a><li><a name="Section8">numvars - number of variables, -1 for all variables, 0 for no variables
+     </a></li><li><a name="Section8">varlist - list of variables numbers, or blank if numvars = -1 or numvars = 0
+     </a></li><li><a name="Section8">Example: vis5d_set_probe_vars 0 5 0 1 2 3 7 
+     </a></li></ul>
+</dd></dl>
+
+
+<h3><a name="Section8">Clipping Functions</a></h3>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_hclip</b> display_context number level</a></code>
+</dt><dd><a name="Section8"> Set a a horizontal clipping plane.
+     </a><ul>
+<a name="Section8">     </a><li><a name="Section8">number - one of
+         </a><ul>
+<a name="Section8">         </a><li><a name="Section8"> 0 = default level position is MaxLevels
+         </a></li><li><a name="Section8"> 1 = default level position is 0
+         </a></li></ul>
+<a name="Section8">     </a></li><li><a name="Section8">level - the grid level at which to set the selected
+                 horizontal clipping plane
+     </a></li></ul>
+</dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_vclip</b> display_context number r1 c1 r2 c2</a></code>
+</dt><dd><a name="Section8"> Set a vertical clipping plane.
+     </a><ul>
+<a name="Section8">     </a><li><a name="Section8">number - one of
+         </a><ul><a name="Section8"> 
+         </a><li><a name="Section8"> 0 = default position is north side of grid box, (r1,c1,r2,c2) =
+              (0,0,0,Nc)
+         </a></li><li><a name="Section8"> 1 = defualt position is south side of grid box, (r1,c1,r2,c2) =
+              (Nr,0,Nr,Nc)
+         </a></li><li><a name="Section8"> 2 = default position is west side of grid box, (r1,c1,r2,c2) =
+              (0,0,Nr,0)
+         </a></li><li><a name="Section8"> 3 = default position is east side of grid box, (r1,c1,r2,c2) =
+              (0,Nc,Nr,Nc)
+         </a></li></ul>
+<a name="Section8">      </a></li><li><a name="Section8"> r1, c1, r2, c2 - grid coordinates of the two corners of the
+           vertical clipping plane
+      </a></li></ul>
+</dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_hclip</b> display_context number</a></code>
+</dt><dd><a name="Section8"> Return the grid level at which the horizontal clipping
+     plane, designated by <i>number(0..1)</i>, is located at.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_vclip</b> display_context number</a></code>
+</dt><dd><a name="Section8"> Return the grid coordinates (r1, c1, r2, c2) for the two 
+     corners of the vertical clipping plane designated by
+     <i>number (0..3)</i>.
+</a></dd></dl>
+
+
+
+<h3><a name="Section8">3-D View Commands</a></h3>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_matrix</b> display_context matrix</a></code>
+</dt><dd><a name="Section8">Sets the 3-D viewing matrix.  matrix is a list of sixteen values
+    representing the transformation matrix in row-major order.  This is
+    an advanced function not intended for most users.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_matrix</b> display_context</a></code>
+</dt><dd><a name="Section8">Returns a list of 16 numbers which is the current 3-D viewing
+    transformation matrix.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_ortho_view</b> display_context view </a></code>
+</dt><dd><a name="Section8">Set the current view to either VIS5D_NORTH, VIS5D_SOUTH, VIS5D_EAST,
+    VIS5D_WEST, VIS5D_TOP or VIS5D_BOTTOM.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_view</b> display_context xrot yrot zrot scale xtrans ytrans ztrans</a></code>
+</dt><dd><a name="Section8">Sets the 3-D viewing matrix by means of separate rotation, scale and
+    translation values.  The order of transformations is Z-axis rotate,
+    X-axis rotate, Y-axis rotate, scale then translate.  Arguments:
+    </a><ul>
+<a name="Section8">    </a><li><a name="Section8">xrot, yrot, zrot - rotation about each axis in degrees
+    </a></li><li><a name="Section8">scale - scaling factor
+    </a></li><li><a name="Section8">xtrans, ytrans, ztrans - translation along each axis
+    </a></li></ul>
+</dd></dl>
+
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_view</b> display_context </a></code>
+</dt><dd><a name="Section8">Returns the xrot, yrot, zrot, scale, xtrans, ytrans, and ztrans.
+</a></dd></dl>
+
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_view_scales </b> display_context scalex scaley scalez</a></code>
+</dt><dd><a name="Section8"> Set the current 3-D transformation matrix scale factors.
+    </a><ul>
+<a name="Section8">    </a><li><a name="Section8">scalex - scale factor for the X axis
+    </a></li><li><a name="Section8">scaley - scale factor for the Y axis
+    </a></li><li><a name="Section8">scalez - scale factor for the Z axis
+    </a></li></ul>
+</dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_view_scales </b> display_context</a></code>
+</dt><dd><a name="Section8"> Get the current 3-D transformation matrix scale factors.
+</a></dd></dl>
+
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_camera</b> display_context perspective frontclip zoom</a></code>
+</dt><dd><a name="Section8">Sets the parameters of the imaginary 3-D camera.  Arguments:
+    </a><ul>
+<a name="Section8">    </a><li><a name="Section8">perspective - 0=orthographic, 1=perspective
+    </a></li><li><a name="Section8">frontclip - position of front clipping plane, a value in [0,1] where
+                    0=no clipping and 1=all clipped
+    </a></li><li><a name="Section8">zoom - zoom (scale) factor, 1.0 is normal
+    </a></li></ul>
+</dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_camera</b> display_context </a></code>
+</dt><dd><a name="Section8">Returns the parameters of the imaginary 3-D camera: perspec, frnotclip, zoom.
+</a></dd></dl>
+
+
+<h3><a name="Section8">Text Plots</a></h3>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_text_plot</b> irregular_data_context var density fontx fonty fontspace</a></code>
+</dt><dd><a name="Section8">Sets the parameters for a text plot.
+     </a><ul>
+<a name="Section8">     </a><li><a name="Section8">var - variable number
+     </a></li><li><a name="Section8">density - number specifying the density for plotting the data
+     </a></li><li><a name="Section8">fontx, fonty - text plot font size
+     </a></li><li><a name="Section8">fontspace - number specifying size of the space between text plot characters
+     </a></li></ul>
+</dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_text_plot</b> irregular_data_context var</a></code>
+</dt><dd><a name="Section8">Returns the parameters for a text plot: density, fontx, fonty and fontspace
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_make_text_plot</b> irregular_data_context time urgent</a></code>
+</dt><dd><a name="Section8">Compute a text plot for 'time'.  If urgent is non-zero then computing this
+    text plot will be given priority over any other pending computation.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_textplot_color_status</b> irregular_data_context var status</a></code>
+</dt><dd><a name="Section8">Set the color status of the text plot variable 'var'.  If status is VIS5D_ON then
+    a colormap will be used to determine the colors of the text plot.  If status is
+    VIS5D_OFF then monocolor will be used.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_textplot_color_status</b> irregular_data_context var</a></code>
+</dt><dd><a name="Section8">Return the status of the text plot variable.  VIS5D_ON indicates multicolor and
+VIS5D_OFF indicates a monocolor.
+</a></dd></dl>
+
+
+<h3><a name="Section8">Isosurface, Slice, and Trajectory Commands</a></h3>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_isosurface</b> data_context var isolevel</a></code>
+</dt><dd><a name="Section8">Sets the isolevel for the isosurface specified by var.  Note that the
+    isosurface is not computed by this function.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_isosurface</b> data_context var</a></code>
+</dt><dd><a name="Section8">Returns the current isolevel for a particular variable.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_isosurface_color_var_and_owner</b> data_context isovar colorvarctx colorvar</a></code>
+</dt><dd><a name="Section8">Specifies which variable to use to color an isosurface.  isovar is the
+    isosurface to color.  colorvar is the variable to color the surface or
+    -1 which means don't color the surface. colorvarctx is the $ctx number where
+    colorvar is from.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_make_isosurface</b> data_context time var urgent</a></code>
+</dt><dd><a name="Section8">Compute a(n) isosurface(s).  Time indicates which timestep to compute.
+    The value VIS5D_ALL_TIMES can be used to specify all timesteps.  var
+    indicates which variable to compute the isosurface for.  If urgent is
+    non-zero then computing this isosurface will be given priority over
+    any other pending computation.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_hslice</b> data_context var interval low high level</a></code>
+</dt><dd><a name="Section8">Sets the attributes for a horizontal contour line slice.
+    </a><ul>
+<a name="Section8">    </a><li><a name="Section8">var - which variable, a name or number
+    </a></li><li><a name="Section8">interval - the interval between contour lines
+    </a></li><li><a name="Section8">low - the low limit for contouring
+    </a></li><li><a name="Section8">high - the high limit for contouring
+    </a></li><li><a name="Section8">level - position of the slice as a grid level
+    </a></li></ul>
+<a name="Section8">    Note that this function does not actually compute the slice.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_hslice</b> data_context var</a></code>
+</dt><dd><a name="Section8">Returns the attributes of a horizontal contour lines slice.  A list
+    of four values is returned:  <em> interval low high level</em>.
+    These values correspond to those of <code>vis5d_set_hslice</code>.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_make_hslice</b> data_context time var urgent</a></code>
+</dt><dd><a name="Section8">Compute (a) horizontal contour slice(s).  Time indicates which timestep
+    to compute.
+    The value VIS5D_ALL_TIMES can be used to specify all timesteps.  var
+    indicates which variable to compute the slice for.  If urgent is
+    non-zero then computing this slice will be given priority over
+    any other pending computation.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_vslice</b> data_context var interval low high r0 c0 r1 c1</a></code>
+</dt><dd><a name="Section8">Sets the attributes for a vertical contour line slice.
+    </a><ul>
+<a name="Section8">    </a><li><a name="Section8">var - which variable, a name or number
+    </a></li><li><a name="Section8">interval - the interval between contour lines
+    </a></li><li><a name="Section8">low - the low limit for contouring
+    </a></li><li><a name="Section8">high - the high limit for contouring
+    </a></li><li><a name="Section8">r0, c0 - position of left edge of slice in grid rows and columns
+    </a></li><li><a name="Section8">r1, c1 - position of right edge of slice in grid rows and columns
+    </a></li></ul>
+<a name="Section8">    Note that this function does not actually compute the slice.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_vslice</b> data_context var</a></code>
+</dt><dd><a name="Section8">Returns the attributes of a vertical contour lines slice.  A list
+    of seven values is returned:  <em> interval low high r0 c0 r1 c1</em>.
+    These values correspond to those of <code>vis5d_set_vslice</code>.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_make_vslice</b> data_context time var urgent</a></code>
+</dt><dd><a name="Section8">Compute (a) vertical contour slice(s).  Time indicates which timestep
+    to compute.
+    The value VIS5D_ALL_TIMES can be used to specify all timesteps.  var
+    indicates which variable to compute the slice for.  If urgent is
+    non-zero then computing this slice will be given priority over
+    any other pending computation.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_chslice</b> data_context var level</a></code>
+</dt><dd><a name="Section8">Sets the attributes for a horizontal color slice.
+    </a><ul>
+<a name="Section8">    </a><li><a name="Section8">var - which variable, a name or number
+    </a></li><li><a name="Section8">level - position of the slice as a grid level
+    </a></li></ul>
+<a name="Section8">    Note that this function does not actually compute the slice.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_chslice</b> data_context var</a></code>
+</dt><dd><a name="Section8">Returns the attributes of a horizontal color slice.  A list
+    of one value is returned:  <em>level</em>, as is used by
+    <code>vis5d_set_chslice</code>.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_make_chslice</b> data_context time var urgent</a></code>
+</dt><dd><a name="Section8">Compute (a) horizontal color slice(s).  Time indicates which timestep
+    to compute.
+    The value VIS5D_ALL_TIMES can be used to specify all timesteps.  var
+    indicates which variable to compute the slice for.  If urgent is
+    non-zero then computing this slice will be given priority over
+    any other pending computation.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_cvslice</b> data_context var r0 c0 r1 c1</a></code>
+</dt><dd><a name="Section8">Sets the attributes for a vertical color slice.
+    </a><ul>
+<a name="Section8">    </a><li><a name="Section8">var - which variable, a name or number
+    </a></li><li><a name="Section8">r0, c0 - position of left edge of slice in grid rows and columns
+    </a></li><li><a name="Section8">r1, c1 - position of right edge of slice in grid rows and columns
+    </a></li></ul>
+<a name="Section8">    Note that this function does not actually compute the slice.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_cvslice</b> data_context var</a></code>
+</dt><dd><a name="Section8">Returns the attributes of a vertical color slice.  A list
+    of four values is returned:  <em>r0, c0, r1, c1</em>, as is used by
+    <code>vis5d_set_cvslice</code>.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_make_cvslice</b> data_context time var urgent</a></code>
+</dt><dd><a name="Section8">Compute (a) vertical color slice(s).  Time indicates which timestep
+    to compute.
+    The value VIS5D_ALL_TIMES can be used to specify all timesteps.  var
+    indicates which variable to compute the slice for.  If urgent is
+    non-zero then computing this slice will be given priority over
+    any other pending computation.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_hwindslice</b> display_context slicenum density scale level</a></code>
+</dt><dd><a name="Section8">Sets the attributes for a horizontal wind vector slice.
+    </a><ul>
+<a name="Section8">    </a><li><a name="Section8">slicenum - which slice, currently 0 or 1
+    </a></li><li><a name="Section8">density - density of wind vectors 0.25, 0.5 or 1.0 for example
+    </a></li><li><a name="Section8">scale - scale factor for vectors.  1.0 is normal
+    </a></li><li><a name="Section8">level - position of the slice as a grid level
+    </a></li></ul>
+<a name="Section8">    Note that this function does not actually compute the slice.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_hwindslice</b> display_context slicenum</a></code>
+</dt><dd><a name="Section8">Returns the attributes of a horizontal wind slice.  A list of three
+    values is returned: <em>density scale level</em> which correspond to
+    the parameters of <code>vis5d_set_hwindslice</code>.
+</a></dd></dl>
+
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_make_hwindslice</b> display_context dtx_time slice urgent</a></code>
+</dt><dd><a name="Section8">Compute (a) horizontal wind vector slice(s).  Time indicates which timestep
+    to compute.
+    NOTE: dtx_time = [0..Numtimes-1] where Numtimes is the number
+    of timesteps in the display context.
+    The value VIS5D_ALL_TIMES can be used to specify all timesteps.  slice
+    indicates which slice to compute.  If urgent is
+    non-zero then computing this slice will be given priority over
+    any other pending computation.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_vwindslice</b> display_context slicenum density scale r0 c0 r1 c1</a></code>
+</dt><dd><a name="Section8">Sets the attributes for a vertical wind vector slice.
+    </a><ul>
+<a name="Section8">    </a><li><a name="Section8">slicenum - which slice, currently 0 or 1
+    </a></li><li><a name="Section8">density - density of wind vectors 0.25, 0.5 or 1.0 for example
+    </a></li><li><a name="Section8">scale - scale factor for vectors.  1.0 is normal
+    </a></li><li><a name="Section8">r0, c0 - position of left edge of slice in grid rows and columns
+    </a></li><li><a name="Section8">r1, c1 - position of right edge of slice in grid rows and columns
+    </a></li></ul>
+<a name="Section8">    Note that this function does not actually compute the slice.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_vwindslice</b> display_context slicenum</a></code>
+</dt><dd><a name="Section8">Returns the attributes of a vertical wind slice.  A list of six
+    values is returned: <em>density scale r0 c0 r1 c1 </em> which correspond
+    to the parameters of <code>vis5d_set_vwindslice</code>.
+</a></dd></dl>
+
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_make_vwindslice</b> display_context dtx_time slice urgent</a></code>
+</dt><dd><a name="Section8">Compute (a) vertical wind vector slice(s).  Time indicates which timestep
+    to compute.
+    NOTE: dtx_time = [0..Numtimes-1] where Numtimes is the number
+    of timesteps in the display context. 
+    The value VIS5D_ALL_TIMES can be used to specify all timesteps.  slice
+    indicates which slice to compute.  If urgent is
+    non-zero then computing this slice will be given priority over
+    any other pending computation.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_hstreamslice</b> display_context slicenum density level</a></code>
+</dt><dd><a name="Section8">Sets the attributes for a horizontal wind stream slice.
+    </a><ul>
+<a name="Section8">    </a><li><a name="Section8">slicenum - which slice, currently 0 or 1
+    </a></li><li><a name="Section8">density - density of stream lines, 1.0 is default
+    </a></li><li><a name="Section8">level - position of the slice as a grid level
+    </a></li></ul>
+<a name="Section8">    Note that this function does not actually compute the slice.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_hstreamslice</b> display_context slicenum</a></code>
+</dt><dd><a name="Section8">Returns the attributes of a horizontal stream slice.  A list of two
+    values is returned: <em>density level</em> which correspond
+    to the parameters of <code>vis5d_set_hstreamslice</code>.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_make_hstreamslice</b> display_context dtx_time slice urgent</a></code>
+</dt><dd><a name="Section8">Compute (a) horizontal wind stream slice(s).  Time indicates which timestep
+    to compute.
+    NOTE: dtx_time = [0..Numtimes-1] where Numtimes is the number
+    of timesteps in the display context. 
+    The value VIS5D_ALL_TIMES can be used to specify all timesteps.  slice
+    indicates which slice to compute.  If urgent is
+    non-zero then computing this slice will be given priority over
+    any other pending computation.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_vstreamslice</b> display_context slicenum density r0 c0 r1 c1</a></code>
+</dt><dd><a name="Section8">Sets the attributes for a vertical wind stream slice.
+    </a><ul>
+<a name="Section8">    </a><li><a name="Section8">slicenum - which slice, currently 0 or 1
+    </a></li><li><a name="Section8">density - density of stream lines, 1.0 is default
+    </a></li><li><a name="Section8">r0, c0 - position of left edge of slice in grid rows and columns
+    </a></li><li><a name="Section8">r1, c1 - position of right edge of slice in grid rows and columns
+    </a></li></ul>
+<a name="Section8">    Note that this function does not actually compute the slice.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_vstreamslice</b> display_context slicenum</a></code>
+</dt><dd><a name="Section8">Returns the attributes of a vertical stream slice.  A list of five
+    values is returned: <em>density r0 c0 r1 c1</em> which correspond
+    to the parameters of <code>vis5d_set_vstreamslice</code>.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_make_vstreamslice</b> display_context dtx_time slice urgent</a></code>
+</dt><dd><a name="Section8">Compute (a) vertical wind stream slice(s).  Time indicates which timestep
+    to compute.
+    NOTE: dtx_time = [0..Numtimes-1] where Numtimes is the number
+    of timesteps in the display context. 
+    The value VIS5D_ALL_TIMES can be used to specify all timesteps.  slice
+    indicates which slice to compute.  If urgent is
+    non-zero then computing this slice will be given priority over
+    any other pending computation.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_print_traj</b> display_context traj_num</a></code>
+</dt><dd><a name="Section8">Prints the tail position of the trajectory and the variable value
+    if one is mapped to it for each time step.  traj_num specifies
+    which trajectory to print out.  The output will be
+    of the form:  TimeStep Lat Lon Hgt VarValue
+</a></dd></dl>
+<a name="Section8"> 
+</a><dl>
+<dt><code><a name="Section8"><b>vis5d_make_traj</b> display_context row column level dtx_time trajset</a></code>
+</dt><dd><a name="Section8">Compute a window trajectory.
+    </a><ul>
+<a name="Section8">    </a><li><a name="Section8">row, column, level - starting coordinate of trajectory in dtx (virtual) grid coordinates
+    </a></li><li><a name="Section8">dtx_time - display context timestep at which to start trajectory trace
+    </a></li><li><a name="Section8">trajset - which trajectory set
+    </a></li></ul>
+</dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_traj</b> display_context step length ribbonflag</a></code>
+</dt><dd><a name="Section8">Set trajectory attributes.
+    </a><ul>
+<a name="Section8">    </a><li><a name="Section8">step - trajectory step size.  1.0 is default
+    </a></li><li><a name="Section8">length - trajectory length scaling.  1.0 is default
+    </a></li><li><a name="Section8">ribbonflag - if non-zero draw a ribbon trajectory, else draw as
+        line segments.
+    </a></li></ul>
+</dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_traj</b> display_context</a></code>
+</dt><dd><a name="Section8">Returns current trajectory attributes as a list of three values:
+    <em>step length ribbonflag</em> which correspond to the parameters
+    of <code>vis5d_set_traj</code>
+</a></dd></dl>
+
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_delete_last_traj</b> display_context</a></code>
+</dt><dd><a name="Section8">Delete the last trajectory made.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_delete_traj_set</b> display_context set</a></code>
+</dt><dd><a name="Section8">Delete a whole set of trajectories.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_trajectory_color_var_and_owner</b> display_context set varctx var</a></code>
+</dt><dd><a name="Section8">Color all trajectories in the specified set according to the physical
+    variable var.  var may be a variable name or number. varctx is the $ctx
+    number where the var is from.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_make_timestep_graphics</b> display_context timestep</a></code>
+</dt><dd><a name="Section8">Compute all graphics for the specified display context timestep.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_free_graphics</b> data_context</a></code>
+</dt><dd><a name="Section8">Deallocate all stored graphics.  This can be useful if memory
+    becomes severlay fragmented.
+</a></dd></dl>
+
+
+<h3><a name="Section8">Text Label Commands</a></h3>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_make_label</b> display_context x y text</a></code>
+</dt><dd><a name="Section8">Make a text label at coordinate (x,y).  x and y are in window coordinates
+    with (0,0) being the upper-left corner.  text is a string.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_delete_label</b> display_context x y</a></code>
+</dt><dd><a name="Section8">Delete a text label at coordinate (x,y).  x and y are in window coordinates
+    with (0,0) being the upper-left corner.
+</a></dd></dl>
+
+
+<h3><a name="Section8">Cursor Commands</a></h3>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_cursor</b> display_context</a></code>
+</dt><dd><a name="Section8">Returns the current 3-D cursor position as a list of three numbers
+    which are in $dtx graphics coordinates.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_cursor</b> display_context x y z</a></code>
+</dt><dd><a name="Section8">Sets the current 3-D cursor position given an (X,Y,Z) position in
+    $dtx graphics space.
+</a></dd></dl>
+
+
+<h3><a name="Section8">3-D Window Commands</a></h3>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_image_formats</b> </a></code>
+</dt><dd><a name="Section8">Return's a list of image file formats supported by this implementation
+    of Vis5D.  The list may include:
+    </a><ul>
+<a name="Section8">    </a><li><a name="Section8">VIS5D_RGB - SGI's RGB image file format
+    </a></li><li><a name="Section8">VIS5D_GIF - GIF image file format
+    </a></li><li><a name="Section8">VIS5D_XWD - X window dump file format
+    </a></li><li><a name="Section8">VIS5D_PS - Black and white PostScript
+    </a></li><li><a name="Section8">VIS5D_COLOR_PS - Color PostScript
+    </a></li></ul>
+</dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_save_window</b> filename format</a></code>
+</dt><dd><a name="Section8">Save the large window image to the named file.  format is one of the file
+    format identifiers returned by vis5d_get_image_formats.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_save_snd_window</b> display_context filname format</a></code>
+</dt><dd><a name="Section8"> Save the sounding/vertical plot window to the named file. There is
+     a seperate window for each $dtx so the display_context denotes which
+     $dtx.  format is one of the file
+     format identifiers returned by vis5d_get_image_formats.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_print_window</b></a></code>
+</dt><dd><a name="Section8">Print the large window image to the default PostScript printer.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_print_snd_window</b> display_context</a></code>
+</dt><dd><a name="Section8">Print the sounding/vertical plot window image to the default
+     PostScript printer.  display_context
+    specifies which $dtx sounding/vertical plot window to print.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_resize_BIG_window</b> width height </a></code>
+</dt><dd><a name="Section8"> Resize the BIG main window which all other 3-D graphics displays
+     are mapped to.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_resize_3d_window</b> display_context width height</a></code>
+</dt><dd><a name="Section8"> Resize the 3-D graphics window associated with the $dtx.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_moveresize_BIG_window</b> xpos ypos width height</a></code>
+</dt><dd><a name="Section8"> Move and Resize BIG main window which all other 3-D graphics displays
+     are mapped to.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_moveresize_3d_window</b> display_context xpos ypos width height</a></code>
+</dt><dd><a name="Section8"> Move and Resize the 3-D graphics window associated with the $dtx.
+</a></dd></dl>
+
+
+<h3><a name="Section8">Coordinate Conversion Commands</a></h3>
+<a name="Section8"><i> A $ctx may have a different graphics and/or grid coordinate system than
+    the $dtx it is attached to.  In the following functions a PRIME will
+    indicate that the coordinate system is defined by the $dtx.  If the PRIME
+    is omitted then the coordinate system is defined by the $ctx.
+</i>
+
+</a><dl>
+<dt><code><a name="Section8"><b>vis5d_xyz_to_grid</b> data_context time var {x y z}</a></code>
+</dt><dd><a name="Section8">Convert a data graphics (x,y,z) coordinate to a data grid coordinate.  The
+    resulting grid coordinate is returned as a list of three values:
+    {row column level}.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_xyzPRIME_to_gridPRIME</b> display_context time var {x y z}</a></code>
+</dt><dd><a name="Section8">Convert a display graphics (x,y,z) coordinate to a display grid coordinate.  The
+    resulting grid coordinate is returned as a list of three values:
+    {row column level}.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_grid_to_xyz</b> data_context time var {row col lev}</a></code>
+</dt><dd><a name="Section8">Convert a data grid (row,column,level) coordinate to a data graphics coordinate.
+    The resulting graphics coordinate is returned as a list of three values:
+    {x y z}.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_gridPRIME_to_xyzPRIME</b> display_context time var {row col lev}</a></code>
+</dt><dd><a name="Section8">Convert a display grid (row,column,level) coordinate to a display graphics coordinate.
+    The resulting graphics coordinate is returned as a list of three values:
+    {x y z}.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_xyz_to_geo</b> data_context time var {x y z}</a></code>
+</dt><dd><a name="Section8">Convert a data graphics (x,y,z) coordinate to a geographic coordinate.  The
+    resulting geographic coordinate is returned as a list of three values:
+    {latitude longitude height}.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_xyzPRIME_to_geo</b> display_context time var {x y z}</a></code>
+</dt><dd><a name="Section8">Convert a display graphics (x,y,z) coordinate to a geographic coordinate.  The
+    resulting geographic coordinate is returned as a list of three values:
+    {latitude longitude height}.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_geo_to_xyz</b> data_context time var {lat lon hgt}</a></code>
+</dt><dd><a name="Section8">Convert a geographic coordinate (lat,lon,hgt) to a data graphics
+    coordinate.  The resulting graphics coordinate is returned as a list
+    of three values: {x y z}.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_geo_to_xyzPRIME</b> display_context time var {lat lon hgt}</a></code>
+</dt><dd><a name="Section8">Convert a geographic coordinate (lat,lon,hgt) to a display graphics
+    coordinate.  The resulting graphics coordinate is returned as a list
+    of three values: {x y z}.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_grid_to_geo</b> data_context time var {row col lev}</a></code>
+</dt><dd><a name="Section8"> Convert a data grid coordinate (row,col,lev) to a geographic coordinate.  The
+    resulting geographic coordinate is returned as a list of three values:
+    {latitude longitude height}.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_gridPRIME_to_geo</b> display_context time var {row col lev}</a></code>
+</dt><dd><a name="Section8"> Convert a display grid coordinate (row,col,lev) to a geographic coordinate.  The
+    resulting geographic coordinate is returned as a list of three values:
+    {latitude longitude height}.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_rowcol_to_latlon</b> data_context time var {row col}</a></code>
+</dt><dd><a name="Section8"> Convert a data row and column to lat and lon.  The output is a 
+     list of two values: {latitude longitude}.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_rowcolPRIME_to_latlon</b> display_context time var {row col}</a></code>
+</dt><dd><a name="Section8"> Convert a display row and column to lat and lon.  The output is a 
+     list of two values: {latitude longitude}.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_latlon_to_rowcol</b> data_context time var {lat lon}</a></code>
+</dt><dd><a name="Section8"> Convert a lat and lon to a data row and column. The output is a
+     list of two values: {row column}.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_latlon_to_rowcolPRIME</b> display_context time var {lat lon}</a></code>
+</dt><dd><a name="Section8"> Convert a lat and lon to a display row and column. The output is a
+     list of two values: {row column}.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_geo_to_grid</b> data_context time var {lat lon hgt}&gt;/CODE&gt;
+</a></code></dt><dd><a name="Section8"> Convert a geographic coordinate (lat,lon,hgt) to a data grid 
+     coordinate. The resulting grid coordinate is returned as a list of three values:
+     {row column level}.
+</a></dd></dl>
+
+<dl><code><a name="Section8"><b>vis5d_geo_to_gridPRIME</b> display_context time var {lat lon hgt}&gt;/CODE&gt;
+<dd> Convert a geographic coordinate (lat,lon,hgt) to a display grid
+     coordinate. The resulting grid coordinate is returned as a list of three values:
+     {row column level}.
+</dd></a></code></dl>
+
+
+<h3><a name="Section8">Commands Useful with -pipe command line option</a></h3>
+
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_locate_dtx</b> window x_location y_location</a></code>
+</dt><dd><a name="Section8">Return $dtx and $grp based on location in window (either the BIG
+    3-D window or a small 3-D window).
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_name_ctx</b> ContextName</a></code>
+</dt><dd><a name="Section8">Return $ctx, $dtx and $grp based on ContextName.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_iconify</b> display_context</a></code>
+</dt><dd><a name="Section8">Iconify Vis5D windows with GUI for display_context.
+    Iconify current GUI if display_context = -1.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_deiconify</b> display_context</a></code>
+</dt><dd><a name="Section8">De-iconify Vis5D windows with GUI for display_context.
+    De-iconify current GUI if display_context = -1.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_name_value</b> name value</a></code>
+</dt><dd><a name="Section8">Bind the value string to the name string.  This is useful
+    for successive scripts to communicate with each other.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_get_name_value</b> name</a></code>
+</dt><dd><a name="Section8">Return the value string bound to the name string.  This is
+    useful for successive scripts to communicate with each other.
+</a></dd></dl>
+
+
+<h3><a name="Section8">Miscellaneous Commands</a></h3>
+
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_save</b> display_context filename</a></code>
+</dt><dd><a name="Section8">Save current Vis5D state of a $dtx to a file as a Tcl script.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>source</b> filename</a></code>
+</dt><dd><a name="Section8">Restore Vis5D state from Tcl script file.  This is a general
+Tcl command rather than a special Vis5D Tcl command.
+</a></dd></dl>
+
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_sleep</b> time</a></code>
+</dt><dd><a name="Section8">Pause execution of the script for <em>time</em> milliseconds.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_set_busy_cursor</b> display window busy_flag</a></code>
+</dt><dd><a name="Section8"> This changes the status of the window cursor bewteen an arrow and a
+     watch.
+    </a><ul>
+<a name="Section8">    </a><li><a name="Section8">display - the display
+    </a></li><li><a name="Section8">window - the window
+    </a></li><li><a name="Section8">busy_flag - if 0 then use arrow cursor, if 1 then use watch cursor
+    </a></li></ul>
+</dd></dl>
+
+
+
+<h3><a name="Section8"> Vis5d GUI commands</a></h3>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_gui_set_mouse_mode</b> display_context mode</a></code>
+</dt><dd><a name="Section8"> Set the current mouse mode for the given vis5d GUI associated
+     with the display_context.
+    </a><ul>
+<a name="Section8">    </a><li><a name="Section8">mode - one of
+        </a><ul><a name="Section8">        
+        </a><li><a name="Section8"> 1 - Normal 
+        </a></li><li><a name="Section8"> 2 - Trajectory
+        </a></li><li><a name="Section8"> 3 - Slice
+        </a></li><li><a name="Section8"> 4 - Label
+        </a></li><li><a name="Section8"> 5 - Probe
+        </a></li><li><a name="Section8"> 6 - Sounding
+        </a></li><li><a name="Section8"> 7 - Clipping
+        </a></li></ul>
+<a name="Section8">    </a></li></ul>
+</dd></dl>
+
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_gui_set_animate</b> display_context state rate dwell</a></code>
+</dt><dd><a name="Section8"> Set the animation attributes for the given vis5d GUI associated
+     with the display_context.
+    </a><ul>
+<a name="Section8">    </a><li><a name="Section8">state - one of
+        </a><ul>
+<a name="Section8">        </a><li><a name="Section8">-1 - animate backward 
+        </a></li><li><a name="Section8"> 0 - stop animation
+        </a></li><li><a name="Section8"> 1 - animate forward
+        </a></li></ul>
+<a name="Section8">    </a></li><li><a name="Section8">rate - minimum delay time in ms between animation frames.
+    </a></li><li><a name="Section8">dwell- minimum delay time in ms bewteen the last timestep
+               and first timestep while animating
+    </a></li></ul>
+</dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_gui_get_animate</b> display_context</a></code>
+</dt><dd><a name="Section8"> Get the animation attributes(state, rate, dwell) for
+     the given vis5d GUI associated
+     with the display_context.
+</a></dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_gui_set_title</b> x y font title</a></code>
+</dt><dd><a name="Section8"> Create a title and place it in a margin.  This function
+     is used in conjunction with 'vis5d_gui_set_margins'.  Any
+     number of titles may be created.
+    </a><ul>
+<a name="Section8">    </a><li><a name="Section8"> x, y - location of the title in screen coordinates. (0,0) is upper left.
+    </a></li><li><a name="Section8"> font - X font to use for title. 
+    </a></li><li><a name="Section8"> title - string to use as title.
+    </a></li></ul>
+</dd></dl>
+
+<dl>
+<dt><code><a name="Section8"><b>vis5d_gui_set_margins</b> top bottom left right</a></code>
+</dt><dd><a name="Section8"> Create margins around all windows mapped.  Top, bottom, left
+     and right specify the size of the window margins in screen pixels. This
+     option will only work when 2 or more windows are mapped.
+</a></dd></dl>
+
+
+
+
+<a name="Section8"><br>
+<br>
+<br>
+</a><a name="Section9">
+</a><h2><a name="Section9">9. Example scripts</a></h2>
+
+<a name="Section9">This section contains a number of example scripts.  The
+Tcl package must be installed to execute them.</a><p>
+
+
+<a name="Section9"><br>
+</a></p><h3><a name="Section9">Example 1: Save a time series of GIF images</a></h3>
+
+<a name="Section9">If only one v5dfile is loaded this script will generate a GIF image file for each timestep in your
+dataset.  Near the top is the <code>basename</code> variable which is
+used to name the GIF files.  You may want to change it.</a><p>
+
+</p><pre><a name="Section9"># movie.tcl
+
+# A Vis5d Tcl script for saving a whole time series of images
+
+# You may need to change these:
+set base "frame"
+set ext ".gif"
+set format VIS5D_GIF
+
+set numtimes [ vis5d_get_dtx_numtimes $ctx ]
+
+for {set time 1} {$time&lt;=$numtimes} {set time [expr $time+1]} {
+        vis5d_set_dtx_timestep $ctx [expr $time-1]
+        vis5d_draw_frame $ctx
+        set name $base$time$ext
+        vis5d_save_window $name $format
+}
+
+
+# At this point you may want to invoke a Unix utility to convert a
+# series of GIF files into an MPEG animation file.....
+</a></pre>
+
+<a name="Section9"><br>
+</a><h3><a name="Section9">Example 2: Save a time series of GIF images with two v5d files</a></h3>
+<a name="Section9">The following example includes two v5d files and each data set is attached
+to one display.  In order to animate both data sets correctly they have
+been grouped.  The result is similar to example 1.
+
+</a><pre><a name="Section9"># movie2.tcl
+
+# A Vis5d Tcl script for saving a whole time series of images
+# with multiple data sets.
+
+# You may need to change these:
+set base "frame"
+set ext ".gif"
+set format VIS5D_GIF
+set ctx0 0
+set ctx1 1
+set dtx0 0
+set dtx1 1
+set grp 1
+
+vis5d_set_display_group 0 1
+vis5d_set_display_group 1 1
+set numtimes [ vis5d_get_grp_numtimes $grp ]
+
+for {set time 1} {$time&lt;=$numtimes} {set time [expr $time+1]} {
+        vis5d_set_grp_timestep $grp [expr $time-1]
+        vis5d_draw_frame $dtx0
+        vis5d_draw_frame $dtx1
+        set name $base$time$ext
+        vis5d_save_window $name $format
+}
+</a></pre>
+
+<a name="Section9"><br>
+</a><h3><a name="Section9">Example 3:  Generate a column of wind trajectories</a></h3>
+
+<a name="Section9">This script generates a column of trajectories, one for each grid level,
+at the cursor's current latitude/longitude.</a><p>
+
+</p><pre><a name="Section9"># trajcol.tcl
+
+# Generate a column of trajectories at the cursor's lat/lon
+# for the current timestep.
+
+
+# Which trajectory set should the trajectories be put in:
+set trajset 0
+
+
+
+# This is a bit tricky:  we need to know how many grid levels are
+# present for trajectory tracing.  We query the variables used for
+# trajectory tracing and then call vis5d_get_ctx_grid_levels to find out
+# how many grid levels are present for the U rajectory component.
+# Note: element 14 of the wind_vars list is the traj U variable.
+set wind_vars [ vis5d_get_wind_vars $ctx ]
+set traj_uvar [ lindex $wind_vars 14 ]
+set traj_levs [ vis5d_get_ctx_grid_levels $ctx $traj_uvar ]
+
+
+# Get current timestep
+set curtime [ vis5d_get_dtx_timestep $ctx ]
+
+
+# Get the current cursor position as (row,col).
+set cursor_xyz [ vis5d_get_cursor $ctx ]
+set cursor_rcl [ vis5d_xyz_to_grid $ctx $curtime $traj_uvar $cursor_xyz ]
+set row [ lindex $cursor_rcl 0 ]
+set col [ lindex $cursor_rcl 1 ]
+
+
+# Loop over grid levels making a trajectory for each level.
+for {set lev 0} {$lev &lt; $traj_levs} {set lev [expr $lev+1]} {
+        vis5d_make_traj $ctx $row $col $lev $curtime $trajset
+}
+</a></pre>
+
+<a name="Section9"><br>
+</a><h3><a name="Section9">Example 3: Genenerate a column of wind trajectories for two data sets in one display</a></h3>
+
+<a name="Section9">This script is the same as the above except there are two data sets sharing the same
+display( two $ctxs attached to the same $dtx ).  The second set of trajectories is
+also colored yellow instead of white.
+
+</a><pre><a name="Section9"># trajcol.tcl
+
+# Generate a column of trajectories at the cursor's lat/lon
+# for the current timestep for both data sets which are in the
+# same display.
+
+
+# Which trajectory set should the trajectories be put in:
+set trajset 0
+
+set dtx 0
+set ctx0 0
+set ctx1 1
+
+#set the wind vars for the first data set ctx0, assuming there number
+#0 1 and 2 for U V and W.
+vis5d_set_wind_vars $dtx -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 0 0 0 1 0 2
+
+# use the levels of the display grid (not data grid), so it's not
+# dependent on the variable.
+set traj_levs [ vis5d_get_dtx_grid_levels $dtx ]
+
+
+# Get current timestep
+set curtime [ vis5d_get_dtx_timestep $dtx ]
+
+
+# Get the current cursor position in display grid coordinates
+# (not data grid coordinates) as (row,col).
+set cursor_xyz [ vis5d_get_cursor $dtx ]
+set cursor_rcl [ vis5d_xyzPRIME_to_gridPRIME $dtx $curtime 0 $cursor_xyz ]
+set row [ lindex $cursor_rcl 0 ]
+set col [ lindex $cursor_rcl 1 ]
+
+
+# Loop over grid levels making a trajectory for each level.
+for {set lev 0} {$lev &lt; $traj_levs} {set lev [expr $lev+1]} {
+        vis5d_make_traj $dtx $row $col $lev $curtime $trajset
+        puts "calculating trajset0 for ctx0 at level $lev"
+}
+
+#now set the wind vars for the second data set and repeat the above logic.
+vis5d_set_wind_vars $dtx -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 1 0 1 1 1 2
+
+set trajset 1
+for {set lev 0} {$lev &lt; $traj_levs} {set lev [expr $lev+1]} {
+        vis5d_make_traj $dtx $row $col $lev $curtime $trajset
+        puts "calculating trajset1 for ctx1 at level $lev"
+}
+</a></pre>
+
+<a name="Section9"> 
+<br>
+</a><h3><a name="Section9">Example 4:  Display a horizontal contour slice of W</a></h3>
+
+<pre><a name="Section9"># wslice.tcl
+
+# Display a horizontal contour line slice of W (vertical wind) at the
+# middle altitude using dashed lines for negative values.  Draw the
+# slice in yellow.
+
+
+# You can change these:
+set wvar "W"
+set interval -0.05
+
+# The color specified in RGBA:
+set red 1.0
+set green 1.0
+set blue 0.0
+set alpha 1.0
+
+
+# Get min and max W values
+set minmax [ vis5d_get_var_range $ctx $wvar ]
+set low_val  [ lindex $minmax 0 ]
+set high_val [ lindex $minmax 1 ]
+
+# Compute location of middle grid level
+set num_levels [ vis5d_get_ctx_grid_levels $ctx $wvar ]
+set level [ expr $num_levels / 2.0 ]
+
+
+# set the color
+vis5d_set_color $ctx VIS5D_HSLICE $ctx $wvar $red $green $blue $alpha
+
+# setup slice parameters
+vis5d_set_hslice $ctx $wvar $interval $low_val $high_val $level
+
+# compute the slice
+vis5d_make_hslice $ctx VIS5D_ALL_TIMES $wvar 0
+
+# display it!
+vis5d_enable_graphics $ctx VIS5D_HSLICE $wvar VIS5D_ON
+</a></pre>
+
+
+<a name="Section9"><br>
+</a><h3><a name="Section9">Example 5: Spin and zoom the 3-D box</a></h3>
+
+<pre><a name="Section9"># spin.tcl
+
+# Spin and zoom the 3-D box
+
+
+# spin
+for {set angle 0} {$angle &lt;= 360} {set angle [expr $angle + 10]} {
+	vis5d_set_view $ctx -60.0 0.0 $angle  1.0  0.0 0.0 0.0
+	vis5d_draw_frame $ctx
+	vis5d_sleep 100
+}
+
+# zoom in
+for {set scale 1.0} {$scale &lt;= 1.8} {set scale [expr $scale + 0.1]} {
+	vis5d_set_view $ctx -60.0 0.0 0.0  $scale  0.0 0.0 0.0
+	vis5d_draw_frame $ctx
+	vis5d_sleep 100
+}
+
+# zoom out
+for {set scale 1.8} {$scale &gt;= 1.0} {set scale [expr $scale - 0.1]} {
+	vis5d_set_view $ctx -60.0 0.0 0.0  $scale  0.0 0.0 0.0
+	vis5d_draw_frame $ctx
+	vis5d_sleep 100
+}
+
+</a></pre>
+
+
+<a name="Section9"><br>
+</a><h3><a name="Section9">Example 6: Invoking scripts from cron via shell scripts</a></h3>
+
+<a name="Section9">You can invoke a Vis5D script from cron via a shell script like this (note
+that Vis5D needs an open display):</a><p>
+
+</p><pre><a name="Section9">  #!/bin/csh
+  setenv DISPLAY your_x_display.your_department.your_university.edu:0  
+  vis5d your_file.v5d -script your_script.tcl ...
+</a></pre>
+
+
+<hr>
+
+<a name="Section9">Other links:
+</a><a href="http://www.ssec.wisc.edu/%7Ebillh/vis5d.html">Vis5D</a>,
+<a href="http://www.ssec.wisc.edu/%7Ebillh/api.html">API document</a>,
+<a href="http://www.ssec.wisc.edu/%7Ebillh/script.html">Scripting document</a>,
+<a href="http://www.ssec.wisc.edu/%7Ebillh/homepage1.html">Bill Hibbard</a>,
+<p>
+
+
+</p></body></html>

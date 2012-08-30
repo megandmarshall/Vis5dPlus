@@ -1,0 +1,185 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Volume Rendering</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Using Vis5D to Visualize Your Data"
+HREF="ch06.html"><LINK
+REL="PREVIOUS"
+TITLE="Slices"
+HREF="ch06sec6.html"><LINK
+REL="NEXT"
+TITLE="Wind Trajectories"
+HREF="ch06sec8.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch06sec6.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Using Vis5D to Visualize Your Data</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch06sec8.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH06SEC7"
+>Volume Rendering</A
+></H1
+><P
+>     Volume rendering is a technique for displaying a 3-dimensional field as a
+semi-transparent colored fog.  Though volume renderings of some physical
+variables don't look, others can be displayed very effectively with the right
+color mapping.</P
+><P
+>     The volume rendering feature is available in Vis5D on almost all systems.
+Be warned that systems without 3-D graphics hardware (i.e. those using Mesa)
+will render volumes very slowly.</P
+><P
+>     The sixth column of buttons on the control panel are the volume buttons.
+Only one may be displayed at a time.  When a volume rendering is activated a pop-
+up window with a color table appears.  This color table is used in exactly the
+same way as described for colored slices above.  That is, using the mouse or
+keyboard you can change the function which maps data values to color and
+transparency.  Again, the transparency can be changed while holding down the
+SHIFT key and drawing a curve with the mouse or pressing the up/down keys.</P
+><P
+>For those who are curious about the implementation of this feature, the volume
+rendering is made as follows:</P
+><P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>       Examine the current viewing transformation to determine which axis of
+       the 3-D box is most nearly parallel to the view direction.</P
+></LI
+><LI
+><P
+>       Create a number of colored slices perpindicular to that axis which map
+       data values to colors and opacity.</P
+></LI
+><LI
+><P
+>       Render the colored slices in back to front order.  The alpha values at
+       vertices are interpolated and blended to make smooth transitions between
+       and within slices.</P
+></LI
+></OL
+></P
+><P
+>     Despite the simplicity of the algorithm, most fields are rendered
+acceptably.  Those that aren't can be improved by adjusting the color and
+opacity mappings.  While more attractive volume rendering techniques are known,
+this technique can be implemented quickly on many systems.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch06sec6.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch06sec8.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Slices</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ch06.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Wind Trajectories</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -123,7 +123,7 @@
 #define TAG_VERSION     1000        /* char*10 FileVersion              */
 #define TAG_NUMTIMES    1001        /* int*4 NumTimes                   */
 #define TAG_NUMVARS     1002        /* int*4 NumVars                    */
-#define TAG_VARNAME     1003        /* int*4 var; char*10 VarName[var]  */
+#define TAG_VARNAME     1003        /* int*4 var; char*MAXVARNAME VarName[var]  */
 
 #define TAG_NR          1004        /* int*4 Nr                         */ 
 #define TAG_NC          1005        /* int*4 Nc                         */
@@ -422,14 +422,14 @@ void v5dPrintStruct( const v5dstruct *v )
          printf("Unequally spaced levels in km:\n");
          printf("Level\tHeight(km)\n");
          for (i=0;i<maxnl;i++) {
-            printf("%3d\t%-15.8f\n", i+1, v->VertArgs[i] );
+            printf("%3d     %10.3f\n", i+1, v->VertArgs[i] );
          }
          break;
       case 3:
          printf("Unequally spaced levels in mb:\n");
          printf("Level\tPressure(mb)\n");
          for (i=0;i<maxnl;i++) {
-            printf("%3d\t%-15.8f\n", i+1, height_to_pressure(v->VertArgs[i]) );
+            printf("%3d     %10.3f\n", i+1, height_to_pressure(v->VertArgs[i]) );
          }
          break;
       default:
@@ -492,18 +492,6 @@ void v5dPrintStruct( const v5dstruct *v )
          printf("\tCenter Longitude: %f\n", v->ProjArgs[1] );
          printf("\tRow Increment: %f Kilometers\n", v->ProjArgs[2] );
          printf("\tCol Increment: %f Kilometers\n", v->ProjArgs[3] );
-         break;
-      /* ZLB 02-09-2000 */
-      case -1:
-         printf("Generic unequally spaced projection:\n");
-         printf("Column\tPosition\n");
-         for (i=0;i<v->Nc;i++) {
-            printf("%3d\t%-15.8f\n", i+1, v->ProjArgs[i+v->Nr] );
-         }
-         printf("Row\tPosition\n");
-         for (i=0;i<v->Nr;i++) {
-            printf("%3d\t%-15.8f\n", i+1, v->ProjArgs[i] );
-         }
          break;
       default:
          printf("Bad projection number: %d\n", v->Projection );
@@ -1016,6 +1004,7 @@ int v5dSizeofGrid( const v5dstruct *v, int time, int var )
 void v5dInitStruct( v5dstruct *v )
 {
    int i;
+   int len;
 
    /* set everything to zero */
    memset( v, 0, sizeof(v5dstruct) );
@@ -1032,6 +1021,17 @@ void v5dInitStruct( v5dstruct *v )
 
    /* set file version */
    strcpy(v->FileVersion, FILE_VERSION);
+
+   /* JCM: Fill rest with null */
+   len=strlen(FILE_VERSION)+1; // includes \0 already put into v->FileVersion
+   for(i=len;i<10;i++){
+     v->FileVersion[i]='\0';
+   }
+   //   fprintf(stderr,"len=%d %s\n",len,v->FileVersion);
+   //   for(i=0;i<10;i++){
+   //     fprintf(stderr,"i=%d char=%c\n",i,v->FileVersion[i]);
+   //   }
+   /* JCM: Fill rest with null */
 
    v->CompressMode = 1;
    v->FileDesc = -1;
@@ -1301,28 +1301,8 @@ int v5dVerifyStruct( const v5dstruct *v )
             invalid = 1;
          }
          break;
-      /* ZLB 02-09-2000 */
-      case -1:  /* Generic non equally spaced */
-         for (i=1;i<v->Nr;i++) {
-            if (v->ProjArgs[i] <= v->ProjArgs[i-1]) {
-               printf("Row[%d]=%f >= Row[%d]=%f, row coordinates must increase\n",
-                      i, v->ProjArgs[i], i-1, v->ProjArgs[i-1] );
-               invalid = 1;
-               break;
-            }
-         }
-         if (invalid) break;
-         for (i=v->Nr+1;i<v->Nr+v->Nc;i++) {
-            if (v->ProjArgs[i] <= v->ProjArgs[i-1]) {
-               printf("Column[%d]=%f >= Column[%d]=%f, Column coordinates must increase\n",
-                      i-v->Nr, v->ProjArgs[i], i-v->Nr-1, v->ProjArgs[i-1] );
-               invalid = 1;
-               break;
-            }
-         }
-         break;
       default:
-         printf("Projection = %d, must be in -1..5\n", v->Projection);
+         printf("Projection = %d, must be in 0..4\n", v->Projection );
          invalid = 1;
    }
 
@@ -1770,9 +1750,9 @@ static int read_v5d_header( v5dstruct *v )
             read_int4( f, &v->NumVars );
             break;
          case TAG_VARNAME:
-            assert( length==14 );   /* 1 int + 10 char */
+            assert( length==4+MAXVARNAME );   /* 1 int + MAXVARNAME char */
             read_int4( f, &var );
-            read_bytes( f, v->VarName[var], 10 );
+            read_bytes( f, v->VarName[var], MAXVARNAME );
             break;
          case TAG_NR:
             /* Number of rows for all variables */
@@ -1855,6 +1835,7 @@ static int read_v5d_header( v5dstruct *v )
             break;
          case TAG_VERT_ARGS:
             read_int4( f, &numargs );
+	    printf("maxvertargs %d %d \n", MAXVERTARGS, numargs); 
             assert( numargs <= MAXVERTARGS );
             read_float4_array( f, v->VertArgs, numargs );
             assert( length==numargs*4+4 );
@@ -1880,9 +1861,7 @@ static int read_v5d_header( v5dstruct *v )
          case TAG_PROJECTION:
             assert( length==4 );
             read_int4( f, &v->Projection );
-	    /* WLH 4-21-95 */
-	    /* ZLB 04-06-02 */
-            if (v->Projection<-1 || v->Projection>5) {
+            if (v->Projection<0 || v->Projection>5) { /* WLH 4-21-95 */
                printf("Error while reading header, bad projection (%d)\n",
                        v->Projection );
                return 0;
@@ -1891,6 +1870,7 @@ static int read_v5d_header( v5dstruct *v )
          case TAG_PROJ_ARGS:
             read_int4( f, &numargs );
             assert( numargs <= MAXPROJARGS );
+	    //	    fprintf(stderr,"numargs=%d %d\n",numargs,MAXPROJARGS);
             read_float4_array( f, v->ProjArgs, numargs );
             assert( length==4*numargs+4 );
             break;
@@ -2161,13 +2141,13 @@ int v5dReadCompressedGrid( v5dstruct *v, int time, int var,
    /* read compressed grid data */
    n = v->Nr * v->Nc * v->Nl[var];
    if (v->CompressMode==1) {
-      k = read_block( v->FileDesc, compdata, n, 1 )==n;
+     k = read_block( v->FileDesc, compdata, n, 1, INTTYPE )==n;
    }
    else if (v->CompressMode==2) {
-      k = read_block( v->FileDesc, compdata, n, 2 )==n;
+      k = read_block( v->FileDesc, compdata, n, 2, INTTYPE )==n;
    }
    else if (v->CompressMode==4) {
-      k = read_block( v->FileDesc, compdata, n, 4 )==n;
+      k = read_block( v->FileDesc, compdata, n, 4, INTTYPE )==n;
    }
    if (!k) {
       /* error */
@@ -2282,8 +2262,6 @@ static int write_v5d_header( v5dstruct *v )
    int var, time, filler, maxnl;
    int f;
    int newfile;
-   /* ZLB */
-   int n;
 
    if (v->FileFormat!=0) {
       printf("Error: v5d library can't write comp5d format files.\n");
@@ -2324,7 +2302,8 @@ static int write_v5d_header( v5dstruct *v )
 
    /* File Version */
    WRITE_TAG( v, TAG_VERSION, 10 );
-   write_bytes( f, FILE_VERSION, 10 );
+   //   write_bytes( f, FILE_VERSION, 10 );
+   write_bytes( f, v->FileVersion, 10 ); // JCM correction
 
    /* Number of timesteps */
    WRITE_TAG( v, TAG_NUMTIMES, 4 );
@@ -2336,9 +2315,9 @@ static int write_v5d_header( v5dstruct *v )
 
    /* Names of variables */
    for (var=0;var<v->NumVars;var++) {
-      WRITE_TAG( v, TAG_VARNAME, 14 );
+      WRITE_TAG( v, TAG_VARNAME, 4+MAXVARNAME );
       write_int4( f, var );
-      write_bytes( f, v->VarName[var], 10 );
+      write_bytes( f, v->VarName[var], MAXVARNAME );
    }
 
    /* Physical Units */
@@ -2388,7 +2367,12 @@ static int write_v5d_header( v5dstruct *v )
       WRITE_TAG( v, TAG_MAXVAL, 8 );
       write_int4( f, var );
       write_float4( f, v->MaxVal[var] );
+
+      // JCM DEBUG
+      //      fprintf(stderr,"var=%d %g %g\n",var,v->MinVal[var],v->MaxVal[var]);
+
    }
+
 
    /* Compress mode */
    WRITE_TAG( v, TAG_COMPRESS, 4 );
@@ -2397,32 +2381,20 @@ static int write_v5d_header( v5dstruct *v )
    /* Vertical Coordinate System */
    WRITE_TAG( v, TAG_VERTICAL_SYSTEM, 4 );
    write_int4( f, v->VerticalSystem );
-   /* ZLB 02-09-2000 */
-#if 0
    WRITE_TAG( v, TAG_VERT_ARGS, 4+4*MAXVERTARGS );
    write_int4( f, MAXVERTARGS );
+   //   fprintf(stderr,"MAXVERTARGS=%d\n",MAXVERTARGS); // JCM DEBUG
    write_float4_array( f, v->VertArgs, MAXVERTARGS );
-#else
-   n = ( v->VerticalSystem == 0 || v->VerticalSystem == 1 ) ? 2 : maxnl;
-   WRITE_TAG( v, TAG_VERT_ARGS, 4+4*n );
-   write_int4( f, n );
-   write_float4_array( f, v->VertArgs, n );
-#endif
+
+   //   exit(0); // JCM DEBUG
+
 
    /* Map Projection */
    WRITE_TAG( v, TAG_PROJECTION, 4 );
    write_int4( f, v->Projection );
-   /* ZLB 02-09-2000 */
-#if 0
    WRITE_TAG( v, TAG_PROJ_ARGS, 4+4*MAXPROJARGS );
    write_int4( f, MAXPROJARGS );
    write_float4_array( f, v->ProjArgs, MAXPROJARGS );
-#else
-   n= ( v->Projection != -1 ) ? 10 : v->Nc + v->Nr;
-   WRITE_TAG( v, TAG_PROJ_ARGS, 4+4*n );
-   write_int4( f, n );
-   write_float4_array( f, v->ProjArgs, n );
-#endif
 
    /* write END tag */
    if (newfile) {
@@ -2560,13 +2532,16 @@ int v5dWriteCompressedGrid( const v5dstruct *v, int time, int var,
       /* write compressed grid data (k=1=OK, k=0=Error) */
       n = v->Nr * v->Nc * v->Nl[var];
       if (v->CompressMode==1) {
-         k = write_block( v->FileDesc, compdata, n, 1 )==n;
+	k = write_block( v->FileDesc, compdata, n, 1, INTTYPE )==n;
+	//k = write_block( v->FileDesc, compdata, n, 1)==n;
       }
       else if (v->CompressMode==2) {
-         k = write_block( v->FileDesc, compdata, n, 2 )==n;
+	k = write_block( v->FileDesc, compdata, n, 2, INTTYPE )==n;
+        // k = write_block( v->FileDesc, compdata, n, 2 )==n;
       }
       else if (v->CompressMode==4) {
-         k = write_block( v->FileDesc, compdata, n, 4 )==n;
+	k = write_block( v->FileDesc, compdata, n, 4, INTTYPE )==n;
+        // k = write_block( v->FileDesc, compdata, n, 4)==n;
       }
    }
 
@@ -2724,8 +2699,8 @@ int v5dCreateStruct(v5dstruct *v, int numtimes, int numvars,
       }
       v->Nl[var] = nl[var];
       v->LowLev[var] = 0;
-      strncpy( v->VarName[var], varname[var], 10 );
-      v->VarName[var][9] = 0;
+      strncpy( v->VarName[var], varname[var], MAXVARNAME );
+      v->VarName[var][MAXVARNAME-1] = 0;
    }
 
    /* time and date for each timestep */
@@ -2738,6 +2713,7 @@ int v5dCreateStruct(v5dstruct *v, int numtimes, int numvars,
 
    /* Map projection and vertical coordinate system */
    v->Projection = projection;
+   //   fprintf(stderr,"MAXPROJARGS=%d\n",MAXPROJARGS); // JCMDEBUG
    memcpy( v->ProjArgs, proj_args, MAXPROJARGS*sizeof(float) );
 
    v->VerticalSystem = vertical;
@@ -2781,6 +2757,14 @@ int v5dCreate( const char *name, int numtimes, int numvars,
    Simple = v5dNewStruct();
    v5dCreateStruct(Simple, numtimes,numvars,nr,nc,nl,varname,timestamp,datestamp,
 						 compressmode, projection, proj_args, vertical, vert_args);
+
+
+   //   v5dPrintStruct(Simple); // JCM
+
+
+   // JCMDEBUG
+   //   fprintf(stderr,"PRESTRUCT: %d %d %d %d %d %s %d %d %d %d %g %d %g\n",numtimes,numvars,nr,nc,nl[0],varname[0],timestamp[0],datestamp[0],
+   //	   compressmode, projection, proj_args[0], vertical, vert_args[0]);
 
    /* create the file */
    if (v5dCreateFile( name, Simple )==0) {
@@ -3049,10 +3033,6 @@ int F77_FUNC(v5dcreate,V5DCREATE)
       case 5:
          args = 4;
          break;
-      /* ZLB 02-09-2000 */
-      case -1:
-         args = *nr + *nc;
-         break;
       default:
          args = 0;
          printf("Error: projection invalid\n");
@@ -3097,7 +3077,7 @@ int F77_FUNC(v5dcreate,V5DCREATE)
          return 0;
       }
    }
-
+   printf("right befor calling create\n");
    return v5dCreate( filename, *numtimes, *numvars, *nr, *nc, nl,
                      (const char(*)[10]) names, timestamp, datestamp,
                      *compressmode,

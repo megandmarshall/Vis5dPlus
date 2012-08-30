@@ -37,6 +37,10 @@
 #define BINIO_H
 
 
+// JCM (same as in v5d.h)
+#define FLOATTYPE 0
+#define INTTYPE 1
+
 /* Include files which define SEEK_SET, O_RD_ONLY, etc. */
 /* and prototype open(), close(), lseek(), etc. */
 #include <unistd.h>
@@ -50,6 +54,8 @@ extern "C" {
 extern void flip4( const unsigned int *src, unsigned int *dest, int n );
 
 extern void flip2( const unsigned short *src, unsigned short *dest, int n );
+
+extern void flip4_float( const float *src, float *dest, int n );
 
 
 #ifdef _CRAY
@@ -77,7 +83,7 @@ extern int read_float4( int f, float *x );
 
 extern int read_float4_array( int f, float *x, int n );
 
-extern int read_block( int f, void *data, int elements, int elsize );
+extern int read_block( int f, void *data, int elements, int elsize, int eltype );
 
 
 
@@ -100,7 +106,8 @@ extern int write_float4( int f, float x );
 
 extern int write_float4_array( int f, const float *x, int n );
 
-extern int write_block( int f, const void *data, int elements, int elsize );
+extern int write_block( int f, const void *data, int elements, int elsize, int eltype );
+  //extern int write_block( int f, const void *data, int elements, int elsize);
 
 #ifdef __cplusplus
 }                               /* extern "C" */

@@ -39,7 +39,8 @@ extern struct volume *alloc_volume( Context ctx, int nr, int nc, int nl );
 
 extern void free_volume( Context ctx);
 
-extern void draw_volume( Context ctx, int it, int ip, unsigned int *ctable );
+//extern void draw_volume( Context ctx, int it, int ip, int whichVolume, unsigned int *ctable );
+extern void draw_volume( Context ctx, int it, unsigned int (*Colors)[256]);
 
 
 #endif

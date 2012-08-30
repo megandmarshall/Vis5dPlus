@@ -1,0 +1,241 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Getting Irregular Data into Vis5D</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Putting Your Data Into Vis5D "
+HREF="ch03.html"><LINK
+REL="PREVIOUS"
+TITLE="User Defined File Formats"
+HREF="ch03sec4.html"><LINK
+REL="NEXT"
+TITLE="McIDAS 3D Grid Data Files"
+HREF="ch04.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch03sec4.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Putting Your Data Into Vis5D</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch04.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH03SEC5"
+>Getting Irregular Data into Vis5D</A
+></H1
+><P
+>     One method for getting irregular data into vis5d is to use the
+irregular importer.  The 'IRG IMPORT' button can be found on the Vis5D
+control panel which will invoke the irregular importer.  The control
+panel will be brought up when loading a regular v5d file or it can be
+brought up by typing </P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>vis5d -nofile</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>     In the importer there is a "File List."  Pressing the "Load
+File..." button will bring up a file browser where one can select the
+NetCDF files to load.  Any number of NetCDF files may be loaded at one
+time.  Once these files are loaded a list of unique times and
+variables will be created and displayed.  The user can
+highlight/unhighlight desired times and variables.  Frequently there
+may be a large number of times which do not contain much data.  The
+"FILTER" button can be used to quickly select certain times.</P
+><P
+>     Once the desired files have been selected the user will need to
+assign a "Dataset Name"  and select the memory pool size (default
+32M).  The "Load" button will then load the selected files and data
+into vis5d.</P
+><P
+>     The irregular importer can currently read three types of NetCDF
+files.  The first type of file is created by translating the Aviation
+Routine Weather Reports (METARs) and the Aviation Selected Special
+Reports (SPECIs) to NetCDF format, using the 
+<A
+HREF="ftp://ftp.unidata.ucar.edu/pub/decoders/decoders-2.3.5.tar.Z"
+TARGET="_top"
+>Unidata decoders</A
+>. 
+More information about these decoders and METAR data can be found at
+the 
+<A
+HREF="http://www.unidata.ucar.edu"
+TARGET="_top"
+>Unidata</A
+>
+web site. The other two types of data
+that can be read are METARs converted to the 
+<A
+HREF="http://www.fsl.noaa.gov/"
+TARGET="_top"
+> 
+FSL (Forecast Systems Laboratory)</A
+>
+NetCDF format and profiles which are also converted to the
+FSL NetCDF format.</P
+><P
+>     It is possible to read other NetCDF formats with the irregular
+importer but it requires the addition of source code to the importer.
+If one is familiar with C programming and the 
+<A
+HREF="http://www.unidata.ucar.edu/packages/netcdf/index.html"
+TARGET="_top"
+>NetCDF </A
+>
+file structure it would not be a hard task. 
+The two files: 
+<TT
+CLASS="FILENAME"
+>file.c</TT
+> and <TT
+CLASS="FILENAME"
+>iapi.c</TT
+>
+would require the additions and they are found in the source code.</P
+><P
+><A
+HREF="ftp://www.ssec.wisc.edu/pub/vis5d-5.2/vis5d-irregular-data.tar.Z"
+TARGET="_top"
+>     Sample METAR data </A
+>
+in both the Unidata and FSL formats can be
+downloaded.
+This tar file also contains a gridded v5d file of an NGM
+model run. The time frame of this v5d file coincides with the Unidata
+METAR files.  One can overlay both a regular v5d data set and an
+irregular data set in the same display.</P
+><P
+>     The second method for incorporating irregular data into vis5d is
+the creation of a new import program or converter.  This program would
+read the user's file format and insert the data into vis5d via the
+irregular_v5d library calls.  The functions that would need to be
+called and information about them are found in the src file
+<TT
+CLASS="FILENAME"
+>/vis5d-5.2/src/irregular_v5d.c</TT
+>.  
+This route for getting irregular data into vis5d is suggested for 
+experienced programmers only.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch03sec4.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch04.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>User Defined File Formats</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ch03.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>McIDAS 3D Grid Data Files</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

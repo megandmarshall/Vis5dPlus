@@ -1,0 +1,511 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Vis5D Utilities</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="PREVIOUS"
+TITLE="Using the McIDAS Utilities"
+HREF="ch04sec2.html"><LINK
+REL="NEXT"
+TITLE="Using Vis5D to Visualize Your Data"
+HREF="ch06.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch04sec2.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch06.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="CH05"
+>Vis5D Utilities</A
+></H1
+><P
+>Vis5D includes a number of utility programs.  This section describes each one.
+The v5dimport program is described separately in 
+<A
+HREF="ch07.html"
+>chapter 7</A
+>.</P
+><P
+><P
+></P
+><UL
+><LI
+><P
+><B
+CLASS="COMMAND"
+>v5dinfo</B
+>
+     Usage:  v5dinfo file</P
+><P
+>     
+     Description:  v5dinfo prints information about the given v5d file such
+     as the size of the 3-D grid, the number of time steps, the names of
+     the variables, etc.</P
+><P
+>     
+     This program will also work on comp5d files.  Therefore, the old
+     compinfo program has been removed.</P
+></LI
+><LI
+><P
+><B
+CLASS="COMMAND"
+>v5dstats</B
+>
+     Usage:  v5dstats file</P
+><P
+>     
+     Description:  v5dstats prints simple statistical information 
+     about the grid data in the named v5d file.  
+     Again, comp5d files are also accepted.</P
+></LI
+><LI
+><P
+><B
+CLASS="COMMAND"
+>v5dedit</B
+>
+     Usage:  v5dedit file.v5d</P
+><P
+>     
+     Description:  v5dedit allows you to change header information such as
+     the map projection, vertical coordinate system and variables names in
+     the named file.  It is an interacive, menu-driven program and is
+     intended to be self explanatory.  This program does NOT work with
+     comp5d files.</P
+></LI
+><LI
+><P
+><B
+CLASS="COMMAND"
+>v5dappend</B
+>
+     Usage:  v5dappend [-var] [...] file.v5d [...] target.v5d</P
+><P
+>     
+     Description:  v5dappend allows you to append a number of v5d files
+     together to make one larger file.  This might be useful if your
+     weather model generates a separate 
+     <TT
+CLASS="FILENAME"
+>.v5d</TT
+> file for each timestep because
+     you'll want to join those files together to view the data in vis5d.</P
+><P
+>     
+     The arguments are, in order:
+     </P
+><P
+><P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>          An optional list of variables to omit from the output file. For
+          example, if you want to omit the variables U and THETA you would
+          use the arguments <TT
+CLASS="PARAMETER"
+><I
+>-U</I
+></TT
+> and 
+          <TT
+CLASS="PARAMETER"
+><I
+>-THETA</I
+></TT
+>.
+          </P
+></LI
+><LI
+><P
+>         The list of v5d files to append onto the target file.
+         </P
+></LI
+><LI
+><P
+>          The name of the target v5d file to create (if it doesn't exit)
+          or append onto (if the target file already exists).
+         </P
+></LI
+></OL
+></P
+><P
+>     
+     Note that the dimensions of the grids (rows, columns and levels) must
+     be the same in each file to append them together.  The map projection
+     and vertical coordinate system information will be taken from the
+     first input file and ignored the the remaining files.</P
+></LI
+><LI
+><P
+><B
+CLASS="COMMAND"
+>gr3d_to_v5d</B
+>
+     Usage:  gr3d_to_v5d N M file.v5d C</P
+><P
+>     
+     Description:  gr3d_to_v5d converts (a) McIDAS GR3D file(s) to a v5d
+     file.  N is a number which indicates the name of the first grid file,
+     M is the number of grid files to convert, 
+     <TT
+CLASS="FILENAME"
+>file.v5d</TT
+> is the name of the
+     file to produce, and C is 1, 2 or 4 to indicate how many bytes per
+     grid point to use for compression (the default is 1).  
+     <DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN1593"
+></A
+><P
+></P
+><P
+>     Example:  if N=20 and M=4 then the files GR3D0020, 
+     GR3D0021, GR3D0022, and GR3D0023
+     will be read an converted to the named <TT
+CLASS="FILENAME"
+>file.v5d</TT
+>.
+     </P
+><P
+></P
+></DIV
+></P
+></LI
+><LI
+><P
+><B
+CLASS="COMMAND"
+>igg3d</B
+>
+     Usage:  igg3d ...</P
+><P
+>     
+     Description:  igg3d is used to perform a variety of manipulations on
+     McIDAS GR3D files.  See 
+     <A
+HREF="ch04sec2.html"
+>section 4.2</A
+> for more details.</P
+></LI
+><LI
+><P
+><B
+CLASS="COMMAND"
+>igu3d</B
+>
+     Usage:  igu3d  ...</P
+><P
+>     
+     Description:  
+     igu3d is a utility to perform a variety of manipulations
+     on McIDAS GR3D files.  See 
+     <A
+HREF="ch04sec2.html"
+>section 4.2</A
+> for more details.</P
+></LI
+><LI
+><P
+><B
+CLASS="COMMAND"
+>gg3d</B
+>
+     Usage:  gg3d ...</P
+><P
+>     
+     Description:  
+     gg3d is a utility for resampling McIDAS GR3D files.  See
+     <A
+HREF="ch04sec2.html"
+>section 4.2</A
+> for more details.</P
+></LI
+><LI
+><P
+><B
+CLASS="COMMAND"
+>listfonts</B
+>
+     Usage:  listfonts</P
+><P
+>     
+     Description:  listfonts, used on SGI systems only, lists the IRIS GL
+     fonts available for use in vis5d's 3-D window.  After listing the
+     fonts you may use one in vis5d by specifying it with the <TT
+CLASS="PARAMETER"
+><I
+>-font</I
+></TT
+>
+     option.
+     For non-SGI systems or systems using OpenGL, use the xlsfonts or
+     xfontsel program to select a font.</P
+></LI
+><LI
+><P
+><B
+CLASS="COMMAND"
+>comp5d</B
+>
+     Usage:  comp5d N M filename</P
+><P
+>     
+     Description:  comp5d converts one or more McIDAS GR3D files to the
+     comp5d format used in previous (and the current) versions of vis5d.</P
+><P
+>     
+     N is the first 3D grid file number and M is the number of grid files
+     in the data set.  The M parameter allows data sets which span multiple
+     grid files and should not be confused with the total number of 3D
+     grids in the data set.</P
+><P
+>     
+     filename is the name of the compressed grid file.  You can choose
+     whatever name you want, but note that comp5d will convert the name to
+     all upper case characters.</P
+><P
+>     
+     If your data set contains wind vector components you can use the 
+     <TT
+CLASS="PARAMETER"
+><I
+>-wind</I
+></TT
+>
+     keyword to select a subset of wind components or calculate horizontal
+     wind speed, named 'SPD ', for the compressed file.  The longitude,
+     latitude, and vertical components of the wind vector must be named 'U
+     ', 'V   ' and 'W   ' respectively.  If you use the 
+     <TT
+CLASS="PARAMETER"
+><I
+>-wind</I
+></TT
+> keyword, then
+     only those wind-relevant variables (i.e. U, V, W &#38; SPD) whose names
+     are listed after 
+     <TT
+CLASS="PARAMETER"
+><I
+>-wind</I
+></TT
+>
+     will be included in the compressed file.  For
+     example, to include SPD and W in the compressed file, from a 3D grid
+     file containing U, V and W components, use the command:</P
+><P
+>     <B
+CLASS="COMMAND"
+>comp5d N M F -wind SPD W</B
+></P
+></LI
+><LI
+><P
+><B
+CLASS="COMMAND"
+>help</B
+>
+     Usage:  help utilityname</P
+><P
+>     
+     Description:  The help command will list a quick reference 
+     to the parameter
+     formats for the named utility such as igg3d, igu3d, gg3d, and comp5d
+     utilities.  
+     <DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN1632"
+></A
+><P
+></P
+><P
+>Example:  help igg3d</P
+><P
+></P
+></DIV
+></P
+></LI
+><LI
+><P
+><TT
+CLASS="FILENAME"
+>maketopo.c</TT
+></P
+><P
+>     This program, found in the util directory, is a template program for
+     generating your own new topography (*.TOPO) files.  
+     Read the information at
+     the top of the file for instructions.  To compile maketopo see 
+     the makefile named <TT
+CLASS="FILENAME"
+>maketopo.m</TT
+>.</P
+></LI
+><LI
+><P
+><TT
+CLASS="FILENAME"
+>makemap.c</TT
+></P
+><P
+>     This program, found in the util directory, is a template program for
+     generating your own new McIDAS map outline (OUTL*) files.  Read the
+     information at the top of the file for instructions.  
+     To compile makemap see the makefile named 
+     <TT
+CLASS="FILENAME"
+>makemap.m</TT
+>.
+     If you create a map with lots too many
+     line segments, it will be displayed with some line segments 
+     missing and some extra crazy line segments.  
+     You can fix this by increasing MAXMAPVERT
+     and MAXMAPSEG in <TT
+CLASS="FILENAME"
+>src/globals.h</TT
+>, then 
+     re-making vis5d.</P
+></LI
+><LI
+><P
+><TT
+CLASS="FILENAME"
+>newmap.c</TT
+></P
+><P
+>     This program and <TT
+CLASS="FILENAME"
+>mapfunc.f</TT
+>, 
+     found in the util directory, is used to transform the vertices 
+     of an existing map outline file to make a new map
+     outline file.  This might be useful if you need to transform 
+     a map to a new
+     coordinate system.  
+     Read the <TT
+CLASS="FILENAME"
+>newmap.c</TT
+> and 
+     <TT
+CLASS="FILENAME"
+>newmap.m</TT
+> files for more information.</P
+></LI
+></UL
+></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch04sec2.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch06.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Using the McIDAS Utilities</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Using Vis5D to Visualize Your Data</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

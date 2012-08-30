@@ -1736,7 +1736,13 @@ void gridPRIME_to_xyzPRIME( Display_Context dtx, int time, int var, int n,
                   else zs = 0.0;
                   for (i=0;i<n;i++) {
                      x[i] = dtx->Xmin + c[i] * xs;
+		     // JCM:
+		     if(COORDHAND==COORDRIGHTHAND){
+		       y[i] = dtx->Ymin + r[i] * ys;
+		     }
+		     else{
                      y[i] = dtx->Ymax - r[i] * ys;
+		     }
                      z[i] = dtx->Zmin + l[i] * zs;
                   }
                }
@@ -1749,7 +1755,13 @@ void gridPRIME_to_xyzPRIME( Display_Context dtx, int time, int var, int n,
                   ys = (dtx->Ymax-dtx->Ymin) / (float) (dtx->Nr-1);
                   for (i=0;i<n;i++) {
                      x[i] = dtx->Xmin + c[i] * xs;
+		     // JCM:
+		     if(COORDHAND==COORDRIGHTHAND){
+		       y[i] = dtx->Ymin + r[i] * ys;
+		     }
+		     else{
                      y[i] = dtx->Ymax - r[i] * ys;
+		     }
                      z[i] = gridlevelPRIME_to_zPRIME( dtx, time, var, l[i] );
                   }
                }
@@ -1836,16 +1848,28 @@ void grid_to_xyz( Context ctx, int time, int var, int n,
                /* simplest, fast case */
                {
                   float xs, ys, zs;
+		  // JCM: DEBUG:
+		  //		  fprintf(stderr,"Xmin=%g Xmax=%g\n",ctx->dpy_ctx->Xmin,ctx->dpy_ctx->Xmax);
+		  //		  fprintf(stderr,"Ymin=%g Ymax=%g\n",ctx->dpy_ctx->Ymin,ctx->dpy_ctx->Ymax);
+		  //		  fprintf(stderr,"Zmin=%g Zmax=%g\n",ctx->dpy_ctx->Zmin,ctx->dpy_ctx->Zmax);
                   xs = (ctx->dpy_ctx->Xmax-ctx->dpy_ctx->Xmin) / (float) (ctx->Nc-1);
                   ys = (ctx->dpy_ctx->Ymax-ctx->dpy_ctx->Ymin) / (float) (ctx->Nr-1);
                   if (ctx->MaxNl > 1) zs = (ctx->dpy_ctx->Zmax-ctx->dpy_ctx->Zmin) /
                      (float) (ctx->MaxNl-1);
                   else zs = 0.0;
+		  //		  fprintf(stderr,"xs=%g ys=%g zs=%g c[0]=%g r[0]=%g l[0]=%g\n",xs,ys,zs,c[0],r[0],l[0]);
                   for (i=0;i<n;i++) {
                      x[i] = ctx->dpy_ctx->Xmin + c[i] * xs;
+		     // JCM:
+		     if(COORDHAND==COORDRIGHTHAND){
+		       y[i] = ctx->dpy_ctx->Ymin + r[i] * ys;
+		     }
+		     else{
                      y[i] = ctx->dpy_ctx->Ymax - r[i] * ys;
+		     }
                      z[i] = ctx->dpy_ctx->Zmin + l[i] * zs;
                   }
+		  //		  fprintf(stderr,"x=%g y=%g z=%g\n",x[0],y[0],z[0]);
                }
                break;
             case VERT_NONEQUAL_MB:
@@ -1856,7 +1880,13 @@ void grid_to_xyz( Context ctx, int time, int var, int n,
                   ys = (ctx->dpy_ctx->Ymax-ctx->dpy_ctx->Ymin) / (float) (ctx->Nr-1);
                   for (i=0;i<n;i++) {
                      x[i] = ctx->dpy_ctx->Xmin + c[i] * xs;
+		     // JCM:
+		     if(COORDHAND==COORDRIGHTHAND){
+		       y[i] = ctx->dpy_ctx->Ymin + r[i] * ys;
+		     }
+		     else{
                      y[i] = ctx->dpy_ctx->Ymax - r[i] * ys;
+		     }
                      z[i] = gridlevel_to_z( ctx, time, var, l[i] );
                   }
                }
@@ -1923,7 +1953,7 @@ void grid_to_xyz( Context ctx, int time, int var, int n,
  */
 void grid_to_compXYZ( Context ctx, int time, int var, int n,
                       float r[], float c[], float l[],
-                      int_2 xyz[][3] )
+                      int_vert2 xyz[][3] )
 {
    int i;
    float xx, yy, zz;
@@ -1953,11 +1983,18 @@ void grid_to_compXYZ( Context ctx, int time, int var, int n,
                      zs = 0.0;
                   }
                   xt = ctx->dpy_ctx->Xmin * VERTEX_SCALE;
-                  yt = ctx->dpy_ctx->Ymax * VERTEX_SCALE;
                   zt = ctx->dpy_ctx->Zmin * VERTEX_SCALE;
                   for (i=0;i<n;i++) {
                      xx = (xt + c[i] * xs);
+		     // JCM:
+		     if(COORDHAND==COORDRIGHTHAND){
+		       yt = ctx->dpy_ctx->Ymin * VERTEX_SCALE;
+		       yy = (yt + r[i] * ys);
+		     }
+		     else{
+		       yt = ctx->dpy_ctx->Ymax * VERTEX_SCALE;
                      yy = (yt - r[i] * ys);
+		     }
                      zz = (zt + l[i] * zs);
                      if (xx > 32760.0) xx = 32760.0;
                      if (xx < -32760.0) xx = -32760.0;
@@ -1981,10 +2018,17 @@ void grid_to_compXYZ( Context ctx, int time, int var, int n,
                        (float) (ctx->Nr-1) * VERTEX_SCALE;
                   zs = VERTEX_SCALE;
                   xt = ctx->dpy_ctx->Xmin * VERTEX_SCALE;
-                  yt = ctx->dpy_ctx->Ymax * VERTEX_SCALE;
                   for (i=0;i<n;i++) {
                      xx = (xt + c[i] * xs);
+		     // JCM:
+		     if(COORDHAND==COORDRIGHTHAND){
+		       yt = ctx->dpy_ctx->Ymin * VERTEX_SCALE;
+		       yy = (yt + r[i] * ys);
+		     }
+		     else{
+		       yt = ctx->dpy_ctx->Ymax * VERTEX_SCALE;
                      yy = (yt - r[i] * ys);
+		     }
                      zz = (gridlevel_to_z( ctx, time, var, l[i] ) * zs);
                      if (xx > 32760.0) xx = 32760.0;
                      if (xx < -32760.0) xx = -32760.0;
@@ -2069,7 +2113,7 @@ void grid_to_compXYZ( Context ctx, int time, int var, int n,
 }
 
 void xyz_to_compXYZ( Display_Context dtx, int n, float x[], float y[],
-                     float z[], int_2 xyz[][3] )
+                     float z[], int_vert2 xyz[][3] )
 {
    int i;
    float xx, yy, zz;
@@ -2093,7 +2137,7 @@ void xyz_to_compXYZ( Display_Context dtx, int n, float x[], float y[],
       
 void gridPRIME_to_compXYZPRIMEcheck(Display_Context dtx, int time, int var, int *N,
                       float r[], float c[], float l[],
-                      int_2 xyz[][3] )
+                      int_vert2 xyz[][3] )
 {
    int i;
    int v;
@@ -2124,7 +2168,6 @@ void gridPRIME_to_compXYZPRIMEcheck(Display_Context dtx, int time, int var, int 
                      zs = 0.0;
                   }
                   xt = dtx->Xmin * VERTEX_SCALE;
-                  yt = dtx->Ymax * VERTEX_SCALE;
                   zt = dtx->Zmin * VERTEX_SCALE;
                   for (i=0;i<n;i++) {
                      if(c[i] < 0 || c[i] > dtx->Nc-1 ||
@@ -2133,7 +2176,15 @@ void gridPRIME_to_compXYZPRIMEcheck(Display_Context dtx, int time, int var, int 
                         v++;
                      }
                      xx = xt + c[i] * xs;
+		     // JCM:
+		     if(COORDHAND==COORDRIGHTHAND){
+		       yt = dtx->Ymin * VERTEX_SCALE;
+		       yy = yt + r[i] * ys;
+		     }
+		     else{
+		       yt = dtx->Ymax * VERTEX_SCALE;
                      yy = yt - r[i] * ys;
+		     }
                      zz = zt + l[i] * zs;
                      if (xx > 32760.0) xx = 32760.0;
                      if (xx < -32760.0) xx = -32760.0;
@@ -2156,7 +2207,6 @@ void gridPRIME_to_compXYZPRIMEcheck(Display_Context dtx, int time, int var, int 
                   ys = (dtx->Ymax-dtx->Ymin) / (float) (dtx->Nr-1) * VERTEX_SCALE;
                   zs = VERTEX_SCALE;
                   xt = dtx->Xmin * VERTEX_SCALE;
-                  yt = dtx->Ymax * VERTEX_SCALE;
                   for (i=0;i<n;i++) {
                      if(c[i] < 0 || c[i] > dtx->Nc-1 ||
                         r[i] < 0 || r[i] > dtx->Nr-1 ||
@@ -2164,7 +2214,15 @@ void gridPRIME_to_compXYZPRIMEcheck(Display_Context dtx, int time, int var, int 
                         v++;
                      }
                      xx = xt + c[i] * xs;
+		     // JCM:
+		     if(COORDHAND==COORDRIGHTHAND){
+		       yt = dtx->Ymin * VERTEX_SCALE;
+		       yy = yt + r[i] * ys;
+		     }
+		     else{
+		       yt = dtx->Ymax * VERTEX_SCALE;
                      yy = yt - r[i] * ys;
+		     }
                      zz = gridlevelPRIME_to_zPRIME( dtx, time, var, l[i] ) * zs;
                      if (xx > 32760.0) xx = 32760.0;                     
                      if (xx < -32760.0) xx = -32760.0;                     
@@ -2288,7 +2346,7 @@ void gridPRIME_to_compXYZPRIMEcheck(Display_Context dtx, int time, int var, int 
 
 void gridPRIME_to_compXYZPRIME( Display_Context dtx, int time, int var, int n,
                       float r[], float c[], float l[],
-                      int_2 xyz[][3] )
+                      int_vert2 xyz[][3] )
 {
    int i;
    /* WLH 6 Oct 98 */
@@ -2317,12 +2375,19 @@ void gridPRIME_to_compXYZPRIME( Display_Context dtx, int time, int var, int n,
                      zs = 0.0;
                   }
                   xt = dtx->Xmin * VERTEX_SCALE;
-                  yt = dtx->Ymax * VERTEX_SCALE;
                   zt = dtx->Zmin * VERTEX_SCALE;
                   for (i=0;i<n;i++) {
                      /* WLH 6 Oct 98 */
                      xx = (xt + c[i] * xs);
+		     // JCM:
+		     if(COORDHAND==COORDRIGHTHAND){
+		       yt = dtx->Ymin * VERTEX_SCALE;
+		       yy = (yt + r[i] * ys);
+		     }
+		     else{
+		       yt = dtx->Ymax * VERTEX_SCALE;
                      yy = (yt - r[i] * ys);
+		     }
                      zz = (zt + l[i] * zs);
                      if (xx > 32760.0) xx = 32760.0;
                      if (xx < -32760.0) xx = -32760.0;
@@ -2334,9 +2399,9 @@ void gridPRIME_to_compXYZPRIME( Display_Context dtx, int time, int var, int n,
                      xyz[i][1] = yy;
                      xyz[i][2] = zz;
 /* WLH 6 Oct 98
-                     xyz[i][0] = (int_2) (xt + c[i] * xs);
-                     xyz[i][1] = (int_2) (yt - r[i] * ys);
-                     xyz[i][2] = (int_2) (zt + l[i] * zs);
+                     xyz[i][0] = (int_vert2) (xt + c[i] * xs);
+                     xyz[i][1] = (int_vert2) (yt - r[i] * ys);
+                     xyz[i][2] = (int_vert2) (zt + l[i] * zs);
 */
                   }
                }
@@ -2349,11 +2414,18 @@ void gridPRIME_to_compXYZPRIME( Display_Context dtx, int time, int var, int n,
                   ys = (dtx->Ymax-dtx->Ymin) / (float) (dtx->Nr-1) * VERTEX_SCALE;
                   zs = VERTEX_SCALE;
                   xt = dtx->Xmin * VERTEX_SCALE;
-                  yt = dtx->Ymax * VERTEX_SCALE;
                   for (i=0;i<n;i++) {
                      /* WLH 6 Oct 98 */
                      xx = (xt + c[i] * xs);
+		     // JCM:
+		     if(COORDHAND==COORDRIGHTHAND){
+		       yt = dtx->Ymin * VERTEX_SCALE;
+		       yy = (yt + r[i] * ys);
+		     }
+		     else{
+		       yt = dtx->Ymax * VERTEX_SCALE;
                      yy = (yt - r[i] * ys);
+		     }
                      zz = (gridlevelPRIME_to_zPRIME( dtx, time, var, l[i] ) * zs);
                      if (xx > 32760.0) xx = 32760.0;
                      if (xx < -32760.0) xx = -32760.0;
@@ -2366,9 +2438,9 @@ void gridPRIME_to_compXYZPRIME( Display_Context dtx, int time, int var, int n,
                      xyz[i][2] = zz;
 
 /* WLH 6 Oct 98
-                     xyz[i][0] = (int_2) (xt + c[i] * xs);
-                     xyz[i][1] = (int_2) (yt - r[i] * ys);
-                     xyz[i][2] = (int_2)
+                     xyz[i][0] = (int_vert2) (xt + c[i] * xs);
+                     xyz[i][1] = (int_vert2) (yt - r[i] * ys);
+                     xyz[i][2] = (int_vert2)
                                 (gridlevelPRIME_to_zPRIME( dtx, time, var, l[i] ) * zs);
 */
                   }
@@ -2420,9 +2492,9 @@ void gridPRIME_to_compXYZPRIME( Display_Context dtx, int time, int var, int n,
                xyz[i][1] = yy;
                xyz[i][2] = zz;
 /*MJK 5 Oct 98
-               xyz[i][0] = (int_2) (cylx * VERTEX_SCALE);
-               xyz[i][1] = (int_2) (cyly * VERTEX_SCALE);
-               xyz[i][2] = (int_2) (cylz * VERTEX_SCALE);
+               xyz[i][0] = (int_vert2) (cylx * VERTEX_SCALE);
+               xyz[i][1] = (int_vert2) (cyly * VERTEX_SCALE);
+               xyz[i][2] = (int_vert2) (cylz * VERTEX_SCALE);
 */
             }
          }
@@ -2460,9 +2532,9 @@ void gridPRIME_to_compXYZPRIME( Display_Context dtx, int time, int var, int n,
             xyz[i][1] = yy;
             xyz[i][2] = zz;
 /*MJK 5 Oct 98
-            xyz[i][0] = (int_2) (d * clat * clon);
-            xyz[i][1] = (int_2) (-d * clat * slon);
-            xyz[i][2] = (int_2) (d * slat);
+            xyz[i][0] = (int_vert2) (d * clat * clon);
+            xyz[i][1] = (int_vert2) (-d * clat * slon);
+            xyz[i][2] = (int_vert2) (d * slat);
 */
          }
          break;
@@ -2516,7 +2588,13 @@ void geo_to_xyz( Context ctx, int time, int var, int n,
                row = ic - (Y - YC)/ctx->RowIncKm;
                col = jc -  X/ctx->ColIncKm;
                x[i] = ctx->dpy_ctx->Xmin + col * xscale;
+	       // JCM:
+	       if(COORDHAND==COORDRIGHTHAND){
+		 y[i] = ctx->dpy_ctx->Ymin + row * yscale;
+	       }
+	       else{
                y[i] = ctx->dpy_ctx->Ymax - row * yscale;
+	       }
                z[i] = height_to_z( ctx, hgt[i] );
             }
          }
@@ -2541,7 +2619,13 @@ void geo_to_xyz( Context ctx, int time, int var, int n,
             row = ctx->PoleRow + r * cos(rlon);
             col = ctx->PoleCol - r * sin(rlon);
             x[i] = ctx->dpy_ctx->Xmin + col * xscale;
+	    // JCM:
+	    if(COORDHAND==COORDRIGHTHAND){
+	      y[i] = ctx->dpy_ctx->Ymin + row * yscale;
+	    }
+	    else{
             y[i] = ctx->dpy_ctx->Ymax - row * yscale;
+	    }
             z[i] = height_to_z( ctx, hgt[i] );
          }
          break;
@@ -2575,7 +2659,13 @@ void geo_to_xyz( Context ctx, int time, int var, int n,
             if (row>(ctx->Nr-1))  row = ctx->Nr-1;
 */
             x[i] = ctx->dpy_ctx->Xmin + col * xscale;
+	    // JCM:
+	    if(COORDHAND==COORDRIGHTHAND){
+	      y[i] = ctx->dpy_ctx->Ymin + row * yscale;
+	    }
+	    else{
             y[i] = ctx->dpy_ctx->Ymax - row * yscale;
+	    }
             z[i] = height_to_z( ctx, hgt[i] );
          }
          break;
@@ -2654,7 +2744,13 @@ void geo_to_xyzPRIME( Display_Context dtx, int time, int var, int n,
                row = ic - (Y - YC)/dtx->RowIncKm;
                col = jc -  X/dtx->ColIncKm;
                x[i] = dtx->Xmin + col * xscale;
+	       // JCM:
+	       if(COORDHAND==COORDRIGHTHAND){
+		 y[i] = dtx->Ymin + row * yscale;
+	       }
+	       else{
                y[i] = dtx->Ymax - row * yscale;
+	       }
                z[i] = height_to_zPRIME( dtx, hgt[i] );
             }
          }
@@ -2679,7 +2775,13 @@ void geo_to_xyzPRIME( Display_Context dtx, int time, int var, int n,
             row = dtx->PoleRow + r * cos(rlon);
             col = dtx->PoleCol - r * sin(rlon);
             x[i] = dtx->Xmin + col * xscale;
+	    // JCM:
+	    if(COORDHAND==COORDRIGHTHAND){
+	      y[i] = dtx->Ymin + row * yscale;
+	    }
+	    else{
             y[i] = dtx->Ymax - row * yscale;
+	    }
             z[i] = height_to_zPRIME( dtx, hgt[i] );
          }
          break;
@@ -2713,7 +2815,13 @@ void geo_to_xyzPRIME( Display_Context dtx, int time, int var, int n,
             if (row>(dtx->Nr-1))  row = dtx->Nr-1;
 */
             x[i] = dtx->Xmin + col * xscale;
+	    // JCM:
+	    if(COORDHAND==COORDRIGHTHAND){
+	      y[i] = dtx->Ymin + row * yscale;
+	    }
+	    else{
             y[i] = dtx->Ymax - row * yscale;
+	    }
             z[i] = height_to_zPRIME( dtx, hgt[i] );
          }
          break;
@@ -2793,7 +2901,13 @@ void geo_to_xyzTOPO( Display_Context dtx, int time, int var, int n,
                row = ic - (Y - YC)/dtx->RowIncKm;
                col = jc - X/dtx->ColIncKm;
                x[i] = dtx->Xmin + col * xscale;
+	       // JCM:
+	       if(COORDHAND==COORDRIGHTHAND){
+		 y[i] = dtx->Ymin + row * yscale;
+	       }
+	       else{
                y[i] = dtx->Ymax - row * yscale;
+	       }
                z[i] = height_to_zTOPO( dtx, hgt[i] );
             }
          }
@@ -2818,7 +2932,13 @@ void geo_to_xyzTOPO( Display_Context dtx, int time, int var, int n,
             row = dtx->PoleRow + r * cos(rlon);
             col = dtx->PoleCol - r * sin(rlon);
             x[i] = dtx->Xmin + col * xscale;
+	    // JCM:
+	    if(COORDHAND==COORDRIGHTHAND){
+	      y[i] = dtx->Ymin + row * yscale;
+	    }
+	    else{
             y[i] = dtx->Ymax - row * yscale;
+	    }
             z[i] = height_to_zTOPO( dtx, hgt[i] );
          }
          break;
@@ -2852,7 +2972,13 @@ void geo_to_xyzTOPO( Display_Context dtx, int time, int var, int n,
             if (row>(dtx->Nr-1))  row = dtx->Nr-1;
 */
             x[i] = dtx->Xmin + col * xscale;
+	    // JCM:
+	    if(COORDHAND==COORDRIGHTHAND){
+	      y[i] = dtx->Ymin + row * yscale;
+	    }
+	    else{
             y[i] = dtx->Ymax - row * yscale;
+	    }
             z[i] = height_to_zTOPO( dtx, hgt[i] );
          }
          break;
@@ -3117,7 +3243,13 @@ void xyzPRIME_to_gridPRIME( Display_Context dtx, int time, int var,
       case PROJ_ROTATED:
       case PROJ_MERCATOR:
          *col = (x-dtx->Xmin) / (dtx->Xmax-dtx->Xmin) * (float) (dtx->Nc-1);
+	 // JCM:
+	 if(COORDHAND==COORDRIGHTHAND){
+	   *row = (y-dtx->Ymin) / (dtx->Ymax-dtx->Ymin) * (float) (dtx->Nr-1);
+	 }
+	 else{
          *row = (dtx->Ymax-y) / (dtx->Ymax-dtx->Ymin) * (float) (dtx->Nr-1);
+	 }
          *lev = zPRIME_to_gridlevPRIME( dtx, z );
          break;
       /* ZLB 02-09-2000 */
@@ -3221,8 +3353,15 @@ void xyz_to_grid( Context ctx, int time, int var,
       case PROJ_MERCATOR:
          *col = (x-ctx->dpy_ctx->Xmin) / (ctx->dpy_ctx->Xmax-ctx->dpy_ctx->Xmin)
                 * (float) (ctx->Nc-1);
+	 // JCM:
+	 if(COORDHAND==COORDRIGHTHAND){
+	   *row = (y-ctx->dpy_ctx->Ymin) / (ctx->dpy_ctx->Ymax-ctx->dpy_ctx->Ymin)
+	     * (float) (ctx->Nr-1);
+	 }
+	 else{
          *row = (ctx->dpy_ctx->Ymax-y) / (ctx->dpy_ctx->Ymax-ctx->dpy_ctx->Ymin)
                 * (float) (ctx->Nr-1);
+	 }
          *lev = z_to_gridlev( ctx, z );
          break;
       case PROJ_CYLINDRICAL:
@@ -3923,8 +4062,15 @@ void xyz_to_geo( Context ctx, int time, int var,
             /* convert x,y to row,col */
             col = (x-ctx->dpy_ctx->Xmin) / (ctx->dpy_ctx->Xmax-ctx->dpy_ctx->Xmin)
                   * (float) (ctx->Nc-1);
+	    // JCM:
+	    if(COORDHAND==COORDRIGHTHAND){
+	      row = (y-ctx->dpy_ctx->Ymin) / (ctx->dpy_ctx->Ymax-ctx->dpy_ctx->Ymin) 
+		* (float) (ctx->Nr-1);
+	    }
+	    else{
             row = (ctx->dpy_ctx->Ymax-y) / (ctx->dpy_ctx->Ymax-ctx->dpy_ctx->Ymin) 
                   * (float) (ctx->Nr-1);
+	    }
             alpha = ( (ic-row) * ctx->RowIncKm + YC) / RADIUS;
             *lat = 2 * RAD2DEG * atan( exp(alpha) ) - 90.0;
             *lon = ctx->CentralLon - RAD2DEG * (col-jc) * ctx->ColIncKm / RADIUS;
@@ -3937,8 +4083,15 @@ void xyz_to_geo( Context ctx, int time, int var,
             /* convert x,y to row,col */
             col = (x-ctx->dpy_ctx->Xmin) / (ctx->dpy_ctx->Xmax-ctx->dpy_ctx->Xmin)
                   * (float) (ctx->Nc-1);
+	    // JCM:
+	    if(COORDHAND==COORDRIGHTHAND){
+	      row = (y-ctx->dpy_ctx->Ymin) / (ctx->dpy_ctx->Ymax-ctx->dpy_ctx->Ymin) 
+		* (float) (ctx->Nr-1);
+	    }
+	    else{
             row = (ctx->dpy_ctx->Ymax-y) / (ctx->dpy_ctx->Ymax-ctx->dpy_ctx->Ymin) 
                   * (float) (ctx->Nr-1);
+	    }
             /* convert row,col to lat,lon */
             xldif = ctx->Hemisphere * (row-ctx->PoleRow) / ctx->ConeFactor;
             xedif = (ctx->PoleCol-col) / ctx->ConeFactor;
@@ -3983,8 +4136,15 @@ void xyz_to_geo( Context ctx, int time, int var,
             /* convert x,y to row,col */
             col = (x-ctx->dpy_ctx->Xmin) / (ctx->dpy_ctx->Xmax-ctx->dpy_ctx->Xmin) *
                  (float) (ctx->Nc-1);
+	    // JCM:
+	    if(COORDHAND==COORDRIGHTHAND){
+	      row = (y-ctx->dpy_ctx->Ymin) / (ctx->dpy_ctx->Ymax-ctx->dpy_ctx->Ymin) *
+		(float) (ctx->Nr-1);
+	    }
+	    else{
             row = (ctx->dpy_ctx->Ymax-y) / (ctx->dpy_ctx->Ymax-ctx->dpy_ctx->Ymin) *
                  (float) (ctx->Nr-1);
+	    }
             /* convert row,col to lat,lon */
             xrow = ctx->CentralRow - row - 1;
             xcol = ctx->CentralCol - col - 1;
@@ -4098,8 +4258,15 @@ void xyzPRIME_to_geo( Display_Context dtx, int time, int var,
             /* convert x,y to row,col */
             col = (x-dtx->Xmin) / (dtx->Xmax-dtx->Xmin)
                   * (float) (dtx->Nc-1);
+	    // JCM:
+	    if(COORDHAND==COORDRIGHTHAND){
             row = (dtx->Ymax-y) / (dtx->Ymax-dtx->Ymin)
                   * (float) (dtx->Nr-1);
+	    }
+	    else{
+	      row = (y-dtx->Ymin) / (dtx->Ymax-dtx->Ymin)
+		* (float) (dtx->Nr-1);
+	    }
             alpha = ( (ic-row) * dtx->RowIncKm + YC) / RADIUS;
             *lat = 2 * RAD2DEG * atan( exp(alpha) ) - 90.0;
             *lon = dtx->CentralLon - RAD2DEG * (col-jc) * dtx->ColIncKm / RADIUS;
@@ -4112,7 +4279,13 @@ void xyzPRIME_to_geo( Display_Context dtx, int time, int var,
 
             /* convert x,y to row,col */
             col = (x-dtx->Xmin) / (dtx->Xmax-dtx->Xmin) * (float) (dtx->Nc-1);
+	    // JCM:
+	    if(COORDHAND==COORDRIGHTHAND){
+	      row = (y-dtx->Ymin) / (dtx->Ymax-dtx->Ymin) * (float) (dtx->Nr-1);
+	    }
+	    else{
             row = (dtx->Ymax-y) / (dtx->Ymax-dtx->Ymin) * (float) (dtx->Nr-1);
+	    }
             /* convert row,col to lat,lon */
             xldif = dtx->Hemisphere * (row-dtx->PoleRow) / dtx->ConeFactor;
             xedif = (dtx->PoleCol-col) / dtx->ConeFactor;
@@ -4156,7 +4329,13 @@ void xyzPRIME_to_geo( Display_Context dtx, int time, int var,
             float row, col, xrow, xcol, rho, c, cc, sc;
             /* convert x,y to row,col */
             col = (x-dtx->Xmin) / (dtx->Xmax-dtx->Xmin) * (float) (dtx->Nc-1);
+	    // JCM:
+	    if(COORDHAND==COORDRIGHTHAND){
+	      row = (y-dtx->Ymin) / (dtx->Ymax-dtx->Ymin) * (float) (dtx->Nr-1);
+	    }
+	    else{
             row = (dtx->Ymax-y) / (dtx->Ymax-dtx->Ymin) * (float) (dtx->Nr-1);
+	    }
             /* convert row,col to lat,lon */
             xrow = dtx->CentralRow - row - 1;
             xcol = dtx->CentralCol - col - 1;

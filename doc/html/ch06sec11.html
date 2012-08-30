@@ -1,0 +1,165 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Data Probe</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Using Vis5D to Visualize Your Data"
+HREF="ch06.html"><LINK
+REL="PREVIOUS"
+TITLE="Text Labels"
+HREF="ch06sec10.html"><LINK
+REL="NEXT"
+TITLE="Vertical Sounding and SkewT"
+HREF="ch06sec12.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch06sec10.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Using Vis5D to Visualize Your Data</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch06sec12.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH06SEC11"
+>Data Probe</A
+></H1
+><P
+>     Sometimes it's useful to be able to inspect individual data values at
+various locations in the 3-D volume.  You can do this with the data probe.
+Click on the PROBE radio button on the control panel.  A 3-D cursor appears in
+the 3-D box which you can move around using the right mouse button.  For each
+physical variable the value for the current time step is printed along the left
+edge of the 3-D window.  If physical units are specified for the variable they
+will be printed next to the value.  Units can be assigned with the v5dSetUnits()
+function in your data conversion program as described in 
+<A
+HREF="ch03.html#CH03SEC1"
+>section 3.1</A
+>.</P
+><P
+>     If you turn on the GRID #'s button, the probe will be constrained to
+integral grid coordinates.  That is, the cursor will 'snap' to the nearest
+discrete grid coordinate.</P
+><P
+>     When the PROBE radio button is clicked on with the right mouse button is
+will be attached to the head of a trajectory.  The probe will search for the
+first set of trajectories being displayed, then attach to the head of the first
+trajectory made in that set.  The probe will also follow the movement of the
+trajectory during animation.  This feature is useful for identifying the values
+at the location of a trajectory as is moves along its path.</P
+><P
+>     One may also select which variables to display while in the PROBE mode.
+The API function 'vis5d_set_probe_vars' can be used in a script or via the
+'INTERP' button.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch06sec10.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch06sec12.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Text Labels</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ch06.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Vertical Sounding and SkewT</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

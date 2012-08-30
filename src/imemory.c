@@ -513,7 +513,7 @@ int i_reinit_memory( Irregular_Context itx )
 int i_mem_available( Irregular_Context itx )
 {
    if (itx->memory_limit==0)
-      return 1024*1024*1024;  /* a Gig ought to be enough */
+      return MAXMEMAVAILABLE;  /* a Gig ought to be enough */
    else
       return itx->memory_limit - itx->memory_used;
 }

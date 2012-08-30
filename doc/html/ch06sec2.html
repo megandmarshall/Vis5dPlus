@@ -1,0 +1,534 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>The Control Panel</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Using Vis5D to Visualize Your Data"
+HREF="ch06.html"><LINK
+REL="PREVIOUS"
+TITLE="Using Vis5D to Visualize Your Data"
+HREF="ch06.html"><LINK
+REL="NEXT"
+TITLE="Controlling vis5d"
+HREF="ch06sec3.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch06.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Using Vis5D to Visualize Your Data</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch06sec3.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH06SEC2"
+>The Control Panel</A
+></H1
+><P
+>     After vis5d has opened/read your file/s, two windows will appear:  a large
+window on the right containing one or more 3-D display windows and the current
+control panel on the left of the screen.  The 3-D window/s are used to view and
+interact with the data.  When there are multiple 3-D display windows a control
+panel is assigned to each.  The current control panel will appear when ever a
+mouse event occurs in the associated 3-D display.  In the upper-left corner of
+the 3-D display is a combination analog/digital clock which indicates the
+current time step.  The control panel contains several groups of buttons.</P
+><P
+>     Starting at the top, the first button group contains the following buttons:</P
+><P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1960"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> [ANIMATE] </TD
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> [STEP] </TD
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> NEW VAR </TD
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> EXIT </TD
+></TR
+><TR
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> [TEXTURE] </TD
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> TOP </TD
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> SOUTH </TD
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> WEST </TD
+></TR
+><TR
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> [TOPO] </TD
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> [MAP] </TD
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> BOX </TD
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> CLOCK </TD
+></TR
+><TR
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> SAVE </TD
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> RESTORE </TD
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> GRID #'s </TD
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> CONT #'s </TD
+></TR
+><TR
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> [ANIM-REC] </TD
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> REVERSE </TD
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> [SAVE PIC] </TD
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> [PERSPEC] </TD
+></TR
+><TR
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> SCRIPT </TD
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> INTERP </TD
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> UVW VARS </TD
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+> LEGENDS </TD
+></TR
+><TR
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+>IMPORT </TD
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+>DISPLAY </TD
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+>&nbsp;</TD
+><TD
+WIDTH="120"
+ALIGN="LEFT"
+VALIGN="TOP"
+>&nbsp;</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+><P
+>     These buttons are used to control the primary functions of vis5d.  Some of
+the above buttons are enclosed in brackets [] to indicates that they may be
+blank upon starting vis5d.  This will happen when the button does not apply to
+the current data set, because the button would conflict with a command line
+option, or because the feature is not available on your hardware.</P
+><P
+>     The next group of radio buttons control the viewing mode which determines
+how the mouse is used in the 3-D window:</P
+><P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2005"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Normal </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Normal mouse mode is used to rotate, zoom, and pan the
+               graphics in the 3-D window.  
+               See <A
+HREF="ch06sec4.html"
+>section 6.4</A
+> . </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Trajectory </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>This mode is used for creating and displaying wind
+               trajectories.  
+               See <A
+HREF="ch06sec8.html"
+>section 6.8</A
+> . </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Slice </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>This mode is used to reposition horizontal 
+                and vertical slices.  
+                See <A
+HREF="ch06sec6.html"
+>section 6.6</A
+> . </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Label </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>This mode is used to create and edit text labels 
+                in the 3-D window.  
+                See <A
+HREF="ch06sec10.html"
+>section 6.10</A
+> . </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Probe </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>This mode is used to inspect individual grid values by
+               moving a 3-D cursor through the 3-D grid.  Using the right
+               mouse button when clicking on this button will cause the
+               probe to attach to the head of a trajectory.  
+               See <A
+HREF="ch06sec11.html"
+>section 6.11</A
+> . </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Sounding </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>This mode is used to display a vertical sounding 
+                and SkewT at the location of a moveable vertical cursor.  
+                See <A
+HREF="ch06sec12.html"
+>section 6.12</A
+> . </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Clipping </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>                This mode is used to reposition the six clipping planes.
+                See <A
+HREF="ch06sec18.html"
+>section 6.18</A
+> . </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+><P
+>These modes are mutually exclusive; only one may be selected at a time.  
+To the immediate right of these buttons is the mouse button legend.  
+It is there to remind you of the use of each mouse button in the 
+3-D window for the currently selected mode.</P
+><P
+>Next are buttons labeled:</P
+><P
+>      Hwind1   Vwind1   HStrm   Hwind2   Vwind2   VStrm</P
+><P
+>     A wind vector slice (Hwind or Vwind) depicts wind values by drawing small
+arrows which point in the direction of the wind.  The length of each line
+segment indicates its magnitude.  The tails of the line segments are all
+anchored within a horizontal or vertical plane through the 3-D box.  The
+horizontal wind streamline slice (HStrm) depicts wind values by drawing
+streamlines on a horizontal plane.  The vertical wind streamline slice 
+(VStrm) depicts wind values by drawing streamlines on a vertical plane.  
+The location of slice planes can be changed with the mouse while in "Slice" 
+mode.  See <A
+HREF="ch06sec5.html"
+>section 6.5</A
+> for more details.</P
+><P
+>     The bottom part of the control panel window may contain a 2-D matrix of
+buttons when a regular v5d file is loaded. Each row corresponds to a physical
+variable in your dataset.  Each column corresponds to one type of graphical
+representation.  By selecting the correct row and column you can view any
+variable as a 3-D isosurface, horizontal contour slice, vertical contour 
+slice, horizontal colored slice, vertical colored slice, or volume 
+rendering.  This matrix of button is scrollable if there are more rows of 
+buttons than will fit in the window.  You can use the mouse to drag the 
+scrollbar or press the up/down arrow keys on your keyboard to scroll the 
+button matrix.  If an irregular data set is loaded, another button matrix 
+will be available.  The buttons will contain the name of the irregular v5d 
+data set.  Only the Text Plot option is currently available.  
+See <A
+HREF="ch06sec22.html"
+>section 6.22</A
+> on viewing text plots.</P
+><P
+>     When multiple data sets are viewed in the same display a period and an
+index number will be appended to the end of each variable name.  This will be a
+common notation seen in several display widgets when ever multiple data sets are
+loaded.</P
+><P
+>     The display of any graphic is controlled by clicking on its widget button
+with the left mouse button.  Each type of graphic also has a small pop-up
+control window which appears when turned on.  The control windows are different
+for each type of graphic and are explained below.  To bring up a graphic's
+control window without toggling its display, use the middle mouse button.  When
+the graphic is displayed it will be the same color as the widget button, making
+it easy to distinguish and identify different variables in the display.  To
+change the color of the graphic, click on its widget button with the right mouse
+button and a small window with four slider widgets will appear.  By changing the
+levels of red, green, and blue you can make any color.</P
+><P
+>     If the control panel window becomes obscured by other windows, you can
+bring it to the top by pressing the 
+<B
+CLASS="KEYCAP"
+>F1</B
+> key while the mouse pointer is in the 3-
+D window.  This is especially useful when using the 
+<TT
+CLASS="OPTION"
+>-full</TT
+> option.</P
+><P
+>     When mutliple data sets are displayed in different displays there is the
+option of grouping these them together.  This synchronizes the control of one
+display with the others.  
+See <A
+HREF="ch06sec19.html"
+>section 6.19</A
+> for more information.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch06.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch06sec3.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Using Vis5D to Visualize Your Data</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ch06.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Controlling vis5d</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

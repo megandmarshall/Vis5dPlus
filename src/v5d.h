@@ -56,6 +56,116 @@ extern "C" {
 typedef unsigned char V5Dubyte;     /* Must be 1 byte, except for cray */
 typedef unsigned short V5Dushort;   /* Must be 2 byte, except for cray */
 
+// JCM
+
+// Maximum memory to ever use in bytes:
+//#define MAXMEMAVAILABLE 1024*1024*1024 // old value
+#define MAXMEMAVAILABLE 2*1024*1024*1024
+
+  // whether to make left-handed vis5d+ coord system look like right-handed when showing plot axes
+#define SWITCHXAXES 1 // for Jon
+#define SWITCHYAXES 0
+#define SWITCHZAXES 0 // for Jon
+// whether to draw vis5d+ logo
+#define DODRAWLOGO 0
+  // whether to draw box arrow associated with North
+#define DRAWBOXARROW 0
+  // whether to draw box North symbol
+#define DRAWBOXNORTH 0
+  // whether to darw box tick marks (forces off if 0, no matter other options)
+#define DRAWBOXTICKS 1
+
+#define SWITCHSIGNLABEL 0 // if each label is specific instead of +-, then remove +-
+// drawing of axes labels
+#if(0)
+#define NORTHLABEL "N"
+#define SOUTHLABEL "S"
+#define WESTLABEL "W"
+#define EASTLABEL "E"
+#define UPLABEL ""
+#define DOWNLABEL ""
+
+#elif(0)
+  // +U = +\vec{E} = +\vec{z}
+  // +V = +\vec{N} = +\vec{x}
+  // +W = +\vec{N}\times\vec{W} = +\vec{y}
+#define NORTHLABEL ".+x"
+#define SOUTHLABEL ".-x"
+#define WESTLABEL ".-z"
+#define EASTLABEL ".+z"
+#define UPLABEL ".+y"
+#define DOWNLABEL ".-y"
+#elif(1)
+  // used with SWITCHSIGNLABEL==0
+#define NORTHLABEL "x"
+#define SOUTHLABEL "x"
+#define WESTLABEL "z"
+#define EASTLABEL "z"
+#define UPLABEL "y"
+#define DOWNLABEL "y"
+#endif
+
+#define COORDLEFTHAND 0 // was default
+#define COORDRIGHTHAND 1 // incomplete, more Ymax uses in grid.c, etc.
+#define COORDHAND COORDLEFTHAND
+
+#if(COORDHAND==COORDRIGHTHAND)
+#define MYYMINMAX Ymin
+#else
+#define MYYMINMAX Ymax
+
+#endif
+
+
+// JCM after AS
+#define TRACEORIGINAL 0
+#define TRACEAS 1
+#define TRACEVERSION TRACEAS
+
+// JCM
+#define FLOATTYPE 0
+#define INTTYPE 1
+
+  // JCM: whether to use int for vertices
+#define USEVERTINT 1
+
+// JCM:
+//#define MAXTRAJCOUNT 1E6 // was 4000
+// true max: MAX_TRAJ_VERTS
+#define MAXTRAJCOUNT 5E5
+//#define MAXTRAJCOUNT 25000
+
+  // was in work.c:
+/* Maximum number of vertices... */
+#ifdef BIG_GFX
+#  define MAX_ISO_VERTS 2400000    /* in an isosurface */
+#else
+#  define MAX_ISO_VERTS 650000     /* in an isosurface */
+#endif
+
+
+#define MAX_CONT_VERTS (MAXROWS*MAXCOLUMNS)   /* in a contour line slice */
+#define MAX_WIND_VERTS (STREAMEDGENUMBERMAX*MAXROWS*MAXCOLUMNS) /* in a wind vector slice */
+//#define MAX_TRAJ_VERTS 750000                   /* in a wind trajectory */
+// JCM: see also MAXTRAJCOUNT
+// 2* is to allow both forward and backward chance to form trajectory
+#define MAX_TRAJ_VERTS (2*MAXTRAJCOUNT)                   /* in a wind trajectory */
+
+
+// JCM:
+#define MAXSTREAMDENSITY 10.0
+#define MINSTREAMDENSITY 0.001
+  //#define MINSTREAMVECTORLENGTH 0.000000001
+#define MINSTREAMVECTORLENGTH 1E-20
+  //#define MAXSTREAMSTEPS 100
+#define MAXSTREAMSTEPS 1000
+#define STREAMEDGENUMBERMAX 10
+#define STREAMEDGENUMBERTRUE 4 // should be multiple of 2 to have symmetric lines for symmetric box
+
+#define MAXWINDDENSITY 1.0 // can't be greater than 1 since just skips over existing memory elements
+#define MINWINDDENSITY 0.001
+
+
 
 
 #define MISSING 1.0e35
@@ -64,12 +174,29 @@ typedef unsigned short V5Dushort;   /* Must be 2 byte, except for cray */
 
 /* Limits on 5-D grid size:  (must match those in v5df.h!!!) */
 #define MAXVARS     200
-#define MAXTIMES    400
-#define MAXROWS     400
-#define MAXCOLUMNS  400 
-#define MAXLEVELS   400
+#define MAXTIMES    1000
+#define MAXROWS     1000
+#define MAXCOLUMNS  1600 
+#define MAXLEVELS   600
 
 #define MAXRECS     10000
+
+  /* JCM 09-15-2008 */
+#define MAXVARNAME (10)
+
+  // JCM
+  // whether to allow multiple volume renderings
+#define MULTIVOLUMERENDER 1 // originally 0
+#if(MULTIVOLUMERENDER==1)
+#define MAXVOLUMEVARS MAXVARS
+#else
+#define MAXVOLUMEVARS 1
+#endif
+
+  // JCM
+#define NUMCOLORTABLEPARAMS 10 // was 7 and 4 were outputted normally (see api.h)
+#define NUMCOLORSINTABLE 256
+
 
 /************************************************************************/
 /***                                                                  ***/
@@ -81,7 +208,7 @@ typedef unsigned short V5Dushort;   /* Must be 2 byte, except for cray */
 extern int v5dCreateSimple( const char *name,
                             int numtimes, int numvars,
                             int nr, int nc, int nl,
-                            const char varname[MAXVARS][10],
+                            const char varname[MAXVARS][MAXVARNAME],
                             const int timestamp[],
                             const int datestamp[],
                             float northlat, float latinc,
@@ -92,7 +219,7 @@ extern int v5dCreateSimple( const char *name,
 extern int v5dCreate( const char *name,
                       int numtimes, int numvars,
                       int nr, int nc, const int nl[],
-                      const char varname[MAXVARS][10],
+                      const char varname[MAXVARS][MAXVARNAME],
                       const int timestamp[],
                       const int datestamp[],
                       int compressmode,
@@ -136,7 +263,7 @@ typedef struct {
         int Nc;                         /* Number of columns */
         int Nl[MAXVARS];                /* Number of levels per variable */
         int LowLev[MAXVARS];            /* Lowest level per variable */
-        char VarName[MAXVARS][10];      /* 9-character variable names */
+        char VarName[MAXVARS][MAXVARNAME];      /* 9-character variable names */
         char Units[MAXVARS][20];        /* 19-character units for variables */
         int TimeStamp[MAXTIMES];        /* Time in HHMMSS format */
         int DateStamp[MAXTIMES];        /* Date in YYDDD format */
@@ -325,7 +452,7 @@ extern int v5dWriteGrid( v5dstruct *v, int time, int var, const float data[] );
   /* JPE added 09-19-2000  */
 extern int v5dCreateStruct( v5dstruct *v, int numtimes, int numvars,
 										int nr, int nc, const int nl[],
-										const char varname[MAXVARS][10],
+										const char varname[MAXVARS][MAXVARNAME],
 										const int timestamp[], const int datestamp[],
 										int compressmode,
 										int projection,

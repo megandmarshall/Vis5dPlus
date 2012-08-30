@@ -1,0 +1,311 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Keyboard Functions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Using Vis5D to Visualize Your Data"
+HREF="ch06.html"><LINK
+REL="PREVIOUS"
+TITLE="Tcl scripting"
+HREF="ch06sec16.html"><LINK
+REL="NEXT"
+TITLE="The Clipping Planes"
+HREF="ch06sec18.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch06sec16.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Using Vis5D to Visualize Your Data</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch06sec18.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH06SEC17"
+>Keyboard Functions</A
+></H1
+><P
+></P
+><P
+>     The following keyboard functions can be invoked while the mouse pointer is
+inside the 3-D viewing window:</P
+><P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2543"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><THEAD
+><TR
+><TH
+ALIGN="LEFT"
+VALIGN="TOP"
+>	Key   </TH
+><TH
+ALIGN="LEFT"
+VALIGN="TOP"
+> Function </TH
+></TR
+></THEAD
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><B
+CLASS="KEYCAP"
+>F1 </B
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Raise or lower the control panel window.  This
+                is useful with the <TT
+CLASS="PARAMETER"
+><I
+>-full</I
+></TT
+> option. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><B
+CLASS="KEYCAP"
+>F2 </B
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Toggle display of system information including
+                memory used and number of graphics to be computed. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><B
+CLASS="KEYCAP"
+>P </B
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Print the current window image.  A PostScript printer must be
+                available.  Set the PRINTER environment variable from your shell to
+                specify which printer to use. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><B
+CLASS="KEYCAP"
+>S </B
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Slower animation - increases the minimum time
+                between frames by 10 msec. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><B
+CLASS="KEYCAP"
+>F </B
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Faster animation - decreases the minimum time
+                between frames by 10 msec. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><B
+CLASS="KEYCAP"
+>R </B
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Reset the clipping planes to there default positions </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><B
+CLASS="KEYCAP"
+>B </B
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>    Turn of the window borders.( This is useful
+                when using Sun workstations, an    unsolved bug causes the borders to
+                flash in a very annoying manner!) </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><B
+CLASS="KEYCAP"
+>l </B
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> Reduce the size fo the Vis5D logo</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><B
+CLASS="KEYCAP"
+>L </B
+></TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Increase the size of the Vis5D logo </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+><P
+>     
+     If you want to program your own keyboard functions look the in the file
+src/gui.c for the
+func1(), func2(), func3(), etc functions.  They are called when the
+corresponding function key is pressed.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch06sec16.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch06sec18.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Tcl scripting</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ch06.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>The Clipping Planes</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

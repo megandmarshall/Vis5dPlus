@@ -1,0 +1,579 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>The v5dimport Utility</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="PREVIOUS"
+TITLE="Final Notes"
+HREF="ch06sec23.html"><LINK
+REL="NEXT"
+TITLE="The v5dimport User Interface Embedded in Vis5D"
+HREF="ch07sec2.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch06sec23.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch07sec2.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="CH07"
+>The v5dimport Utility</A
+></H1
+><P
+>The <B
+CLASS="COMMAND"
+>v5dimport</B
+> utility is a program for converting grid files to v5d 
+format, combining multiple source files, resampling to new coordinate 
+systems and culling variables and timesteps.  It has both a graphical 
+and command line user interface.</P
+><P
+>For example, you may use <B
+CLASS="COMMAND"
+>v5dimport</B
+> to read 2 McIDAS GR3D files and a 2-D
+McIDAS GRID file, resample all the data to a Lambert Conformal 
+projection, omit the CWAT and VORT variables and then write the data to 
+a Vis5D file called <TT
+CLASS="FILENAME"
+>lambert1.v5d</TT
+>.</P
+><P
+>The basic order of events when using <B
+CLASS="COMMAND"
+>v5dimport</B
+> is:
+<P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+>       Read the input file(s).</P
+></LI
+><LI
+><P
+>Select grids for output according to timestep, physical variable, map
+projection or vertical coordinate system.</P
+></LI
+><LI
+><P
+>Setup a map projection and vertical coordinate system for the output
+file.</P
+></LI
+><LI
+><P
+>Write the output file.  Resampling is done at this time.</P
+></LI
+><LI
+><P
+>Optionally, start Vis5D on the output file.</P
+></LI
+></OL
+></P
+><P
+>Currently, <B
+CLASS="COMMAND"
+>v5dimport</B
+> can read the following file formats:
+<DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2675"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>McIDAS GR3D and GRID files</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Vis5D v5d and comp5d files</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>GRADS files</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>"UW vis" files (used at the University of Wisconsin)</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>EPA MM4 and RADM files (on Crays only)</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH07SEC1"
+>Using <B
+CLASS="COMMAND"
+>v5dimport</B
+>'s graphical interface</A
+></H1
+><P
+>Start <B
+CLASS="COMMAND"
+>v5dimport</B
+> from your shell with</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>v5dimport [-path pathname] [files]</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+> where [files] is an optional list of input files and 
+ [<TT
+CLASS="PARAMETER"
+><I
+>-path pathname</I
+></TT
+>] 
+ specifies that the directory named "pathname" is to be used as the 
+ default, in place of the current directory, for the input file browser 
+ and for making output files.</P
+><P
+> When <B
+CLASS="COMMAND"
+>v5dimport</B
+> has started you'll see its main window appear.  
+ It consists of:
+<P
+></P
+><OL
+TYPE="1"
+><LI
+><P
+> a scrollable list of all grids scanned from the input files</P
+></LI
+><LI
+><P
+> buttons used for selecting/culling grids according to variable name,
+ timestep, projection or vertical coordinate system</P
+></LI
+><LI
+><P
+> buttons and type-in fields for describing and creating the output file.</P
+></LI
+></OL
+></P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="CH07SEC1.1"
+>Reading input grids</A
+></H2
+><P
+> You may read additional grid files into <B
+CLASS="COMMAND"
+>v5dimport</B
+> at any time by clicking
+ on the "Read file..." button.  Use the file selector to locate your 
+ file and click on OK or CANCEL.  It's best to read all input files 
+ right at the beginning because whenever a new file is read all grids 
+ are selected for output, overriding any selections you may have 
+ previously made.</P
+><P
+> The button labeled "Discard all grids" does exactly what it says.  It's
+ equivalent to exiting <B
+CLASS="COMMAND"
+>v5dimport</B
+> and restarting it.</P
+><P
+> After reading each input file, the list of grids shown in the top half of
+ the window, will be resorted by time then variable name.</P
+><P
+>The columns in this list are:
+<DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2714"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Grid </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>grid number (no significant meaning)</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>YYDDD </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>the year and date of the grid</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>HHMMSS</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+> the time of the grid in hours, minutes, and seconds</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Variable</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>the variable name</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Nr </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>number of grid rows</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Nc</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>number of grid columns</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Nl</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>number of grid levels</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Proj#</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>the projection number (see "Select by projection..." window)</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>VCS#</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>the vertical coordinate system number (see "Select by VCS...")</TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Filename</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>name of file the grid was found in</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="CH07SEC1.2"
+>Selecting grids for output</A
+></H2
+><P
+> It's often the case that one wants to discard some physical variables or
+ timesteps from the input file so they aren't written to the output file.
+ By default, all variables are selected for output.</P
+><P
+> To select/cull variables, click on the "Select by variable..." button.  
+ A pop-up window will appear which lists all the variables.  
+ The ones that are highlighted are selected for ouput.  
+ Click on variables names to select or deselect them.</P
+><P
+> Similarly, you can select timesteps via the "Select by time..." button.
+ A pop-up window listing all time steps will appear.  
+ Use the mouse to select the time steps you want and unselect the 
+ timesteps you wish to omit.  Note that you can select/deselect a number 
+ of timsteps by just dragging the mouse while holding down the button.</P
+><P
+> Finally, grids may be selected or discarded according to their map
+ projection or vertical coordinate system (VCS) via the "Select by
+ projectiion..." and "Select by VCS... buttons.</P
+><P
+> Note that as you select/deselect timesteps, variables, projections, 
+ or VCSs the effected grids will be high-lighted/unhigh-lighted in 
+ the main grid list.</P
+><P
+> The "Select All" and "Select None" buttons do just what they imply.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="CH07SEC1.3"
+>Defining the output file</A
+></H2
+><P
+> The default parameters for the output file (grid size, projection, etc) 
+ are taken from the first file read in.  
+ You should always review these parameters before making your output 
+ file. It will often be necessary to change these values.</P
+><P
+> The number of rows, columns, and levels for the output file is 
+ specified by the type-in fields on the main window labeld "Rows", 
+ "Columns" and "Max Levels". Type in new values if the defaults are 
+ incorrect.</P
+><P
+> The map projection for the output file can be viewed and changed by
+ clicking on the "Map projection..." button.  In this pop-up window 
+ you'll be able to choose a map projection type then enter the 
+ specific projection parameters.  There is also a "Guess" button 
+ which will attempt to find a reasonable output projection given the 
+ currently selected grid list.  It's often helpful to have the 
+ "Select by Projection" pop-up window on-screen to compare the output 
+ projection to the input projections.</P
+><P
+> The vertical coordinate system for the output file can be viewed and
+ changed by clicking on the "Vertical Coord System..." button.  
+ In this pop-up window you'll be able to choose a vertical coordinate 
+ system type and enter the specific parameters.  This window also has 
+ a "Guess" button to try to find a reasonable default.  
+ Similarly, it's often helpful to have the "Select by VCS" pop-up window 
+ on-screen to compare the output VCS to the input VCSs.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="CH07SEC1.4"
+>Making the output file</A
+></H2
+><P
+> Enter a filename for the output file in the type-in field at the 
+ bottom of the main window then click on "Make".  
+ Messages will be printed as the file conversion takes place.  
+ If there are any errors the process will halt.  Note that generating 
+ the output file can be time-consuming if data must be resampled
+ from the input grid's coordinate system to a new coordinate system 
+ for the output file.</P
+><P
+>     If you click on "Visualize" this will make the file and then automatically
+start up Vis5D on that file (i.e., you don't need to click on "Make" first).  If
+you type a filename in the type-in field, it wil use that name.  Otherwise, it
+will use your login name followed by ".v5d".  If you want command line options
+on the Vis5D command, put them in a file named 
+<TT
+CLASS="FILENAME"
+>vis5d_options</TT
+>.  For example, <TT
+CLASS="PARAMETER"
+><I
+>-mbs 64</I
+></TT
+>.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="CH07SEC1.5"
+>Miscellaneous</A
+></H2
+><P
+>An options window is available by clicking on the "Options..." button.</P
+><P
+>     The first item controls the "combining of co-located data".  It may be the
+case that several 3-D grids, selected for output, are co-located in space and
+time.  When computing the value to put in the output file you can either choose
+the data value from the higher resolution grid at that location, or take the
+average of all grid values at that grid location.</P
+><P
+>     The second item controls how grid data is compressed in the output file.
+By default, grid values are scaled down to 1-byte integers.  Alternately, you
+can scale down to 2-byte integers for better resolution, or perform no
+compression/scaling by selecting 4-byte floating point values.  This option
+respresents a tradeoff in file size and precision.</P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch06sec23.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch07sec2.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Final Notes</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>The v5dimport User Interface Embedded in Vis5D</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

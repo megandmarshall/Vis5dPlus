@@ -1,0 +1,246 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Texture mapping</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Using Vis5D to Visualize Your Data"
+HREF="ch06.html"><LINK
+REL="PREVIOUS"
+TITLE="Saving Image Files and Printing"
+HREF="ch06sec14.html"><LINK
+REL="NEXT"
+TITLE="Tcl scripting"
+HREF="ch06sec16.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch06sec14.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Using Vis5D to Visualize Your Data</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch06sec16.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH06SEC15"
+>Texture mapping</A
+></H1
+><P
+>     Texture mapping is a term from computer graphics which means to display a 2-
+D image over a surface in 3-D.  In Vis5D you can display images over the
+topography (or bottom of the 3-D box when topography is turned off) such as
+satellite or map images.  Texture mapping is only available on SGI systems and
+those using the Mesa library.  Hardware support for texture mapping is highly
+recommended.</P
+><P
+>There are three types of texture/image mapping in Vis5D which can specified on
+the command line or in the 'Options' menu:</P
+><P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><P
+><B
+></B
+></P
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-area N</TT
+></DT
+><DD
+><P
+> N is the number of the first of a sequence of McIDAS area files.
+ The number of files read equals the number of timesteps in your
+ datafile.  Images should all be of the same size.  You must use
+ McIDAS to do remapping if necessary.
+ <DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN2515"
+></A
+><P
+></P
+><P
+> Example:  Suppose your datafile has 4 time steps and you specify
+ <TT
+CLASS="OPTION"
+>-area 100</TT
+>, 
+ then AREA0100, AREA0101, AREA0102 and AREA0103 will be
+ loaded and displayed.
+ </P
+><P
+></P
+></DIV
+>
+ This option needs the McIDAS library which is only 
+ available on SGI systems.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-sequence file</TT
+></DT
+><DD
+><P
+>               This works like the -area option, except that the data come
+               from a very simple file format rather than from McIDAS area
+               files.  The file starts with 3 int's that contain the number of
+               images in the sequence, the number of lines per image, and the
+               number of pixels per line.  The rest of the file contains the
+               images, one byte per pixel.  The function read_texture_sequence
+               in the 
+               <TT
+CLASS="FILENAME"
+>image.c</TT
+> 
+               file of the src directory reads this file and
+               serves as a file format reference for those wishing to create
+               such image sequence files.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-texture file</TT
+></DT
+><DD
+><P
+>               This options specifies a single image to display over the
+               topography for all time steps.  
+               The file format is the SGI RGB
+               format.  The free 
+               <A
+HREF="http://www.trilon.com/xv/"
+TARGET="_top"
+>               XV program 
+               </A
+>
+               can be used to convert your image to
+               RGB format.</P
+></DD
+></DL
+></DIV
+></P
+><P
+>When a texture map is available the TEXTURE button on the control panel is used
+to toggle the display of the imagery on or off.</P
+><P
+>     Note these command line options can be used with each data set named on the
+command line, and can be entered under Options for each display in the display
+widget window described in <A
+HREF="ch06sec20.html"
+>Section 6.20</A
+> .</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch06sec14.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch06sec16.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Saving Image Files and Printing</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ch06.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Tcl scripting</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

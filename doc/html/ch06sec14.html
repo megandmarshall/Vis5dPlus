@@ -1,0 +1,286 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Saving Image Files and Printing</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Using Vis5D to Visualize Your Data"
+HREF="ch06.html"><LINK
+REL="PREVIOUS"
+TITLE="Making New Variables"
+HREF="ch06sec13.html"><LINK
+REL="NEXT"
+TITLE="Texture mapping"
+HREF="ch06sec15.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch06sec13.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Using Vis5D to Visualize Your Data</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch06sec15.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH06SEC14"
+>Saving Image Files and Printing</A
+></H1
+><P
+>     The SAVE PIC button on the control panel can be used to save the image in
+the 3-D or sounding window to a file.  If you are in 'Sounding' mode the
+sounding window will be saved, any other mode will save the 3-D window
+(including all displays if multiple displays exist).  When you click on SAVE PIC
+a pop-up window appears in which you can select the file format and filename.
+The choices of file formats depends on the computer you're using or whether or
+not you have the 'convert' program installed.  The formats supported by Vis5D
+are:</P
+><P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2472"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>XWD </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>X Window Dump, displayable with xwud or xv. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>RGB </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>SGI image file format, displayable with ipaste or xv. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>GIF </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Standard GIF format, displayable with xv and many other programs.
+		 </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>PostScript </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>may be printed or viewed on-screen with a program like ghostview.
+		 </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Color PostScript </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>may be printed or viewed with a ghostview-like program. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>PPM </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>standard unix file format. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>TGA </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>only available with the 'convert' program </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+><P
+>     It is recomended that the 'convert' program be downloaded.  This ensures
+more save file formats and in some cases produces higher quality save pictures.
+ImageMagick's 'convert' program can be downloaded at:
+   ftp://ftp.wizards.dupont.com/pub/Imagemagick
+and the www page is
+   http://www.wizards.dupont.com/cristy/ImageMagick.html
+Once the 'convert' binary has been downloaded or compiled it has to be placed in
+a directory 'util' where vis5d is being run.  For example if you are running
+vis5d from '/usr/home/jane' then the convert program must be placed in
+'/usr/home/jane/util'.</P
+><P
+>     Configurations of Vis5D  using OpenGL directly write XWD files.  The
+following methods are used if no 'convert' program is present.  To make an RGB
+file the fromxwd program is used.  Unfortunately, the fromxwd program shipped by
+SGI has a bug which causes it to fail.  Since source code for fromxwd is shipped
+with IRIX we include a patched version which works correctly.  To make a gif
+file requires both fromxwd and togif (only available on SGI systems).  To make a
+grayscale PostScript file requires the xpr utility (standard with X11).  To make
+a color PostScript file the tops program is needed (only available on SGI
+systems).</P
+><P
+>     If you don't have any of the utilities mentioned above you should try using 
+<A
+HREF="http://www.trilon.com/xv/"
+TARGET="_top"
+>xv </A
+>
+to convert your image files.</P
+><P
+>     To print a Vis5D image, position the mouse pointer over the 3-D window and
+press the 
+<B
+CLASS="KEYCAP"
+>P</B
+> key.  If you are in 'Sounding' mode the sounding window will be
+printed, any other mode and the 3-D window will be printed.  You'll be asked to
+verify your action.  Vis5D uses lpr to send a PostScript image file to the
+default printer or the printer specified by the PRINTER environment variable.
+To generate the PostScript file Vis5D uses the utilities described above.  If
+you have problems printing you should try to first save your image as a
+PostScript file then try to print it manually using lpr or lp.  Another option
+is to save your image as an XWD file then use xpr (a standard X11 utility) to
+convert it to PostScript and print it.</P
+><P
+>     To learn more about the xwud, xpr, fromxwd, tops and togif program read the
+man pages.  Many of these programs have options which you may find useful.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch06sec13.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch06sec15.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Making New Variables</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ch06.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Texture mapping</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -46,7 +46,7 @@ extern void free_grid_cache( Context ctx );
 
 extern int open_gridfile( Context ctx, const char filename[] );
 
-extern int init_grid_cache( Context ctx, int maxbytes, float *ratio );
+extern int init_grid_cache( Context ctx, PTRINT maxbytes, float *ratio );
 
 extern void preload_cache( Context ctx );
 

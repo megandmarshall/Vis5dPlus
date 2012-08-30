@@ -160,15 +160,20 @@ int find_best_visual( Display *dpy, int scr, int *depth, Visual **visual,
  */
 void init_graphics( void )
 {
+  extern void check_opendisplay(int which, Display **testdpy);
    /* open the default display */
    GfxDpy = XOpenDisplay( NULL );
-   SndDpy = GfxDpy; 
-   if (!GfxDpy) {
-      printf("Unable to open default display\n");
-      exit(1);
+  check_opendisplay(0,&GfxDpy); // JCM
+  
+  if(very_off_screen_rendering==1){
+    
+    
    }
+  else{
+
+    SndDpy = GfxDpy; 
   if (!SndDpy) {
-      printf("Unable to open sound display\n");
+      printf("Unable to open sound display: init_graphics()\n");
       exit(1);
    }
 
@@ -182,14 +187,19 @@ void init_graphics( void )
    SndScrWidth = DisplayWidth( SndDpy, SndScr );
    SndScrHeight = DisplayHeight( SndDpy, SndScr );
 
-   /* Do library-specific initializations */
-   init_graphics2();
-
    /* While some graphics libraries don't need this, others do and the
     * X/GUI stuff always does.
     */
    find_best_visual( GfxDpy, GfxScr, &GfxDepth, &GfxVisual, &GfxColormap );
    find_best_visual( SndDpy, SndScr, &SndDepth, &SndVisual, &SndColormap );
+
+  }
+
+
+  /* Do library-specific initializations */
+  init_graphics2();
+
+
 }
 
 

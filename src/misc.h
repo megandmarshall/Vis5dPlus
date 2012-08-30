@@ -37,7 +37,7 @@
 
 extern void die( char *msg );
 
-extern float round( float x );
+extern float v5dround( float x );
 
 extern int which( char *file, char *fullpath );
 

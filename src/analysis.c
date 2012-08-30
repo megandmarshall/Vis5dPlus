@@ -106,6 +106,26 @@ int find_analysis_functions( char *path, char FuncName[][1000] )
    return numfuncs;
 }
 
+#define ibm
+/*** unlink_socket_name ***********************************************
+   Delete the named socket from the filesystem.  The reason we can't
+   just use unlink() is because the IBM RS/6000 for some unknown reason
+   truncates the socket filename by 1 character after it has been bound
+   to its socket (dumb)!
+**********************************************************************/
+static int unlink_socket_name( char *name )
+{
+#ifdef ibm
+   char name2[1000];
+
+   strcpy( name2, name );
+   name2[ strlen(name2)-1 ] = '\0';
+   return unlink(name2);
+#else
+   return unlink(name);
+#endif
+}
+
 
 /*** start_external_function ******************************************
    Start a new process (i.e. begin executing the named program)
@@ -123,6 +143,7 @@ static int start_external_function( Context ctx, char *progname )
 
    /* first delete the socket's name if it exists */
    unlink ( SOCK_NAME );
+   unlink_socket_name( SOCK_NAME );
 
    /* make the socket */
    s = socket( PF_UNIX, SOCK_STREAM, 0 );
@@ -134,7 +155,13 @@ static int start_external_function( Context ctx, char *progname )
    /* bind the socket to its name */
    strcpy( addr.sun_path, SOCK_NAME );
    addr.sun_family = AF_UNIX;
+#ifdef ibm
+     if ( bind( s, (struct sockaddr *) &addr,
+              strlen(addr.sun_path)+sizeof(addr.sun_family) ) < 0 ) {
+#else
    if ( bind(s, (struct sockaddr *) &addr, sizeof(addr)) < 0 ) {
+              strlen(addr.sun_path)+sizeof(addr.sun_family) ) < 0 ) {
+#endif
       perror("External Function Error: Couldn't bind socket to name:");
       return -1;
    }

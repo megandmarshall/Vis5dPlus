@@ -68,8 +68,9 @@
 
 
 /* Default directory to search for user functions: */
-#define FUNCTION_PATH "userfuncs"
-
+/*  #define FUNCTION_PATH "userfuncs" */
+/*  #define FUNCTION_PATH "/Users/mansell/vis5d+-1.3.0/userfuncs" */
+#define FUNCTION_PATH "/usr/local/share/vis5d+/userfuncs"
 
 /* Default animation rate in milliseconds: */
 #define ANIMRATE 100
@@ -90,6 +91,9 @@
 /**********************************************************************/
 /**********************************************************************/
 
+// comment below if don't want to debug memory issues
+//#define DEBUG_MEM
+
 /*
  * Define BIG_GFX to allow larger isosurfaces, contour slices, etc. if
  * there's enough memory.
@@ -97,7 +101,7 @@
 #  define BIG_GFX
 #endif
  */
-
+// JCM:
 #define BIG_GFX
 
 

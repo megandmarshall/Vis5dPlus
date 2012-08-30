@@ -1399,12 +1399,8 @@ void end_aa_pass( int n )
 
 
 void draw_isosurface( int n,
-#ifdef BIG_GFX
-                      uint_4 *index,
-#else
-                      uint_2 *index,
-#endif
-                      int_2 verts[][3],
+                      uint_vert2 *index,
+                      int_vert2 verts[][3],
                       int_1 norms[][3],
                       unsigned int color )
 {
@@ -1458,12 +1454,8 @@ void draw_isosurface( int n,
 
 
 void draw_colored_isosurface( int n,
-#ifdef BIG_GFX
-                              uint_4 *index,
-#else
-                              uint_2 *index,
-#endif
-                              int_2 verts[][3],
+                              uint_vert2 *index,
+                              int_vert2 verts[][3],
                               int_1 norms[][3],
                               uint_1 color_indexes[],
                               unsigned int color_table[],
@@ -1536,7 +1528,7 @@ void draw_colored_isosurface( int n,
 }
 
 
-void draw_triangle_strip( int n, int_2 verts[][3], int_1 norms[][3],
+void draw_triangle_strip( int n, int_vert2 verts[][3], int_1 norms[][3],
                           unsigned int color )
 {
     register int i, index, remaining_points;
@@ -1583,7 +1575,7 @@ void draw_triangle_strip( int n, int_2 verts[][3], int_1 norms[][3],
 
 
 void draw_colored_triangle_strip( int n,
-                                  int_2 verts[][3], int_1 norms[][3],
+                                  int_vert2 verts[][3], int_1 norms[][3],
                                   uint_1 color_indexes[],
                                   unsigned int color_table[] )
 {
@@ -1645,7 +1637,7 @@ void draw_colored_triangle_strip( int n,
 }
 
 
-void draw_color_quadmesh( int rows, int columns, int_2 verts[][3],
+void draw_color_quadmesh( int rows, int columns, int_vert2 verts[][3],
                           uint_1 color_indexes[], unsigned int color_table[],
                           int alphavalue )
 {
@@ -1754,7 +1746,7 @@ void draw_lit_color_quadmesh( int rows, int columns,
 }
 
 
-void draw_wind_lines( int nvectors, int_2 verts[][3], unsigned int color )
+void draw_wind_lines( int nvectors, int_vert2 verts[][3], unsigned int color )
 {
    int i, j;
    PEXCoord vertex_data[3];
@@ -1785,7 +1777,7 @@ void draw_wind_lines( int nvectors, int_2 verts[][3], unsigned int color )
 
 
 
-void draw_disjoint_lines( int n, int_2 verts[][3], unsigned int color )
+void draw_disjoint_lines( int n, int_vert2 verts[][3], unsigned int color )
 {
    int i;
    PEXCoord vertex_data[2];
@@ -1807,7 +1799,7 @@ void draw_disjoint_lines( int n, int_2 verts[][3], unsigned int color )
 
 
 
-void draw_polylines( int n, int_2 verts[][3], unsigned int color )
+void draw_polylines( int n, int_vert2 verts[][3], unsigned int color )
 {
     register int i, index, remaining_points;
     PEXCoord vertex_data[VERTS_PER_CALL];
@@ -1841,7 +1833,7 @@ void draw_polylines( int n, int_2 verts[][3], unsigned int color )
 
 
 
-void draw_colored_polylines( int n, int_2 verts[][3],
+void draw_colored_polylines( int n, int_vert2 verts[][3],
                              uint_1 color_indexes[],
                              unsigned int color_table[] )
 {

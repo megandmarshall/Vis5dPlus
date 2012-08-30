@@ -58,6 +58,18 @@
 #include <sys/stat.h>
 #include "xdump.h"
 
+// JCM:
+#if(USEVERTINT)
+// use int vertex
+#define myglRrasterPosv glRasterPos3iv
+#define myglVertex3v glVertex3iv
+#else
+// use byte vertex
+#define myglRrasterPosv glRasterPos3sv
+#define myglVertex3v glVertex3sv
+#endif
+
+
 GLuint v5d_glGenLists(GLsizei  cnt);
 
 extern int vis5d_verbose;
@@ -345,6 +357,7 @@ int make_3d_window( Display_Context dtx, const char *title, int xpos, int ypos,
    }
 
 	dtx->StereoEnabled = 0;
+	dtx->FakeStereoEye = -1;
    if(GfxStereoEnabled){
 	  int size_attrib_list = sizeof(attrib_list)/sizeof(int);
 	  int stereo_attrib_list[(sizeof(attrib_list)/sizeof(int))+1];
@@ -952,6 +965,18 @@ void set_3d( int perspective, float frontclip, float zoom, float *modelmat)
    check_gl_error("end set_3d");
 
    glViewport(0, 0,width,height);
+
+
+   if(1){
+     // JCM
+     glEnable(GL_POINT_SMOOTH);
+     glEnable(GL_LINE_SMOOTH);
+     glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);	// Make round points, not square points
+     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);		// Antialias the lines
+     glEnable(GL_BLEND);
+     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+   }
+
 }
 
 
@@ -1682,7 +1707,7 @@ void set_transparency( int alpha )
 
 void generate_isosurface( int n,
 								  uint_index *index,
-								  int_2 verts[][3],
+								  int_vert2 verts[][3],
 								  int_1 norms[][3],
 								  int	draw_triangles,
 								  GLuint *list )
@@ -1703,7 +1728,7 @@ void generate_isosurface( int n,
 	 glBegin(GL_TRIANGLES);
 	 for (i=0;i<n;i++) {
 		glNormal3bv( (GLbyte *) norms[i] );
-		glVertex3sv( verts[i] );
+		myglVertex3v( verts[i] );
 	 }
 	 glEnd();
   }
@@ -1714,7 +1739,7 @@ void generate_isosurface( int n,
 		for (i=0;i<n;i++) {
 		  int j = index[i];
 		  glNormal3bv( (GLbyte *) norms[j] );
-		  glVertex3sv( verts[j] );
+		  myglVertex3v( verts[j] );
 		}
 		glEnd();
 	 }  
@@ -1728,7 +1753,7 @@ void generate_isosurface( int n,
 
 void draw_isosurface( int n,
                       uint_index *index,
-                      int_2 verts[][3],
+                      int_vert2 verts[][3],
                       int_1 norms[][3],
 							 int	draw_triangles,
                       unsigned int color, GLuint *list, int listtype )
@@ -1763,7 +1788,7 @@ void draw_isosurface( int n,
 	 glBegin(GL_TRIANGLES);
 	 for (i=0;i<n;i++) {
 		glNormal3bv( (GLbyte *) norms[i] );
-		glVertex3sv( verts[i] );
+		myglVertex3v( verts[i] );
 	 }
 	 glEnd();
   }
@@ -1774,7 +1799,7 @@ void draw_isosurface( int n,
 		 for (i=0;i<n;i++) {
 			int j = index[i];
 			glNormal3bv( (GLbyte *) norms[j] );
-			glVertex3sv( verts[j] );
+			myglVertex3v( verts[j] );
 		 }
 		 glEnd();
 	  }
@@ -1793,7 +1818,7 @@ void draw_isosurface( int n,
 
 void draw_colored_isosurface( int n,
                               uint_index *index,
-                              int_2 verts[][3],
+                              int_vert2 verts[][3],
                               int_1 norms[][3],
 										int	draw_triangles,
                               uint_1 color_indexes[],
@@ -1823,7 +1848,7 @@ void draw_colored_isosurface( int n,
 	  for (i=0;i<n;i++) {
 		 glColor4ubv( (GLubyte *) &color_table[color_indexes[i]] );
 		 glNormal3bv( (GLbyte *) norms[i] );
-		 glVertex3sv( verts[i] );
+		 myglVertex3v( verts[i] );
 	  }
 	  glEnd();
 	}else 
@@ -1835,7 +1860,7 @@ void draw_colored_isosurface( int n,
 			unsigned int k = color_indexes[j];
 			glColor4ubv( (GLubyte *) &color_table[k] );
 			glNormal3bv( (GLbyte *) norms[j] );
-			glVertex3sv( verts[j] );
+			myglVertex3v( verts[j] );
 		 }
 		 glEnd();
 	  }
@@ -1843,7 +1868,7 @@ void draw_colored_isosurface( int n,
 
    glDisable( GL_LIGHTING );
    glDisable( GL_COLOR_MATERIAL );
-   glDisable( GL_BLEND );
+   glDisable( GL_BLEND ); // JCM (note that alpha blending with iso's works between iso's but not with volume renderings since not drawn back-to-front together
    glDisable( GL_POLYGON_STIPPLE );
    glDisable( GL_ALPHA_TEST );
    check_gl_error("draw_colored_isosurface");
@@ -1852,7 +1877,7 @@ void draw_colored_isosurface( int n,
 
 
 
-void draw_triangle_strip( int n, int_2 verts[][3], int_1 norms[][3],
+void draw_triangle_strip( int n, int_vert2 verts[][3], int_1 norms[][3],
                           unsigned int color )
 {
    int i;
@@ -1875,7 +1900,7 @@ void draw_triangle_strip( int n, int_2 verts[][3], int_1 norms[][3],
    GLBEGINNOTE glBegin( GL_TRIANGLE_STRIP );
    for (i=0;i<n;i++) {
       glNormal3bv( (GLbyte *) norms[i] );
-      glVertex3sv( verts[i] );
+      myglVertex3v( verts[i] );
    }
    glEnd();
 
@@ -1891,7 +1916,7 @@ void draw_triangle_strip( int n, int_2 verts[][3], int_1 norms[][3],
 
 
 void draw_colored_triangle_strip( int n,
-                                  int_2 verts[][3], int_1 norms[][3],
+                                  int_vert2 verts[][3], int_1 norms[][3],
                                   uint_1 color_indexes[],
                                   unsigned int color_table[], int alpha )
 {
@@ -1936,7 +1961,7 @@ void draw_colored_triangle_strip( int n,
       /* MJK 12.4.98 */
       glNormal3bv( norms[i]);
 
-      glVertex3sv( verts[i] );
+      myglVertex3v( verts[i] );
    }
    glEnd();
 
@@ -1970,7 +1995,7 @@ void color_quadmesh_texture_object(GLuint *texture, GLubyte *color_table )
 
 
 
-void draw_color_quadmesh( int rows, int columns, int_2 verts[][3],
+void draw_color_quadmesh( int rows, int columns, int_vert2 verts[][3],
                           uint_1 color_indexes[], unsigned int color_table[], 
 								  int texture_method, GLuint *list, int listtype )
 {
@@ -2014,9 +2039,9 @@ void draw_color_quadmesh( int rows, int columns, int_2 verts[][3],
 		GLBEGINNOTE glBegin( GL_QUAD_STRIP );
 		for (j=0;j<columns;j++) {
 		  glTexCoord1i( (GLint) color_indexes[base1+j] );
-		  glVertex3sv( verts[base1+j] );
+		  myglVertex3v( verts[base1+j] );
 		  glTexCoord1i( (GLint) color_indexes[base2+j] );
-		  glVertex3sv( verts[base2+j] );
+		  myglVertex3v( verts[base2+j] );
 		}
 		glEnd();
 	 }
@@ -2040,9 +2065,9 @@ void draw_color_quadmesh( int rows, int columns, int_2 verts[][3],
       GLBEGINNOTE glBegin( GL_QUAD_STRIP );
       for (j=0;j<columns;j++) {
 		  glArrayElement(color_indexes[base1+j]);
-        glVertex3sv( verts[base1+j] );
+        myglVertex3v( verts[base1+j] );
 		  glArrayElement(color_indexes[base2+j]);
-        glVertex3sv( verts[base2+j] );
+        myglVertex3v( verts[base2+j] );
       }
       glEnd();
 	 }
@@ -2135,7 +2160,7 @@ void draw_lit_color_quadmesh( int rows, int columns,
 
 
 
-void draw_wind_lines( int nvectors, int_2 verts[][3], unsigned int color )
+void draw_wind_lines( int nvectors, int_vert2 verts[][3], unsigned int color )
 {
    int i, j;
 
@@ -2152,13 +2177,13 @@ void draw_wind_lines( int nvectors, int_2 verts[][3], unsigned int color )
    for (i=0;i<nvectors;i++) {
       j = i * 4;
       /* main vector */
-      glVertex3sv( verts[j] );
-      glVertex3sv( verts[j+1] );
+      myglVertex3v( verts[j] );
+      myglVertex3v( verts[j+1] );
       /* head vectors */
-      glVertex3sv( verts[j+1] );
-      glVertex3sv( verts[j+2] );
-      glVertex3sv( verts[j+1] );
-      glVertex3sv( verts[j+3] );
+      myglVertex3v( verts[j+1] );
+      myglVertex3v( verts[j+2] );
+      myglVertex3v( verts[j+1] );
+      myglVertex3v( verts[j+3] );
    }
    glEnd();
 
@@ -2168,7 +2193,7 @@ void draw_wind_lines( int nvectors, int_2 verts[][3], unsigned int color )
    check_gl_error("draw_wind_lines");
 }
 
-void generate_labels(int n, char *str, int_2 verts[][3], GLuint *list)
+void generate_labels(int n, char *str, int_vert2 verts[][3], GLuint *list)
 {
   int i, len;
 
@@ -2196,7 +2221,7 @@ void generate_labels(int n, char *str, int_2 verts[][3], GLuint *list)
   
 
 
-void plot_strings( int n, char *str, int_2 verts[][3], unsigned int color, GLuint fontbase )
+void plot_strings( int n, char *str, int_vert2 verts[][3], unsigned int color, GLuint fontbase )
 {
   int i;
   int len;
@@ -2215,7 +2240,7 @@ void plot_strings( int n, char *str, int_2 verts[][3], unsigned int color, GLuin
 
   for(i=0;i<n;i++){
 	 len = strlen(str);
-	 glRasterPos3sv(verts[i]);
+	 myglRrasterPosv(verts[i]);
 	 glCallLists(len, GL_UNSIGNED_BYTE, (GLubyte *) str);
 	 str+=(len+1);
   }
@@ -2223,7 +2248,7 @@ void plot_strings( int n, char *str, int_2 verts[][3], unsigned int color, GLuin
   glPopMatrix();
 }
 
-void generate_disjoint_lines(int n, int_2 verts[][3], GLuint *list )
+void generate_disjoint_lines(int n, int_vert2 verts[][3], GLuint *list )
 {
   int i;
 
@@ -2234,13 +2259,13 @@ void generate_disjoint_lines(int n, int_2 verts[][3], GLuint *list )
   }
   glNewList(*list,GL_COMPILE);
   GLBEGINNOTE glBegin( GL_LINES );
-  for(i=0;i<n;i++) glVertex3sv(verts[i]);
+  for(i=0;i<n;i++) myglVertex3v(verts[i]);
   glEnd();
   glEndList();
 }
 	 
 
-void draw_disjoint_lines( int n, int_2 verts[][3], unsigned int color, 
+void draw_disjoint_lines( int n, int_vert2 verts[][3], unsigned int color, 
 								 GLuint *list, int listtype )
 {
    int i;
@@ -2268,7 +2293,7 @@ void draw_disjoint_lines( int n, int_2 verts[][3], unsigned int color,
 	if(vis5d_verbose & VERBOSE_OPENGL) printf("draw_disjoint_lines %d\n",n);
 
    GLBEGINNOTE glBegin( GL_LINES );
-	for(i=0;i<n;i++) glVertex3sv(verts[i]);
+	for(i=0;i<n;i++) myglVertex3v(verts[i]);
    glEnd();
 
    glShadeModel( GL_SMOOTH );
@@ -2279,7 +2304,7 @@ void draw_disjoint_lines( int n, int_2 verts[][3], unsigned int color,
 }
 
 
-void draw_colored_disjoint_lines( int n, int_2 verts[][3],
+void draw_colored_disjoint_lines( int n, int_vert2 verts[][3],
                                     uint_1 color_indexes[],
                                     unsigned int color_table[] )
 {
@@ -2292,8 +2317,8 @@ void draw_colored_disjoint_lines( int n, int_2 verts[][3],
    GLBEGINNOTE glBegin( GL_LINES );
    for (i=0;i<n;i+=2 ) {
       glColor4ubv( (GLubyte *) &color_table[color_indexes[i/2]] );
-      glVertex3sv( verts[i] );
-      glVertex3sv( verts[i+1] );
+      myglVertex3v( verts[i] );
+      myglVertex3v( verts[i+1] );
    }
    glEnd();
    glPopMatrix();
@@ -2302,60 +2327,70 @@ void draw_colored_disjoint_lines( int n, int_2 verts[][3],
 
 
 
-void draw_polylines( int n, int_2 verts[][3], unsigned int color )
+// used for traj
+void draw_polylines( int n, int_vert2 verts[][3], unsigned int color )
 {
    int i;
 
    glColor4ubv( (GLubyte *) &color );
    glShadeModel( GL_FLAT );
    glDisable( GL_DITHER );
+   glDisable( GL_BLEND ); // JCM
 
    	glPushMatrix();
    glScalef( 1.0/VERTEX_SCALE, 1.0/VERTEX_SCALE, 1.0/VERTEX_SCALE );
 	
-   
+   glLineWidth(3); // JCM
    GLBEGINNOTE glBegin( GL_LINE_STRIP );
    for (i=0;i<n;i++ ) {
-      glVertex3sv( verts[i] );
+      myglVertex3v( verts[i] );
    }
    glEnd();
    glPopMatrix();
    glShadeModel( GL_SMOOTH );
    glEnable( GL_DITHER );
+   glEnable( GL_BLEND ); // JCM
+   glLineWidth(1); // JCM
    check_gl_error("draw_polylines");
 }
 
 
-
-void draw_colored_polylines( int n, int_2 verts[][3],
+// used for traj
+void draw_colored_polylines( int n, int_vert2 verts[][3],
                              uint_1 color_indexes[],
                              unsigned int color_table[] )
 {
    int i;
 
+   glDisable( GL_BLEND ); // JCM
 	glPushMatrix();
    glScalef( 1.0/VERTEX_SCALE, 1.0/VERTEX_SCALE, 1.0/VERTEX_SCALE );
 	
    
+   glLineWidth(3); // JCM
    GLBEGINNOTE glBegin( GL_LINE_STRIP );
    for (i=0;i<n;i++ ) {
       glColor4ubv( (GLubyte *) &color_table[color_indexes[i]] );
-      glVertex3sv( verts[i] );
+      myglVertex3v( verts[i] );
    }
    glEnd();
    glPopMatrix();
+   glEnable( GL_BLEND ); // JCM
+   glLineWidth(1); // JCM
    check_gl_error("draw_colored_polylines");
 }
 
 
 
 
+// used for box
 void draw_multi_lines( int n, float verts[][3], unsigned int color )
 {
    int i;
 
    glColor4ubv( (GLubyte *) &color );
-
+   //   glDisable( GL_BLEND ); // JCM
+   glLineWidth(1); // JCM
    
    GLBEGINNOTE glBegin( GL_LINE_STRIP );
    for (i=0;i<n;i++ ) {
@@ -2369,6 +2404,7 @@ void draw_multi_lines( int n, float verts[][3], unsigned int color )
       }
    }
    glEnd();
+   //   glEnable( GL_BLEND ); // JCM
 
    check_gl_error("draw_multi_lines");
 }

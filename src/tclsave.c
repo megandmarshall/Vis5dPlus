@@ -68,7 +68,7 @@ static int get_colorbar_params( int index, int graphic, int vindex, int var,
    int same;
 
    vis5d_get_color_table_params( index, graphic, vindex, var, &p ); 
-   for (i=0; i<7; i++) params[i] = p[i];
+   for (i=0; i<NUMCOLORTABLEPARAMS; i++) params[i] = p[i];
 
    /*
     * This is tricky.  Compare the graphic's color table to one computed
@@ -133,23 +133,23 @@ int tcl_save( int index, const char *savefile )
       /* misc colors */
       fprintf(f,"\n#Box color\n");
       vis5d_get_color( index, VIS5D_BOX, 0, &r, &g, &b, &a );
-      fprintf(f,"vis5d_set_color $dtx VIS5D_BOX 0 %5.3f %5.3f %5.3f %5.3f\n",
+      fprintf(f,"vis5d_set_color $dtx VIS5D_BOX 0 %15.7g %15.7g %15.7g %15.7g\n",
               r,g,b,a );
 
       fprintf(f,"\n#Light map color\n");
       vis5d_get_color( index, VIS5D_LIGHT_MAP, 0, &r, &g, &b, &a );
-      fprintf(f,"vis5d_set_color $dtx VIS5D_LIGHT_MAP 0 %5.3f %5.3f %5.3f %5.3f\n",
+      fprintf(f,"vis5d_set_color $dtx VIS5D_LIGHT_MAP 0 %15.7g %15.7g %15.7g %15.7g\n",
               r,g,b,a );
 
       fprintf(f,"\n#Dark map color\n");
       vis5d_get_color( index, VIS5D_DARK_MAP, 0, &r, &g, &b, &a );
-      fprintf(f,"vis5d_set_color $dtx VIS5D_DARK_MAP 0 %5.3f %5.3f %5.3f %5.3f\n",
+      fprintf(f,"vis5d_set_color $dtx VIS5D_DARK_MAP 0 %15.7g %15.7g %15.7g %15.7g\n",
               r,g,b,a );
 
       fprintf(f,"\n#Background color\n");
       vis5d_get_color( index, VIS5D_BACKGROUND, 0, &r, &g, &b, &a );
       fprintf(f,
-              "vis5d_set_color $dtx VIS5D_BACKGROUND 0 %5.3f %5.3f %5.3f %5.3f\n",
+              "vis5d_set_color $dtx VIS5D_BACKGROUND 0 %15.7g %15.7g %15.7g %15.7g\n",
               r,g,b,a );
 
       /* Text labels */
@@ -453,21 +453,9 @@ int tcl_save( int index, const char *savefile )
       fprintf(f, "\n#Current Display Volume\n");
       {
          int current_vol_owner, current_vol;
-         vis5d_get_volume(index, &current_vol_owner, &current_vol);
-         if (current_vol_owner > -1 && current_vol > -1){
-/* WLH 16 Nov 98
-            fprintf(f,"vis5d_set_volume_and_owner $dtx %d %d\n", current_vol_owner,
-                       current_vol);
-*/
-            /* WLH 16 Nov 98 */
-            if (current_vol_owner == cwhichones[0]) {
-              fprintf(f,"vis5d_set_volume_and_owner $dtx $ctx %d\n", current_vol);
-            }
-            else {
-              fprintf(f,"vis5d_set_volume_and_owner $dtx %d %d\n", current_vol_owner,
-                         current_vol);
-            }
-
+         vis5d_get_volume(index, &current_vol_owner, &current_vol); // JCM: Anywhere vis5d_get_volume() is called, have to introduce extra code to deal with more than one volume
+         if (current_vol_owner > -1){
+	   vis5d_printtcl_volume(f, index, current_vol_owner, current_vol, cwhichones[0]); // JCM
          }
          else{
            fprintf(f,"vis5d_set_volume_and_owner $dtx -1 -1\n");
@@ -598,12 +586,12 @@ int tcl_save( int index, const char *savefile )
          vis5d_get_ctx_var_name( vindex, var, varname );
          if (vindex == cwhichones[0]) {
            fprintf(f,
-             "vis5d_set_color $dtx VIS5D_ISOSURF $ctx \"%s\" %5.3f %5.3f %5.3f %5.3f\n",
+             "vis5d_set_color $dtx VIS5D_ISOSURF $ctx \"%s\" %15.7g %15.7g %15.7g %15.7g\n",
              varname, r,g,b,a );
          }
          else {
            fprintf(f,
-             "vis5d_set_color $dtx VIS5D_ISOSURF %d \"%s\" %5.3f %5.3f %5.3f %5.3f\n",
+             "vis5d_set_color $dtx VIS5D_ISOSURF %d \"%s\" %15.7g %15.7g %15.7g %15.7g\n",
              vindex, varname, r,g,b,a );
          }
       }
@@ -615,12 +603,12 @@ int tcl_save( int index, const char *savefile )
          vis5d_get_ctx_var_name( vindex, var, varname );
          if (vindex == cwhichones[0]) {
            fprintf(f,
-               "vis5d_set_color $dtx VIS5D_HSLICE $ctx \"%s\" %5.3f %5.3f %5.3f %5.3f\n",
+               "vis5d_set_color $dtx VIS5D_HSLICE $ctx \"%s\" %15.7g %15.7g %15.7g %15.7g\n",
                varname, r,g,b,a );
          }
          else {
            fprintf(f,
-               "vis5d_set_color $dtx VIS5D_HSLICE %d \"%s\" %5.3f %5.3f %5.3f %5.3f\n",
+               "vis5d_set_color $dtx VIS5D_HSLICE %d \"%s\" %15.7g %15.7g %15.7g %15.7g\n",
                vindex, varname, r,g,b,a );
          }
       }
@@ -632,12 +620,12 @@ int tcl_save( int index, const char *savefile )
          vis5d_get_ctx_var_name( vindex, var, varname );
          if (vindex == cwhichones[0]) {
            fprintf(f,
-              "vis5d_set_color $dtx VIS5D_VSLICE $ctx \"%s\" %5.3f %5.3f %5.3f %5.3f\n",
+              "vis5d_set_color $dtx VIS5D_VSLICE $ctx \"%s\" %15.7g %15.7g %15.7g %15.7g\n",
               varname, r,g,b,a );
          }
          else {
            fprintf(f,
-              "vis5d_set_color $dtx VIS5D_VSLICE %d \"%s\" %5.3f %5.3f %5.3f %5.3f\n",
+              "vis5d_set_color $dtx VIS5D_VSLICE %d \"%s\" %15.7g %15.7g %15.7g %15.7g\n",
               vindex, varname, r,g,b,a );
          }
       }
@@ -649,12 +637,12 @@ int tcl_save( int index, const char *savefile )
          vis5d_get_ctx_var_name( vindex, var, varname );
          if (vindex == cwhichones[0]) {
            fprintf(f,
-             "vis5d_set_color $dtx VIS5D_CHSLICE $ctx \"%s\" %5.3f %5.3f %5.3f %5.3f\n",
+             "vis5d_set_color $dtx VIS5D_CHSLICE $ctx \"%s\" %15.7g %15.7g %15.7g %15.7g\n",
              varname, r,g,b,a );
          }
          else {
            fprintf(f,
-             "vis5d_set_color $dtx VIS5D_CHSLICE %d \"%s\" %5.3f %5.3f %5.3f %5.3f\n",
+             "vis5d_set_color $dtx VIS5D_CHSLICE %d \"%s\" %15.7g %15.7g %15.7g %15.7g\n",
              vindex, varname, r,g,b,a );
          }
       }
@@ -666,12 +654,12 @@ int tcl_save( int index, const char *savefile )
          vis5d_get_ctx_var_name( vindex, var, varname );
          if (vindex == cwhichones[0]) {
            fprintf(f,
-            "vis5d_set_color $dtx VIS5D_CVSLICE $ctx \"%s\" %5.3f %5.3f %5.3f %5.3f\n",
+            "vis5d_set_color $dtx VIS5D_CVSLICE $ctx \"%s\" %15.7g %15.7g %15.7g %15.7g\n",
             varname, r,g,b,a );
          }
          else {
            fprintf(f,
-            "vis5d_set_color $dtx VIS5D_CVSLICE %d \"%s\" %5.3f %5.3f %5.3f %5.3f\n",
+            "vis5d_set_color $dtx VIS5D_CVSLICE %d \"%s\" %15.7g %15.7g %15.7g %15.7g\n",
             vindex, varname, r,g,b,a );
          }
       }
@@ -681,7 +669,7 @@ int tcl_save( int index, const char *savefile )
       for (i=0;i<VIS5D_WIND_SLICES;i++) {
          vis5d_get_color( index, VIS5D_HWIND, i, &r, &g, &b, &a );
          fprintf(f,
-                 "vis5d_set_color $dtx VIS5D_HWIND %d %5.3f %5.3f %5.3f %5.3f\n",
+                 "vis5d_set_color $dtx VIS5D_HWIND %d %15.7g %15.7g %15.7g %15.7g\n",
                  i, r,g,b,a );
       }
 
@@ -690,7 +678,7 @@ int tcl_save( int index, const char *savefile )
       for (i=0;i<VIS5D_WIND_SLICES;i++) {
          vis5d_get_color( index, VIS5D_VWIND, i, &r, &g, &b, &a );
          fprintf(f,
-                 "vis5d_set_color $dtx VIS5D_VWIND %d %5.3f %5.3f %5.3f %5.3f\n",
+                 "vis5d_set_color $dtx VIS5D_VWIND %d %15.7g %15.7g %15.7g %15.7g\n",
                  i, r,g,b,a );
       }
 
@@ -699,7 +687,7 @@ int tcl_save( int index, const char *savefile )
       for (i=0;i<VIS5D_WIND_SLICES;i++) {
          vis5d_get_color( index, VIS5D_HSTREAM, i, &r, &g, &b, &a );
          fprintf(f,
-                 "vis5d_set_color $dtx VIS5D_HSTREAM %d %5.3f %5.3f %5.3f %5.3f\n",
+                 "vis5d_set_color $dtx VIS5D_HSTREAM %d %15.7g %15.7g %15.7g %15.7g\n",
                  i, r,g,b,a );
       }
 
@@ -708,7 +696,7 @@ int tcl_save( int index, const char *savefile )
       for (i=0;i<VIS5D_WIND_SLICES;i++) {
          vis5d_get_color( index, VIS5D_VSTREAM, i, &r, &g, &b, &a );
          fprintf(f,
-                 "vis5d_set_color $dtx VIS5D_VSTREAM %d %5.3f %5.3f %5.3f %5.3f\n",
+                 "vis5d_set_color $dtx VIS5D_VSTREAM %d %15.7g %15.7g %15.7g %15.7g\n",
                  i, r,g,b,a );
       }
 
@@ -717,7 +705,7 @@ int tcl_save( int index, const char *savefile )
       for (i=0;i<VIS5D_TRAJ_SETS;i++) {
          int colorvarowner, colorvar;
          vis5d_get_color( index, VIS5D_TRAJ, i, &r, &g, &b, &a );
-         fprintf(f,"vis5d_set_color $dtx VIS5D_TRAJ %d %5.3f %5.3f %5.3f %5.3f\n",
+         fprintf(f,"vis5d_set_color $dtx VIS5D_TRAJ %d %15.7g %15.7g %15.7g %15.7g\n",
                  i, r,g,b,a );
          vis5d_get_trajectory_color_var( index, i, &colorvarowner, &colorvar ); 
          if (colorvar>=0) {
@@ -737,7 +725,7 @@ int tcl_save( int index, const char *savefile )
       for (var=0;var<numvars;var++) {
          unsigned int *ctable;
          char varname[20];
-         float params[8];
+         float params[NUMCOLORTABLEPARAMS];
 
          vis5d_get_ctx_var_name( index, var, varname );
 
@@ -749,8 +737,7 @@ int tcl_save( int index, const char *savefile )
          else {
            fprintf(f,"vis5d_set_color_table_params $dtx VIS5D_ISOSURF %d", vindex);
          }
-         fprintf(f," \"%s\" %.3f %.3f %.3f %.3f\n", varname, params[0], params[1],
-                 params[2], params[3] );
+         output_params(f,varname,params); // JCM
 
          if (k) {
             /* the color table can't be described by the parameters alone */
@@ -777,7 +764,7 @@ int tcl_save( int index, const char *savefile )
       for (var=0;var<numvars;var++) {
          unsigned int *ctable;
          char varname[20];
-         float params[8];
+         float params[NUMCOLORTABLEPARAMS];
 
          vis5d_get_ctx_var_name( index, var, varname );
 
@@ -789,8 +776,8 @@ int tcl_save( int index, const char *savefile )
          else {
            fprintf(f,"vis5d_set_color_table_params $dtx VIS5D_CHSLICE %d ", vindex);
          }
-         fprintf(f," \"%s\" %.3f %.3f %.3f %.3f\n", varname, params[0], params[1],
-                 params[2], params[3] );
+
+         output_params(f,varname,params); // JCM
 
          if (k) {
             /* the color table can't be described by the parameters alone */
@@ -816,7 +803,7 @@ int tcl_save( int index, const char *savefile )
       for (var=0;var<numvars;var++) {
          unsigned int *ctable;
          char varname[20];
-         float params[8];
+         float params[NUMCOLORTABLEPARAMS];
 
          vis5d_get_ctx_var_name( index, var, varname );
 
@@ -828,8 +815,8 @@ int tcl_save( int index, const char *savefile )
          else {
            fprintf(f,"vis5d_set_color_table_params $dtx VIS5D_CVSLICE %d", vindex);
          }
-         fprintf(f," \"%s\" %.3f %.3f %.3f %.3f\n", varname, params[0], params[1],
-                 params[2], params[3] );
+
+         output_params(f,varname,params); // JCM
 
          if (k) {
             /* the color table can't be described by the parameters alone */
@@ -855,7 +842,7 @@ int tcl_save( int index, const char *savefile )
       for (var=0;var<numvars;var++) {
          unsigned int *ctable;
          char varname[20];
-         float params[8];
+         float params[NUMCOLORTABLEPARAMS];
 
          vis5d_get_ctx_var_name( index, var, varname );
 
@@ -867,8 +854,8 @@ int tcl_save( int index, const char *savefile )
          else {
            fprintf(f,"vis5d_set_color_table_params $dtx VIS5D_VOLUME %d", vindex);
          }
-         fprintf(f," \"%s\" %.3f %.3f %.3f %.3f\n", varname, params[0], params[1],
-                 params[2], params[3] );
+	 //	 fprintf(stderr,"%g\n",params[ALPHAVAL]); // DEBUG
+         output_params(f,varname,params); // JCM
 
          if (k) {
             /* the color table can't be described by the parameters alone */
@@ -893,7 +880,7 @@ int tcl_save( int index, const char *savefile )
       fprintf(f,"\n#Trajectory color tables\n");
       for (var=0;var<numvars;var++) {
          unsigned int *ctable;
-         float params[8];
+         float params[NUMCOLORTABLEPARAMS];
 
          vis5d_get_ctx_var_name( index, var, varname );
          k = get_colorbar_params( index, VIS5D_TRAJ, vindex, var, params );
@@ -904,8 +891,8 @@ int tcl_save( int index, const char *savefile )
          else {
            fprintf(f,"vis5d_set_color_table_params $dtx VIS5D_TRAJ %d", vindex);
          }
-         fprintf(f," \"%s\" %.3f %.3f %.3f %.3f\n", varname, params[0], params[1],
-                 params[2], params[3] );
+
+         output_params(f,varname,params); // JCM
 
          if (k) {
             /* the color table can't be described by the parameters alone */
@@ -928,20 +915,20 @@ int tcl_save( int index, const char *savefile )
 
 
       /* MJK 12.04.98 begin */
-      if (vis5d_enable_sfc_map (index, VIS5D_GET) == VIS5D_ON){
+ /*     if (vis5d_enable_sfc_map (index, VIS5D_GET) == VIS5D_ON){
          fprintf (f,"vis5d_enable_sfc_map $dtx VIS5D_ON\n");
       }
       else{
          fprintf (f,"vis5d_enable_sfc_map $dtx VIS5D_OFF\n");
       }
-      /* MJK 12.04.98 end */
+   */   /* MJK 12.04.98 end */
 
 
       /* Topography color tables */
       fprintf(f,"\n#Topography color tables\n");
       for (var=-1;var<numvars;var++) {
          unsigned int *ctable;
-         float params[8];
+         float params[NUMCOLORTABLEPARAMS];
 
          if (var>=0) {
             vis5d_get_ctx_var_name( index, var, varname );
@@ -949,7 +936,7 @@ int tcl_save( int index, const char *savefile )
          }
          else {
             int j;
-            for (j=0; j<8; j++) params[j] = 0;
+            for (j=0; j<NUMCOLORTABLEPARAMS; j++) params[j] = 0;
             strcpy( varname, "-1" );
             k = 1;
          }
@@ -959,8 +946,8 @@ int tcl_save( int index, const char *savefile )
          else {
            fprintf(f,"vis5d_set_color_table_params $dtx VIS5D_TOPO %d", vindex);
          }
-         fprintf(f," \"%s\" %.3f %.3f %.3f %.3f\n", varname, params[0],
-                     params[1], params[2], params[3] );
+
+         output_params(f,varname,params); // JCM
 
          if (k) {
             /* the color table can't be described by the parameters alone */

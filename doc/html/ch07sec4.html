@@ -1,0 +1,194 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Adding support for new file format</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="The v5dimport Utility"
+HREF="ch07.html"><LINK
+REL="PREVIOUS"
+TITLE="Using v5dimport's text interface"
+HREF="ch07sec3.html"><LINK
+REL="NEXT"
+TITLE="Notes on specific file formats"
+HREF="ch07sec5.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch07sec3.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>The v5dimport Utility</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch07sec5.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH07SEC4"
+>Adding support for new file format</A
+></H1
+><P
+>     <B
+CLASS="COMMAND"
+>v5dimport</B
+> was written so that adding code to
+read new file formats should be easy.  The source code for
+<B
+CLASS="COMMAND"
+>v5dimport</B
+> is in the <TT
+CLASS="FILENAME"
+>src/</TT
+>
+subdirectory (see especially <TT
+CLASS="FILENAME"
+>v5dimport.c</TT
+> and
+<TT
+CLASS="FILENAME"
+>file_i.c</TT
+>).  Look for the comment:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>/*** ADD NEW FORMATS HERE ***/ </PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>to see where code has to be added to support a new file format.</P
+><P
+>     Basically, you need to write two new functions.  One which scans your file
+format to build a list of grid_info structs.  The other reads the actual grid
+data from your file given a grid_info struct.  These functions should be put in
+a new file named <TT
+CLASS="FILENAME"
+>read_foo.c</TT
+> 
+where foo is the name of your file format.  Then, update the 
+<TT
+CLASS="FILENAME"
+>file.c</TT
+> file to use your functions.  
+Use the existing <TT
+CLASS="FILENAME"
+>read_*.c</TT
+> files as a guide.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch07sec3.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch07sec5.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Using <B
+CLASS="COMMAND"
+>v5dimport</B
+>'s text interface</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ch07.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Notes on specific file formats</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

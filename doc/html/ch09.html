@@ -1,0 +1,904 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Version History</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="PREVIOUS"
+TITLE="Example McIDAS files and utilities"
+HREF="ch08sec3.html"><LINK
+REL="NEXT"
+TITLE="Acknowledgments"
+HREF="acknowledgments.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch08sec3.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="acknowledgments.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="CH09"
+>Version History</A
+></H1
+><P
+>Descriptions of the latest revisions to Vis5d+ can be found in the
+<A
+HREF="http://vis5d.sourceforge.net/NEWS.html"
+TARGET="_top"
+>online release
+notes</A
+> or in the included <TT
+CLASS="FILENAME"
+>NEWS</TT
+> file.
+Below, we describe the revision history of the original Vis5d.</P
+><P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><P
+><B
+>This is a summary of the versions of Vis5D</B
+></P
+><DL
+><DT
+>1.0 (December 1988)</DT
+><DD
+><P
+>     This was the original version of Vis5D for the Stellar GS-1000.  It was
+     used to give demonstrations at the ECMWF in December 1988 and at the AMS
+     conference in Anahiem in January 1989.  It had the following features:
+     <P
+></P
+><UL
+><LI
+><P
+>          Depict time series of multivariate 3-D grids by animated isosurfaces
+          and horizontal contour line slices.
+     </P
+></LI
+><LI
+><P
+>          World topography map with map boundaries.
+     </P
+></LI
+><LI
+><P
+>          Wind trajectory tracing with the traj5d program.
+     </P
+></LI
+></UL
+></P
+></DD
+><DT
+>2.0 (Fall 1991)</DT
+><DD
+><P
+>     This version was only available for the Stellar GS-1000/2000 and introduced
+     the following features:</P
+><P
+>     <P
+></P
+><UL
+><LI
+><P
+>          Faster isosurface generation.
+     </P
+></LI
+><LI
+><P
+>          Horizontal and vertical slices moved interactively with the mouse.
+     </P
+></LI
+><LI
+><P
+>          Colored slices.
+     </P
+></LI
+><LI
+><P
+>          Interactive wind trajectory creation.
+     </P
+></LI
+><LI
+><P
+>          Ribbon trajectories.
+     </P
+></LI
+><LI
+><P
+>          Label / text annotations.
+     </P
+></LI
+><LI
+><P
+>          "Pretty" rendering option.
+     </P
+></LI
+></UL
+></P
+><P
+>        
+     The format of the compressed grid file was changed slightly with version
+     2.0.  Specifically, the trajectory files of version 1.0 were eliminated,
+     trajectories are now stored in the compressed grid file itself.  Also, the
+     internal storage representation for surfaces and slices has been changed.</P
+></DD
+><DT
+>2.1 (February 1992)</DT
+><DD
+><P
+>     This is the first version of Vis5D available for the SGI and IBM
+     workstations.  It was also modified to use less memory during isosurface
+     generation.</P
+></DD
+><DT
+>2.2 (April 1992)</DT
+><DD
+><P
+>     This version of Vis5D runs on the base SGI Indigo with 8-bit color though
+     some features not available.  It also has the following improvements:
+     </P
+><P
+>     <P
+></P
+><UL
+><LI
+><P
+> 
+          The <TT
+CLASS="PARAMETER"
+><I
+>-box</I
+></TT
+> option for changing the proportions 
+          of the 3-D box (SGI and Stardent only).
+     </P
+></LI
+><LI
+><P
+>          User topography files.  Vis5D now uses the 
+          <TT
+CLASS="FILENAME"
+>EARTH.TOPO</TT
+> file instead of
+          <TT
+CLASS="FILENAME"
+>TOPOHRES</TT
+> to make the map.  
+     </P
+></LI
+><LI
+><P
+>          The <TT
+CLASS="FILENAME"
+>maketopo.c</TT
+> program 
+          shows how to make new .TOPO files.  (SGI and Stardent only)
+     </P
+></LI
+></UL
+></P
+></DD
+><DT
+>3.0 (August 1992)</DT
+><DD
+><P
+>     This version features the following improvements:</P
+><P
+>     <P
+></P
+><UL
+><LI
+><P
+>          Horizontal and vertical wind vector slices.
+     </P
+></LI
+><LI
+><P
+>          Improved SAVE and RESTORE functionality.
+     </P
+></LI
+><LI
+><P
+>          New trajectory widget options.
+     </P
+></LI
+><LI
+><P
+>          Separate map and topography controls.
+     </P
+></LI
+><LI
+><P
+>          CLONE option added.
+     </P
+></LI
+><LI
+><P
+>          Simultaneous colored and contour line slices.
+     </P
+></LI
+><LI
+><P
+>          Improved transparency, <TT
+CLASS="PARAMETER"
+><I
+>PRETTY</I
+></TT
+> option on SGI.
+     </P
+></LI
+><LI
+><P
+>          Same source code for SGI, Stardent, and IBM.
+     </P
+></LI
+><LI
+><P
+>          Improved portability and porting guide added.
+     </P
+></LI
+><LI
+><P
+>          New video and hardcopy convenience features.
+     </P
+></LI
+></UL
+></P
+></DD
+><DT
+>3.1 (July 1993)</DT
+><DD
+><P
+>     New features:</P
+><P
+>     <P
+></P
+><UL
+><LI
+><P
+>          User-written analysis functions.
+     </P
+></LI
+><LI
+><P
+>          SAVE PIC button to save window image to a file.
+     </P
+></LI
+><LI
+><P
+>          Perspective viewing mode.
+     </P
+></LI
+><LI
+><P
+>          New contour line options to draw dashed negative lines and restrict
+          contouring to a specific range of values.
+     </P
+></LI
+><LI
+><P
+>          Data Probe mode.
+     </P
+></LI
+><LI
+><P
+>          Topography color editing.
+     </P
+></LI
+><LI
+><P
+>          Grid compression done layer-by-layer.
+     </P
+></LI
+></UL
+></P
+></DD
+><DT
+>3.2 (August 1993)</DT
+><DD
+><P
+>     New features and changes:</P
+><P
+>     <P
+></P
+><UL
+><LI
+><P
+>          Volumetric rendering on SGI systems with VGX, VGXT, VTX, RE, or RE2
+          graphics hardware.
+     </P
+></LI
+><LI
+><P
+>          User-contributed software directory.
+     </P
+></LI
+><LI
+><P
+>          2-D contour function rewritten in C.
+     </P
+></LI
+></UL
+></P
+></DD
+><DT
+>3.3 (January 1994)</DT
+><DD
+><P
+>          Vis5D ported to HP, DEC, Sun, and Kubota (DEC Alpha) workstations.
+          The most important part of this work was the enhancement and
+          integration of the VOGL library.  This work was done by Simon
+          Baas and Hans de Jong for the Dutch Meteorological Institute,
+          KNMI.  Porting to the Kubota Denali graphics system was done by
+          Pratish Shah of Kubota Inc.  Thanks guys!</P
+><P
+>     New features:</P
+><P
+>     <P
+></P
+><UL
+><LI
+><P
+>          <TT
+CLASS="PARAMETER"
+><I
+>wdpy</I
+></TT
+> 
+          option now creates a window on the widget display which can be
+          used to move and interact with the 3-D view using the widget
+          display's mouse.
+     </P
+></LI
+><LI
+><P
+>          SAVEPIC button let's you save the window image in PostScript 
+          or color PostScript formats (SGI only).
+     </P
+></LI
+><LI
+><P
+>         <TT
+CLASS="PARAMETER"
+><I
+>wind2</I
+></TT
+> 
+         option added to specify a second set of U,V,W variables for the
+         second set of wind vector slices.
+     </P
+></LI
+><LI
+><P
+>         <TT
+CLASS="PARAMETER"
+><I
+>texture</I
+></TT
+> 
+         option added for a texture mapping an image onto the
+         topography (SGI only).
+     </P
+></LI
+><LI
+><P
+>          user functions are computed faster on SGI multi-processor systems by
+          computing time steps in parallel.
+     </P
+></LI
+></UL
+></P
+></DD
+><DT
+>4.0 (December 1994)</DT
+><DD
+><P
+>     New features:</P
+><P
+>     <P
+></P
+><UL
+><LI
+><P
+>          Map projections and new vertical coordinate systems.
+     </P
+></LI
+><LI
+><P
+>          Type-in formulas for computing new variables.
+     </P
+></LI
+><LI
+><P
+>          Time sequences of satellite images can be texture mapped onto the
+          topography for visual comparison with model data.
+     </P
+></LI
+><LI
+><P
+>          Data may be displayed over a spherical Earth.
+     </P
+></LI
+><LI
+><P
+>          File caching:  compressed grid files which are too large to read 
+          into memory in their entirety are read in piece-by-piece as 
+          needed, a least-recently-used replacement policy is used to purge 
+          data when memory is full.
+     </P
+></LI
+><LI
+><P
+>          New compressed grid format.  New format allows new header 
+          information to be added in the future, currently stores 
+          additional projection information.  
+          Also allows control of data compression.
+     </P
+></LI
+><LI
+><P
+>          New command line options:  
+          <TT
+CLASS="PARAMETER"
+><I
+>-geometry</I
+></TT
+>, 
+          <TT
+CLASS="PARAMETER"
+><I
+>-trajvars</I
+></TT
+>,
+          <TT
+CLASS="PARAMETER"
+><I
+>-projection</I
+></TT
+>,
+          <TT
+CLASS="PARAMETER"
+><I
+>-vertical</I
+></TT
+>,
+          <TT
+CLASS="PARAMETER"
+><I
+>-area</I
+></TT
+>,
+          <TT
+CLASS="PARAMETER"
+><I
+>-sequence</I
+></TT
+>
+     </P
+></LI
+><LI
+><P
+>          External functions can query the probe position and values with
+          PROBEPOS and PROBEVAL functions.
+     </P
+></LI
+><LI
+><P
+>          Interactive control over animation rate (using <B
+CLASS="KEYCAP"
+>F</B
+>
+          and <B
+CLASS="KEYCAP"
+>S</B
+> keys)
+     </P
+></LI
+><LI
+><P
+>          When the "GRID #'s" button is turned on, the probe/trajectory cursor
+          snaps to discrete grid points.
+     </P
+></LI
+><LI
+><P
+>          New utilities for .v5d files:  v5dinfo, v5dstats, v5dedit,
+          comp_to_v5d, and gr3d_to_v5d.
+     </P
+></LI
+></UL
+></P
+></DD
+><DT
+>4.1 (May 1995)</DT
+><DD
+><P
+>          New features:
+          <P
+></P
+><UL
+><LI
+><P
+>          Rotated map projection.
+          </P
+></LI
+><LI
+><P
+>          Improved widgets.
+          </P
+></LI
+><LI
+><P
+>          Stored-frame animation.
+          </P
+></LI
+><LI
+><P
+>          Better 3-D rendering in software using Mesa instead of VOGL.
+          </P
+></LI
+><LI
+><P
+>          Vis5D files defined as a World Wide Web medium for exchanging model
+               output.
+          </P
+></LI
+></UL
+></P
+></DD
+><DT
+>4.2 (April 1996)</DT
+><DD
+><P
+>     New features:</P
+><P
+>          <P
+></P
+><UL
+><LI
+><P
+>          Wind streamlines.
+          </P
+></LI
+><LI
+><P
+>          Colored isosurfaces and trajectories.
+          </P
+></LI
+><LI
+><P
+>          Scripting with Tcl.
+          </P
+></LI
+><LI
+><P
+>          UVW variable widget.
+          </P
+></LI
+><LI
+><P
+>          Pressure vertical coordinate system.
+          </P
+></LI
+><LI
+><P
+>          programmer's API between Vis5D and its user interface.
+          </P
+></LI
+><LI
+><P
+>          v5dSetLowLev function allows fields to occupy any sub-interval of
+               vertical levels.
+          </P
+></LI
+><LI
+><P
+>          physical units can be specified for each variable in a v5d file.
+          </P
+></LI
+><LI
+><P
+>          v5dimport program.
+          </P
+></LI
+></UL
+></P
+></DD
+><DT
+>4.3 (April 1997)</DT
+><DD
+><P
+> 
+    New features:
+    <P
+></P
+><UL
+><LI
+><P
+>          Vertical sounding window. 
+    </P
+></LI
+></UL
+></P
+></DD
+><DT
+>5.0 (July 1998)</DT
+><DD
+><P
+>     New features:
+    <P
+></P
+><UL
+><LI
+><P
+>          Display multiple v5d datasets in one window.
+          </P
+></LI
+><LI
+><P
+>          Display multiple v5d datasets side-by-side in multiple windows.
+          </P
+></LI
+><LI
+><P
+>          Link user interface controls in 'groups' of windows.
+          </P
+></LI
+><LI
+><P
+>          Type-in formulas can combine fields from multiple data sets.
+          </P
+></LI
+><LI
+><P
+>          Open or create new datasets during a Vis5D session (v5dimport embedded
+               in Vis5D).
+          </P
+></LI
+></UL
+></P
+></DD
+><DT
+>5.1 (March 1999)</DT
+><DD
+><P
+>     New Features:
+    <P
+></P
+><UL
+><LI
+><P
+>          Slice Linking - slices can be linked together so that the status and
+          movement of all the slices in the link are synchronized. Horizontal slices 
+          can not be linked with vertical slices.
+          </P
+></LI
+><LI
+><P
+>          Vertical Slice Flipping - the two corners of a vertical slice are
+          flipped as needed so that the contour numbers will never be draw backwards.
+          </P
+></LI
+><LI
+><P
+>          Circular Clock - using the command line option 
+          <TT
+CLASS="PARAMETER"
+><I
+>-circle</I
+></TT
+> will draw a
+          circle around the analog clock.
+          </P
+></LI
+><LI
+><P
+>          Probe Var Selection - the number and type of variables can be
+          controlled when using the probe.  Usefule for data sets with many variables.
+          Transparency in Legends - the legends now reflect the transparency of
+          the color map.
+          </P
+></LI
+><LI
+><P
+>          User Data - user specified formats can be used in loading grid data,
+          topography data, and map data.
+          </P
+></LI
+><LI
+><P
+>          Surface Graphics - horiz. contour slices, horiz. Wind slices, horiz.
+          Stream lines slices, and the map can now be resampled to the topography and
+          displayed on top of the topography.
+          </P
+></LI
+><LI
+><P
+>          Horz. Slice Sliders - GUI sliders have been added to control the level
+          at which slices are displayed.
+          </P
+></LI
+><LI
+><P
+>          Changing Map Height - a user can select the level at which the map is
+          displayed at.  A GUI slider has been added to control this.
+          </P
+></LI
+><LI
+><P
+>          Volume Rendering for PEX
+          </P
+></LI
+><LI
+><P
+>          New Sounding Features - the look of the sounding has changed.
+          Temperature lines can be displayed.  The sounding data is also clipped at the
+          level of the topograpy.
+          </P
+></LI
+><LI
+><P
+>          TopoBase - a solid base can extend below the topography.
+          </P
+></LI
+><LI
+><P
+>          Animation Dwell - a pause can be inserted between timestep=Numtimes
+          and timestep= 0.
+          </P
+></LI
+><LI
+><P
+>          Time Derivatives - the 'time' command can be used in the formula for
+          creating  new variables.
+          </P
+></LI
+><LI
+><P
+>          More Formats in Saving Pictures - when ImageMagicks's convert program
+          is installed more formats are accepted, and better save quality.
+          </P
+></LI
+><LI
+><P
+>          Probe and Trajectory Can Be Coupled
+          </P
+></LI
+><LI
+><P
+>          Offscreen Rendering
+          </P
+></LI
+></UL
+></P
+></DD
+><DT
+>5.2 (December 1999)</DT
+><DD
+><P
+>     New Features:
+    <P
+></P
+><UL
+><LI
+><P
+>          Irregular Data and Text Plots
+          </P
+></LI
+></UL
+></P
+></DD
+></DL
+></DIV
+></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch08sec3.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="acknowledgments.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Example McIDAS files and utilities</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Acknowledgments</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

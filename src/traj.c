@@ -72,7 +72,6 @@ int init_traj( Context ctx )
          ctx->TrajStep = 1.0;
          ctx->TrajLength = 1.0;
          break;
-      /* ZLB ???? */
       default:
          /* TODO: verify this is ok: (seems to work) */
          /* This is tricky:  compute distance, in meters, from left to */
@@ -120,7 +119,6 @@ int init_traj( Context ctx )
       case PROJ_ROTATED:
       case PROJ_CYLINDRICAL:
       case PROJ_SPHERICAL:
-      case PROJ_GENERIC_NONEQUAL:	/* ZLB 02-09-2000 */
       case PROJ_MERCATOR:
          for (i=0;i<ctx->Nr;i++) {
             for (j=0;j<ctx->Nc;j++) {
@@ -331,7 +329,6 @@ int init_trajPRIME( Display_Context dtx )
          dtx->TrajStep = 1.0;
          dtx->TrajLength = 1.0;
          break;
-      /* ZLB ???? */
       default:
          /* TODO: verify this is ok: (seems to work) */
          /* This is tricky:  compute distance, in meters, from left to */
@@ -375,7 +372,6 @@ int init_trajPRIME( Display_Context dtx )
       case PROJ_ROTATED:
       case PROJ_CYLINDRICAL:
       case PROJ_SPHERICAL:
-      case PROJ_GENERIC_NONEQUAL:	/* ZLB 02-09-2000 */
       case PROJ_MERCATOR:
          for (i=0;i<dtx->Nr;i++) {
             for (j=0;j<dtx->Nc;j++) {
@@ -807,6 +803,8 @@ int trace( Context ctx, float row0, float col0, float lev0,
       lev += w * (float) step;
       time += step;
 
+      printf("traj %d %d %f %f %f \n", time, step, col, row, lev);
+
       if (time>ctx->Elapsed[itime+1])
          itime++;
    }
@@ -819,6 +817,287 @@ int trace( Context ctx, float row0, float col0, float lev0,
 
    if (vcount > max){
       vcount = max;
+   }
+   return vcount;
+}
+
+
+// JCM
+#define MAX(a,b) ( ((a) > (b)) ? (a) : (b) )
+#define MIN(a,b) ( ((a) < (b)) ? (a) : (b) )
+//#define MAXNORM 1E4 // with float precision don't trust only use of last 2 digits given how vis5d compresses data with definite range and resolution over all grid
+// below only makes sense if using float, not rescaled data
+#define MAXNORM 1E30 // with float precision don't trust only use of last 2 digits given how vis5d compresses data with definite range and resolution over all grid
+// Note that with a compressed grid, each *level* gets it's own data range, but in general then for CompressedGrid==2, only 65553 in range, so that if (say) field varies from 0.02 to <0.02/65553, then unresolved completely
+/*
+ * Trace a wind trajectory. MODIFIED BY A.S. TO PLOT FULL TRAJECTORY AT EVERY STEP
+ * Input:  row0, col0, lev0 - initial location
+ *         time0 - initial timestep
+ *         step - integration step size in seconds
+ *         max - size of vr,vc,vl,vt arrays
+ * Output:  vr, vc, vl - array of trajectory vertices
+ *          vt - array of corresponding trajectory vertex times in seconds
+ *               elapsed since first time step.
+ * Return:  number of elements in vr,vc,vl,vt
+ */
+int trace1( Context ctx, float row0, float col0, float lev0,
+           int time0, int step, int max,
+           float vr[], float vc[], float vl[], int vt[] )
+{
+   float row, col, lev;
+   int time;   /* in seconds since first time step */
+   int itime;  /* time step corresponding to 'time' */
+   int i, vcount, singlelevel, mx,my,mz, thin;
+   float maxr, maxc, maxl, minl,dipx,dipy,dipz;
+   int it, iprevious; /* iprevious -- index where the trajectory stoped for the previous timestep */
+   float flag1, flag2; /* flag1 = 1,0 -- whether fieldline left domain, or returned to the star on traceback, flag2 -- same for traceforward */
+   float rad0, stepmult, radius;
+   long long int itercount1,itercount2;
+   int startvcount;
+   float dcol,drow,dlev,norm;
+
+
+   //     stepmult=.25/2;
+   stepmult=1.0; // JCM
+
+
+   /* grid bounds */
+   maxr = (float) (ctx->Nr-1);
+   maxc = (float) (ctx->Nc-1);
+   maxl = (float) (ctx->Nl[ctx->dpy_ctx->TrajU]-1);
+   minl = (float) ctx->Variable[ctx->dpy_ctx->TrajU]->LowLev;
+
+   //assume the center is in the middle of the domain always
+   dipx=(maxc+1)/2-1;
+   dipy=(maxr+1)/2 ;
+   dipz=(maxl+1)/2-1;
+
+   rad0=0; // JCM
+
+   //   printf("minmax maxr, maxc, maxnl %f %f %f %f \n",maxr,maxc,maxl,minl); 
+
+   /* allow trajs to work if u&v in one level only */
+   if (maxl == 0 && lev0 == minl){
+      singlelevel = 1;
+   }
+   else{
+      singlelevel = 0;
+   }
+   vcount = max;
+   
+   /* TRACE TRAJECTORY BACKWARD (put vertices into array in backward order) */
+   row = row0;
+   col = col0;
+   lev = lev0;
+   time = ctx->Elapsed[time0];
+   //   printf("tracing fieldline at time %d \n",time);
+
+   //   radius=pow((row-dipy)*(row-dipy)+(col-dipx)*(col-dipx)+(lev-dipz)*(lev-dipz),.5);
+   //      printf("Initial radius %f \n",radius);
+   //printf("x,y,z,dipx,y,z %f %f %f %f %f %f \n",col,row,lev,dipx,dipy,dipz);
+   /*go through time steps and integrate the trajectory first backward, then forward */
+   iprevious=0;
+   /*   for(it=0;it<(ctx->NumTimes-1);it++) { */
+   for(it=time0;it<=time0;it++) {
+   
+   itime=it;
+   row = row0;
+   col = col0;
+   lev = lev0;
+   time = ctx->Elapsed[it];
+   //   printf("row, col, lev, time %f %f %f %d\n",row,col,lev,time);
+   /* integrate backward and write it at the end of the array*/
+   vcount = max;
+   startvcount=vcount;
+
+   if(2*MAXTRAJCOUNT<MAX_TRAJ_VERTS){
+     fprintf(stderr,"2*MAXTRAJCOUNT<MAX_TRAJ_VERTS\n");
+     exit(1);
+   }
+
+   flag1=0.0;
+   itercount1=0;
+   while (1) {
+      float at, bt, u, v, w;
+
+      /* test if current position is out of bounds */
+      if (row<0.0 || row>maxr || col<0.0 || col>maxc || lev<0.0 || lev>maxl || lev<minl || abs(startvcount-vcount) >= MAXTRAJCOUNT ){
+	flag1=1.0;
+	printf("backward: Exiting, %f, %f, %f, %d, %d, %d : iter=%lld :: row0=%f col0=%f lev0=%f\n", row, col, lev, max, vcount, max-vcount,itercount1,row0,col0,lev0);
+	break;
+      }      
+      /* record point */
+      itercount1++;
+      vcount--; // must come before assignment since started with vcount=max
+      vr[vcount] = row;
+      vc[vcount] = col;
+      vl[vcount] = lev;
+      vt[vcount] = time;
+      if (vcount==0){
+	printf("backward: Reached vcount==0\n"); 
+	break;
+      }
+
+      /* get u,v,w vector at current location and time */
+      if (!get_uvw( ctx, itime, itime, 1.0, 0.0, row, col, lev,  &u, &v, &w, singlelevel )){
+	printf("backward: got missing row0=%f col0=%f lev0=%f\n",row0,col0,lev0); 
+	break;
+      }
+
+      /* update position and time */
+      
+      //	       u=col-dipx;
+      //      v=row-dipy;
+      //     w=lev-dipz;
+
+      dcol = u * (float) step * stepmult;
+      drow = v * (float) step * stepmult;
+      dlev = w * (float) step * stepmult;
+      // renormalize stepmult so always move 1/10th of grid cell at most
+      norm=0.1/MAX(1.0E-6,MAX(fabs(dlev),MAX(fabs(dcol),fabs(drow))));
+      //      norm=1.0;
+      dcol *= norm;
+      drow *= norm;
+      dlev *= norm;
+
+      /* pos' = pos + velocity * time */
+      col -= dcol;
+      row -= drow;
+      lev -= dlev;
+
+      //      printf("stepping %f %f %f \n",row,col,lev);
+
+      //      radius=pow((row-dipy)*(row-dipy)+(col-dipx)*(col-dipx)+(lev-dipz)*(lev-dipz),.5);
+      //      printf("step back %f %d %f %f %f \n",radius, max-vcount, col, row, lev);
+
+      //      if (row<0.0 || row>maxr || col<0.0 || col>maxc || lev<0.0 || lev>maxl || lev<minl || radius<rad0 || radius > 20.*20 ) 
+      if (row<0.0 || row>maxr || col<0.0 || col>maxc || lev<0.0 || lev>maxl || lev<minl){
+	col=col0; row=row0; lev=lev0;  //printf("stopping back %d %f %f %f\n",max-vcount,col,row,lev); 
+	printf("backward: stopping %d :: row0=%f col0=%f lev0=%f\n",max-vcount,row0,col0,lev0); 
+	break;
+      }
+      if (fabs(u) < MINSTREAMVECTORLENGTH && fabs(v) <MINSTREAMVECTORLENGTH  && fabs(w) < MINSTREAMVECTORLENGTH){
+	printf("backward: field too small row0=%f col0=%f lev0=%f\n",row0,col0,lev0); 
+	break;
+      }
+
+      if (norm>MAXNORM){
+	printf("backward: norm: field too small row0=%f col0=%f lev0=%f\n",row0,col0,lev0); 
+	break;
+      }
+
+   }
+
+   /* MOVE VERTICES FROM END TO the place where we left off*/
+   i = iprevious;
+   while (vcount<max) {
+      vr[i] = vr[vcount];
+      vc[i] = vc[vcount];
+      vl[i] = vl[vcount];
+      vt[i] = vt[vcount];
+      i++;
+      vcount++;
+   }
+   vcount = i; // so vcount is setup for *next* writing to memory
+   startvcount = vcount;
+
+
+
+   /* now integrate forward */
+   row = row0;
+   col = col0;
+   lev = lev0;
+
+   flag2=0.0;
+   itercount2=0;
+   while (1) {
+      float at, bt, u, v, w, radius; 
+      /* test if position is out of bounds */
+      if (row<0.0 || row>maxr || col<0.0 || col>maxc || lev<0.0 || lev>maxl || lev<minl || abs(startvcount-vcount) >= MAXTRAJCOUNT ){
+	//	printf("Exiting, %d, %d, %d, %d, %d, %d", row, col, lev, max, vcount, max-vcount);
+	printf("forward: Exiting, %f, %f, %f, %d, %d, %d : iter=%lld :: row0=%f col0=%f lev0=%f\n", row, col, lev, max, vcount, max-vcount,itercount2,row0,col0,lev0);
+	flag2=1.0;
+	break;
+      }
+      /* record point */
+      itercount2++;
+      vr[vcount] = row;
+      vc[vcount] = col;
+      vl[vcount] = lev;
+      vt[vcount] = time;
+      vcount++;
+      iprevious=vcount;
+
+      if (vcount>=max){
+	printf("forward: vcount > max, %d %d\n",vcount,max);
+	break;
+      }
+      if (!get_uvw( ctx, itime, itime, 1.0, 0.0, row, col, lev,  &u, &v, &w, singlelevel )){
+	printf("forward: got missing row0=%f col0=%f lev0=%f\n",row0,col0,lev0); 
+	break;
+      }
+
+      //u=col-dipx;
+      // v=row-dipy;
+      // w=lev-dipz;
+
+      dcol = u * (float) step * stepmult;
+      drow = v * (float) step * stepmult;
+      dlev = w * (float) step * stepmult;
+      // renormalize stepmult so always move 1/10th of grid cell at most
+      norm=0.1/MAX(1.0E-6,MAX(fabs(dlev),MAX(fabs(dcol),fabs(drow))));
+      //      norm=1.0;
+      dcol *= norm;
+      drow *= norm;
+      dlev *= norm;
+
+      /* update position and time */
+      /* pos' = pos + velocity * time */
+      col += dcol;
+      row += drow;
+      lev += dlev;
+
+      //               radius=pow((row-dipy)*(row-dipy)+(col-dipx)*(col-dipx)+(lev-dipz)*(lev-dipz),.5); 
+	       //	         printf("traj radius %f %f %f %f %f %f %f \n",radius, row, col, lev,u,v,w); 
+
+	       //	       printf("step forw %f \n",radius);
+	       //printf("step forw %f %d %f %f %f \n",radius, vcount, col, row, lev);
+
+	       //      if (row<0.0 || row>maxr || col<0.0 || col>maxc || lev<0.0 || lev>maxl || lev<minl || radius<rad0 || radius > 20.*20.)
+      if (row<0.0 || row>maxr || col<0.0 || col>maxc || lev<0.0 || lev>maxl || lev<minl){
+	col=col0; row=row0; lev=lev0; 
+	printf("forward: stopping %d :: row0=%f col0=%f lev0=%f\n",vcount,row0,col0,lev0); 
+	break;
+      }
+      if (fabs(u) < MINSTREAMVECTORLENGTH && fabs(v) < MINSTREAMVECTORLENGTH && fabs(w) < MINSTREAMVECTORLENGTH){
+	printf("forward: field too small row0=%f col0=%f lev0=%f\n",row0,col0,lev0); 
+	break;
+      }
+
+      if (norm>MAXNORM){
+	printf("forward: norm: field too small row0=%f col0=%f lev0=%f\n",row0,col0,lev0); 
+	break;
+      }
+
+   }
+
+
+   // diagnostics:
+   //   printf("flags are %g %g :: ",flag1, flag2);
+   printf("flag1=%g flag2=%g step=%d stepmult=%g :: itercount1=%lld itercount2=%lld:: it=%d row0=%f col0=%f lev0=%f\n",flag1,flag2,step,stepmult,itercount1,itercount2,it,row0,col0,lev0);
+   //   printf("DONE: %f %f %f \n",row0,col0,lev0);
+
+ 
+   }/* for(it=0;it<(ctx->NumTimes-1);it++)*/
+
+   /* print the vertex list */
+   //   for (i=0;i<vcount;i++) {
+   //     printf("%3d: %6.3f %6.3f %6.3f %d\n", i, vr[i], vc[i], vl[i], vt[i] );
+   //   }
+
+
+   if (vcount >= max){
+      vcount = max-1;
    }
    return vcount;
 }

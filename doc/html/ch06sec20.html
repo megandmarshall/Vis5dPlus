@@ -1,0 +1,244 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>The Display Widget Window</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Using Vis5D to Visualize Your Data"
+HREF="ch06.html"><LINK
+REL="PREVIOUS"
+TITLE="Grouping"
+HREF="ch06sec19.html"><LINK
+REL="NEXT"
+TITLE="Saving the current v5d file"
+HREF="ch06sec21.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch06sec19.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Using Vis5D to Visualize Your Data</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch06sec21.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH06SEC20"
+>The Display Widget Window</A
+></H1
+><P
+>     The display widget window is the control center when multiple data sets are
+loaded and is invoked by pressing the 'DISPLAY' button on the main control
+panel.  A data set is always assigned to exactly one display, but a display may
+contain zero, one or more data sets.  A display includes a 3-D graphics window
+and defines a virtual grid space where all the graphics from its data sets are
+mapped.  If the data grid is different from the virtual grid the appropriate
+resampling is applied.  In some cases this resampling will cause graphics
+generation to be slow.</P
+><P
+>     The display widget window allows you to: change the number of displays and
+how they are arranged, change the assignment of data sets to displays, change
+the parameters of a display which define the virtual grid, and change most of
+the command line options.</P
+><P
+>     Each display's user interface includes a set of buttons and type-in fields
+and a data set browser.  At the top of the user interface is the 'Display #'
+which gives the index of the display.  Below that is a browser showing a list of
+data sets attached to that display.  Each entry in the browser contains the
+context index of the data set and the context name. There is a scroll bar to the
+right of the browser which can scroll though the list if it gets larger than the
+browser window.  Above the browser is the 'Options' button which is described in
+<A
+HREF="ch06sec20.html#CH06SEC20.4"
+>section 6.20.4</A
+> .  
+Below  the browser is the 'SET DISPLAY PARAMETERS' which is
+described in 
+<A
+HREF="ch06sec20.html#CH06SEC20.3"
+>section 6.20.3</A
+> .
+Currently there can be a total of 16 displays.
+Watch out though, opening many displays can eat up a lot of memory.</P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="CH06SEC20.1"
+>Changing the Number of Displays</A
+></H2
+><P
+>     In the upper left hand corner is the 'Display Matrix' with 9 buttons,
+'1x1', '1x2', '1x3', '2x2', '3x2', '2x3', '3x3', '3x4', '4x3', and '4x4'.  These
+buttons control the number and layout of displays.  Underneath this is the
+'Return to Vis5D' button.  This will exit from the display widget window and map
+the 3-D graphics window of each display according to the chosen button matrix.
+If a display is created but has no data set attached to it then the 3-D window
+is left blank.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="CH06SEC20.2"
+>Changing the Display Assignment of a Data Set</A
+></H2
+><P
+>     In order to change the aassignment a data set to a different display you
+have to highlight the desired data set. This is done by simply clicking on the
+appropriate entry in the display browser.  You then click inside the data set
+browser of another display and the data set transfered.  If a data set is
+transfered to an empty display it may take several seconds while the display is
+initialized.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="CH06SEC20.3"
+>Changing the Parameters of a Display</A
+></H2
+><P
+>      The parameters of a display define the virtual grid.  These parameters
+include: the number of rows, columns and levels of the grid, the map projection,
+and the vertical coordinate system.  There are three ways of changing these
+parameters.  When an index number is typed into the 'FROM Context #' field, the
+parameters are copied from the specified data context over to the current
+display.  When an index number is typed into the 'FROM Display #' field, the
+parameters are copied from the specified display over to the current display.
+The third option is to manually edit one or all of the parameters by pressing
+the 'User Input' button.  A set of fields associated with each parameter will
+then appear on the left hand side.  When you are finished changing the
+parameters press the 'Done' button found at the bottom.</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="CH06SEC20.4"
+>Changing the 'Options' for a Display</A
+></H2
+><P
+>     In Vis5D version 5.2 the command line options 
+(refer to <A
+HREF="ch06.html#CH06SEC1"
+>section 6.1</A
+>) can
+now be changed at any time instead of just once while first running vis5d.  When
+the 'Options' button is pressed at the top of the display browser a set of
+fields will appear on the left hand side.  These fields correlate to the command
+line options.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch06sec19.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch06sec21.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Grouping</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ch06.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Saving the current v5d file</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

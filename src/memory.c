@@ -47,12 +47,12 @@
 #include "sync.h"
 
 struct mem {
-   int        size;
+   PTRINT        size;
    struct mem *prev;
    struct mem *next;
    short int  free, magic;
 #ifdef DEBUG_MEM
-   int type;
+   PTRINT type;
 #endif
 };
 
@@ -78,13 +78,17 @@ static void check_memory( Context ctx );
  *         type - type of block (see list in memory.h)
  * Return:  address of block or NULL if unable to make allocation
  */
-static void *alloc( Context ctx, int b, int permanent, int type )
+static void *alloc( Context ctx, PTRINT b, int permanent, int type )
 {
-   int bytes;
+   PTRINT bytes;
    struct mem *pos, *new;
 
 #ifdef DEBUG_MEM
-   printf("Allocate( %d )\n", b);
+   static PTRINT totalbytes=0;
+   totalbytes+=b;
+   if(b>100000){
+     printf("Allocate( %d , type=%d , total=%lld)\n", b,type,totalbytes);
+   }
 #endif
 
    /* round up bytes to multiple of sizeof(struct mem) */
@@ -222,13 +226,13 @@ static void *alloc( Context ctx, int b, int permanent, int type )
  * Input:  addr - the address of the block to deallocate
  *         b - number of bytes in the block or -1 if unknown
  */
-static void dealloc( Context ctx, void *addr, int b )
+static void dealloc( Context ctx, void *addr, PTRINT b )
 {
-   int bytes;
+   PTRINT bytes;
    struct mem *pos, *pred, *succ;
 
 #ifdef DEBUG_MEM
-   printf("Deallocate( 0x%x, %d )\n", (int)addr, b );
+   printf("Deallocate( 0x%x, %d )\n", (PTRINT)addr, b );
 #endif
    if (addr==NULL) {
       printf("Warning:  deallocate(NULL)\n");
@@ -395,7 +399,7 @@ static void dump_memory( Context ctx )
  *         bytes - size of the memory pool.
  * Return:  1 = success, 0 = error
  */
-int init_memory( Context ctx, int bytes )
+int init_memory( Context ctx, PTRINT bytes )
 {
    struct mem *m;
 
@@ -449,7 +453,7 @@ int init_memory( Context ctx, int bytes )
  *         bytes - size of the memory pool.
  * Return:  1 = success, 0 = error
  */
-int init_shared_memory( Context ctx, void *start, int bytes )
+int init_shared_memory( Context ctx, void *start, PTRINT bytes )
 {
    struct mem *m;
 
@@ -514,10 +518,10 @@ int reinit_memory( Context ctx )
  * Return the amount of available memory.
  * Input:  ctx - the vis5d context
  */
-int mem_available( Context ctx )
+PTRINT mem_available( Context ctx )
 {
    if (ctx->memory_limit==0)
-      return 1024*1024*1024;  /* a Gig ought to be enough */
+      return MAXMEMAVAILABLE;  /* a Gig ought to be enough */
    else
       return ctx->memory_limit - ctx->memory_used;
 }
@@ -533,8 +537,10 @@ int mem_available( Context ctx )
  * Return:  address of memory block or NULL if out of memory.
  */
 #ifndef allocate
-void *allocate( Context ctx, int bytes )
+void *allocate( Context ctx, PTRINT bytes )
 {
+  // DEBUG:
+  //  fprintf(stderr,"Trying to allocate %ld bytes\n",bytes);
   
   assert( bytes>=0 );
 
@@ -550,7 +556,7 @@ void *allocate( Context ctx, int bytes )
 #endif
   }else {
 	 void *addr;
-	 int ma, d;
+	 PTRINT ma, d;
 
 	 do {
 		LOCK_ON( ctx->memlock );
@@ -591,7 +597,7 @@ void *allocate( Context ctx, int bytes )
  *         type - type of block (see list in memory.h)
  * Return:  address of memory block or NULL if out of memory.
  */
-void *allocate_type( Context ctx, int bytes, int type )
+void *allocate_type( Context ctx, PTRINT bytes, int type )
 {
    assert( bytes>=0 );
 
@@ -601,7 +607,7 @@ void *allocate_type( Context ctx, int bytes, int type )
    }
    else {
       void *addr;
-      int ma, d;
+      PTRINT ma, d;
 
       do {
          LOCK_ON( ctx->memlock );
@@ -637,7 +643,7 @@ void *allocate_type( Context ctx, int bytes, int type )
  * Input:  ctx - the vis5d context
  *         bytes - number of bytes to allocate
  */
-void *pallocate( Context ctx, int bytes )
+void *pallocate( Context ctx, PTRINT bytes )
 {
    if (ctx->memory_limit==0) {
       /* just malloc */
@@ -645,7 +651,7 @@ void *pallocate( Context ctx, int bytes )
    }
    else {
       void *addr;
-      int ma, d;
+      PTRINT ma, d;
 
       do {
          LOCK_ON( ctx->memlock );
@@ -682,7 +688,7 @@ void *pallocate( Context ctx, int bytes )
  *         addr - address of block (if NULL, nothing happens)
  *         bytes - size of block (if <= zero, bytes is ignored)
  */
-void deallocate( Context ctx, void *addr, int bytes )
+void deallocate( Context ctx, void *addr, PTRINT bytes )
 {
    LOCK_ON( ctx->memlock );
    if (addr) {
@@ -702,9 +708,9 @@ void deallocate( Context ctx, void *addr, int bytes )
 /*
  * Return the amount of memory used in a context.
  */
-int mem_used( Display_Context dtx )
+PTRINT mem_used( Display_Context dtx )
 {
-   int m;
+   PTRINT m;
    int yo;
 
    m = 0;

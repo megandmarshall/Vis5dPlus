@@ -1,0 +1,172 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Special Variables and Data Values</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Putting Your Data Into Vis5D "
+HREF="ch03.html"><LINK
+REL="PREVIOUS"
+TITLE="Map Projections and Vertical Coordinate Systems"
+HREF="ch03sec2.html"><LINK
+REL="NEXT"
+TITLE="User Defined File Formats"
+HREF="ch03sec4.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch03sec2.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Putting Your Data Into Vis5D</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch03sec4.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH03SEC3"
+>Special Variables and Data Values</A
+></H1
+><P
+>       Analysis and visualization of wind information is an important part
+of Vis5D.  Specifically, the vis5d program looks to see if your data
+set contains variables named U, V and W.  If present, they are assumed
+to be the three components of wind vectors and are used to display
+trajectory tracings and wind slices.</P
+><P
+>      The U wind component is parallel to rows, with positive U values
+pointing toward increasing column numbers (i.e., positive eastward in
+a cylindrical equidistant map projection).  The V wind component is
+parallel to columns, with positive V values pointing toward decreasing
+row numbers (i.e., positive northwardward in a cylindrical equidistant
+map projection).  Positive W values are upward, negative W is
+downward.  The units for U, V and W are assumed to be meters per
+second except when a generic map projection or vertical coordinate
+system is used.  In that case, the units are in X per second where X
+is the units used to specify the northbound, westbound, rowinc, and
+colinc parameters.</P
+><P
+>      If you do not like to use U, V, and W for wind vector components you
+can either specify other wind variable names on the vis5d command line
+or enter them while running vis5d.</P
+><P
+>     Strictly speaking, U, V and W do not have to represent wind
+motion.  They can be used to represent any flow field such as ocean
+currents.  However, you may want to scale U, V, and W by some constant
+for visualization purposes.</P
+><P
+>     Vis5D allows any grid data value to be undefined or 'missing'.
+For example, datasets based on observations are often incomplete or
+contain erroneous values.  In your data conversion program you can
+indicate a grid value is missing by assigning it a value greater than
+1.0e30.  Missing data in vis5d will show up as holes in isosurfaces
+and contour slices and as black regions in colored slices.  The data
+probe will report missing values as 'Missing'.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch03sec2.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch03sec4.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Map Projections and Vertical Coordinate Systems</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ch03.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>User Defined File Formats</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

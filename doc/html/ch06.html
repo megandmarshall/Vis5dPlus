@@ -1,0 +1,1191 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Using Vis5D to Visualize Your Data</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="PREVIOUS"
+TITLE="Vis5D Utilities"
+HREF="ch05.html"><LINK
+REL="NEXT"
+TITLE="The Control Panel"
+HREF="ch06sec2.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch05.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch06sec2.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="CH06"
+>Using Vis5D to Visualize Your Data</A
+></H1
+><P
+>This section describes how to use the Vis5D visualization program, vis5d.
+It is almost completely controlled using the mouse with a graphical user
+interface.  The best way to learn to use it is to experiment.  
+There is no way to harm your data from within the program.</P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH06SEC1"
+>Starting vis5d</A
+></H1
+><P
+><DIV
+CLASS="IMPORTANT"
+><P
+></P
+><TABLE
+CLASS="IMPORTANT"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="./stylesheet-images/important.gif"
+HSPACE="5"
+ALT="Important"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="CENTER"
+><B
+>Important note for OSF users</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>          you need to run <TT
+CLASS="COMPUTEROUTPUT"
+>limit stacksize 32m</TT
+> before you run vis5d.</P
+></TD
+></TR
+></TABLE
+></DIV
+>
+<DIV
+CLASS="IMPORTANT"
+><P
+></P
+><TABLE
+CLASS="IMPORTANT"
+WIDTH="100%"
+BORDER="0"
+><TR
+><TD
+WIDTH="25"
+ALIGN="CENTER"
+VALIGN="TOP"
+><IMG
+SRC="./stylesheet-images/important.gif"
+HSPACE="5"
+ALT="Important"></TD
+><TH
+ALIGN="LEFT"
+VALIGN="CENTER"
+><B
+>Important note for SunOS 5 users</B
+></TH
+></TR
+><TR
+><TD
+>&nbsp;</TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+><P
+>          The X shared memory extension may not work
+          correctly.  If Vis5D prints an error message to the effect 
+          of "Shared memory error" then you'll have to append the 
+          following three lines to the end of your 
+          <TT
+CLASS="FILENAME"
+>/etc/system</TT
+> file then reboot:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>set shmsys:shminfo_shmmax = 0x2000000
+set shmsys:shminfo_shmmni = 0x1000
+set shmsys:shminfo_shmseg = 0x100</PRE
+></TD
+></TR
+></TABLE
+></P
+></TD
+></TR
+></TABLE
+></DIV
+></P
+><P
+>After you have made a v5d file, you can interactively visualize one or more file with the command:</P
+><P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="100%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>vis5d file1.v5d [options] file2.v5d [options]...</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+>[options] may be any combination of the following (though none are usually
+needed):</P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><P
+><B
+></B
+></P
+><DL
+><DT
+><TT
+CLASS="OPTION"
+>-alpha</TT
+></DT
+><DD
+><P
+>          Use alpha blending instead of "screen door" transparency.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-area N</TT
+></DT
+><DD
+><P
+> [SGI only]  Specifies the first of a sequence of McIDAS area files to
+ read and then display inside the 3-D box.  See 
+ <A
+HREF="ch06sec15.html"
+>section 6.15</A
+> for more
+ information.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-box x y z</TT
+></DT
+><DD
+><P
+>          This lets you specify the aspect ratio or proportions of the 3-D box.
+          Default values are 2 2 1.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-circle</TT
+></DT
+><DD
+><P
+>          Display a circular clock</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-cpgeom WIDTHxHEIGHT+X+Y (or WIDTHxHEIGHT or +X+Y)</TT
+></DT
+><DD
+><P
+>          Specify the geometry (position only) of the control panel.  Since the
+     control panel  must be a fixed width, any WIDTH specification will be
+     ignored.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-barbs</TT
+></DT
+><DD
+><P
+>          Use wind barbs in place of wind vectors.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-date</TT
+></DT
+><DD
+><P
+>          Use 'dd month yy' in place of 'yyddd' on the clock.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-dwell</TT
+></DT
+><DD
+><P
+>          Set the animation dwelling time when stepping from time=NumTimes to
+     time=0</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-font xfontname</TT
+></DT
+><DD
+><P
+></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-font PEXfontname height</TT
+></DT
+><DD
+><P
+>          Set the X or PEX font and its height used in the 3D window.  Since 3D
+          fonts have explicit heights, size controls the line spacing.  A size
+          of 0 will restore the line spacing to the font's height.  PEX fonts
+          (those having "PEX" in their names) are scalable.  To restore the
+          default PEX font, use " " for the name.  A PEX font's default size may
+          be resotred by specifying a size of 0.
+          <DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN1725"
+></A
+><P
+></P
+><P
+>          Example: <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>vis5d LAMPS.v5d -font helvb24 20</PRE
+></TD
+></TR
+></TABLE
+>
+          </P
+><P
+></P
+></DIV
+></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-full</TT
+></DT
+><DD
+><P
+>          Open the 3-D window as a borderless, full-screen size window.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-funcpath pathname</TT
+></DT
+><DD
+><P
+>          Specify the directory to search for user Fortran functions.
+          <DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN1738"
+></A
+><P
+></P
+><P
+>          Example:
+          <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>vis5d LAMPS.v5d -funcpath /usr/local/vis5d/userfuncs</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+></P
+></DIV
+></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-geometry WxH+X+Y  (or WxH or +X+Y)</TT
+></DT
+><DD
+><P
+>          Specify the geometry of the 3-D window.
+          <DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN1746"
+></A
+><P
+></P
+><P
+>          Example: 
+          <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>vis5d LAMPS.v5d -geometry 640x480-10+10</PRE
+></TD
+></TR
+></TABLE
+></P
+><P
+></P
+></DIV
+></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-hirestopo</TT
+></DT
+><DD
+><P
+>          Display a high-resolution topography.  
+          This is only recommended on
+          systems with fast graphics hardware.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-legend position size x y</TT
+></DT
+><DD
+><P
+>          Set color legend position and size.  
+          Position values are 1 (bottom,
+          the default), 2 (top), 3 (left) and 4 (right).  
+          Size is the height of
+          the legend bar and is between 10 and 1000 (default=128). 
+          Position is
+          controlled by adding an offset value in the X and Y 
+          direction from the default position.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-log [a] [b]</TT
+></DT
+><DD
+><P
+>          Display height on a logarithmic axis instead of linear.  This is
+          discussed in <A
+HREF="ch03sec2.html"
+>section 3.2</A
+>.  
+          The optional arguments a and b are the
+          scale and exponent factors in the height/pressure equation.  The
+          defaults are 1012.5 and -7.2, respectively.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-map file</TT
+></DT
+><DD
+><P
+>          Use a map file other than the default of 
+          <TT
+CLASS="FILENAME"
+>OUTLSUPW</TT
+>.  
+          See <A
+HREF="ch02sec2.html#CH02SEC2.5"
+>section 2.2.5</A
+> to
+          setup a different default.
+          <DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN1772"
+></A
+><P
+></P
+><P
+>          Example: <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>vis5d LAMPS.v5d -map OUTLUSAL</PRE
+></TD
+></TR
+></TABLE
+>
+          </P
+><P
+></P
+></DIV
+></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-top_margin size</TT
+></DT
+><DD
+><P
+>          Specify the size in points for the top margin of the 3d windows</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-bottom_margin size</TT
+></DT
+><DD
+><P
+>          Specify the size in points for the bottom margin 
+          of the 3d windows</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-left_margin size</TT
+></DT
+><DD
+><P
+>          specify the size in points for the left margin of the 3d windows</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-right_margin size</TT
+></DT
+><DD
+><P
+>          Specify the size in points for the right margin of 
+          the 3d windows</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-mbs n</TT
+></DT
+><DD
+><P
+>          Override the assumed system memory size of 32 megabytes.  
+          See <A
+HREF="ch02sec2.html#CH02SEC2.5"
+>section 2.2.5</A
+> 
+          to setup a different default value.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-nofile</TT
+></DT
+><DD
+><P
+>          Run vis5d with out loading a vis5d data set.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-offscreen</TT
+></DT
+><DD
+><P
+>          Do off screen rendering.  This is used in 
+          conjunction with the <TT
+CLASS="OPTION"
+>-script</TT
+> option.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-path pathname</TT
+></DT
+><DD
+><P
+>          Use a different path for map and topo files 
+          instead of the current.
+          <DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN1817"
+></A
+><P
+></P
+><P
+>          Example: <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>vis5d LAMPS.v5d -path /usr3/data</PRE
+></TD
+></TR
+></TABLE
+>
+          </P
+><P
+></P
+></DIV
+></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-projection p</TT
+></DT
+><DD
+><P
+>          Set the display map projection, default is to display 
+          data in its
+          natural projection (obtained from the data file).
+          p may be one of:
+        </P
+><P
+>        <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>cylindrical - display data on a cylindrical Earth</TD
+></TR
+><TR
+><TD
+>spherical - display data on a spherical Earth</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+         </P
+><P
+>          Only the first 3 characters are significant/needed.  You will be
+          promted for additional parameters.
+  <DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN1830"
+></A
+><P
+></P
+><P
+>  Example: <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>vis5d LAMPS.v5d -projection spherical</PRE
+></TD
+></TR
+></TABLE
+>
+  </P
+><P
+></P
+></DIV
+></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-quickstart</TT
+></DT
+><DD
+><P
+>          Don't load any grids when starting vis5d, even if the whole file will
+          fit into memory.  The grids will be read as needed.  This option is
+          useful when reading a file via NFS.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-rate ms</TT
+></DT
+><DD
+><P
+>          Change the default animation rate.  ms is the minimum delay in
+          milliseconds between frames.  Default is 100 ms.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-samescale</TT
+></DT
+><DD
+><P
+>          Set the scale for the vertical plot variables to be the same for all
+     three variables</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-script script.tcl</TT
+></DT
+><DD
+><P
+>          Specifies a Vis5D/Tcl script to execute automatically.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-sequence filename</TT
+></DT
+><DD
+><P
+> [not available on all systems]  Specifies a file containing a sequence
+ of images to texture map over the topography.  
+ See <A
+HREF="ch06sec15.html"
+>section 6.15</A
+> for more information.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-soundfont fontname</TT
+></DT
+><DD
+><P
+>          Set the X font used in the sounding window.  Use xlsfonts to list your
+          system's fonts</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-title x y font "string"</TT
+></DT
+><DD
+><P
+>          This is used in conjunction with the 
+          <TT
+CLASS="OPTION"
+>-_margin</TT
+> option.  This will print
+          the string at location (x,y) in the BigWindow.  Any number of titles
+          can be created.  The strings will not show up if they are not in a
+          margin</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-texture rgbfile</TT
+></DT
+><DD
+><P
+>          [not available on all systems]  Specify an SGI .rgb file to texture
+          map over the topography.  
+          See <A
+HREF="ch06sec15.html"
+>section 6.15</A
+>
+          for more information.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-topo file</TT
+></DT
+><DD
+><P
+>          Use a topography file other than the default of 
+          <TT
+CLASS="FILENAME"
+>EARTH.TOPO</TT
+>.  See
+          <A
+HREF="ch02sec2.html#CH02SEC2.5"
+>section 2.2.5</A
+>
+          to setup a different default.</P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-topobase [lev_value]</TT
+></DT
+><DD
+><P
+>          Display a base below the topography. lev_value is the vertical grid
+          level value to which the base will extend.  Typically, this is a
+          negative value so that the base is below the lowest level (0.0).  If
+          lev_value is omitted, 0.0 will be used
+          <DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN1888"
+></A
+><P
+></P
+><P
+>          Example: <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>vis5d LAMPS.v5d -topobase -3.0</PRE
+></TD
+></TR
+></TABLE
+>
+          </P
+><P
+></P
+></DIV
+></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-trajvars uvar vvar [wvar]</TT
+></DT
+><DD
+><P
+>          Specify which variables are to be used for trajectory tracing.
+          Defaults are U, V, and W.
+          <DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN1896"
+></A
+><P
+></P
+><P
+>          Example: <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>vis5d LAMPS.v5d -trajvars U2 V2 W2</PRE
+></TD
+></TR
+></TABLE
+>
+          </P
+><P
+></P
+></DIV
+></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-userdata flags</TT
+></DT
+><DD
+><P
+>          Use user-provided functions to read data, maps, or topography .  flags
+          is a string that may contain any combination of:
+          </P
+><P
+>          <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>               g or G - use the function for reading grid data</TD
+></TR
+><TR
+><TD
+>               m or M - use the function for reading map data</TD
+></TR
+><TR
+><TD
+>               t or T - use the function for reading topography data</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+          <DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN1909"
+></A
+><P
+></P
+><P
+>          Example: <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>vis5d dataset -userdata g</PRE
+></TD
+></TR
+></TABLE
+>
+          </P
+><P
+></P
+></DIV
+></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-vertical v</TT
+></DT
+><DD
+><P
+>          Set the vertical coordinate system, default is obtained from datafile.
+          v may be one of:
+          </P
+><P
+>          <P
+></P
+><TABLE
+BORDER="0"
+><TBODY
+><TR
+><TD
+>               generic   - linear, equally spaced levels in generic units</TD
+></TR
+><TR
+><TD
+>               equal     - linear, equally spaced levels in km</TD
+></TR
+><TR
+><TD
+>               nonequal  - linear, unequally spaced levels in km</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+>
+          </P
+><P
+>          Only the first 3 characters of v are significant/needed.  You will be
+          prompted for additional parameters.
+          <DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN1923"
+></A
+><P
+></P
+><P
+>          Example: <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>vis5d LAMPS.v5d -vertical nonequal</PRE
+></TD
+></TR
+></TABLE
+>
+          </P
+><P
+></P
+></DIV
+></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-wdpy xdisplay</TT
+></DT
+><DD
+><P
+>          Put the widgets on a different X display.  Useful in combination with
+          <TT
+CLASS="OPTION"
+>-full</TT
+> for making slides and videos. 
+          <DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN1932"
+></A
+><P
+></P
+><P
+>          Example: <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>vis5d LAMPS.v5d -full -wdpy pluto:0</PRE
+></TD
+></TR
+></TABLE
+>
+          </P
+><P
+></P
+></DIV
+></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-wide w</TT
+></DT
+><DD
+><P
+>          Set width of line segments in pixels (default is 1.0).  
+          Again, useful for making videos.
+          <DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN1940"
+></A
+><P
+></P
+><P
+>          Example: <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>vis5d LAMPS.v5d -wide 3.0</PRE
+></TD
+></TR
+></TABLE
+>
+          </P
+><P
+></P
+></DIV
+></P
+></DD
+><DT
+><TT
+CLASS="OPTION"
+>-wind2 uvar vvar [wvar]</TT
+></DT
+><DD
+><P
+>   Specify the names of a secondary set of U, V, and (optionally) W wind
+   component variables to use when drawing the Hwind2, Vwind2 and Strm2
+   vector slices.  Useful when you have two sets of wind vector
+   components that you want to visualize simultaneously.
+   <DIV
+CLASS="INFORMALEXAMPLE"
+><A
+NAME="AEN1948"
+></A
+><P
+></P
+><P
+>   Example: <TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+WIDTH="90%"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>vis5d MYDATA -wind2 U2 V2 W2</PRE
+></TD
+></TR
+></TABLE
+>
+   </P
+><P
+></P
+></DIV
+></P
+></DD
+></DL
+></DIV
+><P
+>          
+     Most of the above arguments can also be changed by entering the 'Options'
+menu after pressing the 'DISPLAY' button found on the main control panel.</P
+><P
+>          
+     If you start vis5d without arguments you will get a list of all the command
+line options and keyboard functions.  Otherwise, vis5d will begin by reading the
+data file.</P
+><P
+>          
+     Previous versions of vis5d required that the entire file be read into main
+memory; if you didn't have sufficient memory you couldn't visualize the file.
+In version 4.0 and higher, this restriction is lifted; you may visualize files
+which are larger than main memory.  This is implemented with a grid cache: vis5d
+reads data only when needed and discards it on a least-recently-used basis.
+Small files will be read in their entirety as in previous versions.</P
+><P
+>          
+     For the user, this means vis5d will allow you to visualize large files even
+with only 32MB of main memory.  However, performance will degrade as the ratio
+of file size to main memory size increases.  If you observe sluggish performance
+and a lot of disk activity while running vis5d you should get more memory.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch05.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch06sec2.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Vis5D Utilities</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>The Control Panel</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

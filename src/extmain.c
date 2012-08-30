@@ -63,7 +63,7 @@ static float Argument[NUMARGS]; /* only use is commented out;
 
 
 /* Define this if using McIDAS library */
-#define LIB_MCIDAS
+// #define LIB_MCIDAS
 
 
 
@@ -86,14 +86,19 @@ static int create_socket( char *name )
    }
 
    /* try to connect socket to given name */
-   /*printf("EXTMAIN: creating socket named: %s\n", name );*/
+   printf("EXTMAIN: creating socket named: %s\n", name );
    strcpy( addr.sun_path, name );
    addr.sun_family = AF_UNIX;
    len = strlen(addr.sun_path)+sizeof(addr.sun_family);
+ //  printf("EXTMAIN:addr/sun_path: %s\n", addr.sun_path );
+ //  printf("EXTMAIN:addr/sun_family: %d\n", addr.sun_family );
+ //  printf("EXTMAIN: len: %d\n", len );
+ //  printf("EXTMAIN: addr: %d\n", sizeof(addr) );
+
    for (tries=0;tries<5;tries++) {
       if (connect(sock, (struct sockaddr *) &addr, len) < 0) {
          perror("External Function Error: function connect failed");
-         /*printf("   failed on try %d\n", tries );*/
+         printf("   failed on try %d\n", tries );
       }
       else {
          /* success !*/
@@ -236,6 +241,7 @@ static int call_user_function( int sock )
             receive_data( sock, ingrid+iv*Nr*Nc*MaxNl,
                           Nr*Nc*Nl[iv]*sizeof(float) );
          }
+#ifdef LIB_MCIDAS
          else {
             /* read grid data from the original McIDAS grid file. */
             if (!get_mcgrid( mcfile, mcgrid, ingrid+iv*Nr*Nc*Nl[iv], iv )) {
@@ -245,6 +251,8 @@ static int call_user_function( int sock )
                error_flag = 1;
             }
          }
+#endif
+
       }
 
       /*** call user function ***/
@@ -331,6 +339,7 @@ F77_FUNC(main0,MAIN0)()
 }
 
 
+#ifdef LIB_MCIDAS
 
 /*** get_mcgrid *******************************************************
    Get a McIDAS grid.
@@ -364,7 +373,7 @@ int get_mcgrid( int file, int grid, float *data, int var )
    return 1;
 }
 
-
+#endif
 
 void F77_FUNC(pf,PF)( float *x )
 {

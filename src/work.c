@@ -77,17 +77,6 @@
 #define MAX(A,B)  ( (A) > (B) ? (A) : (B) )
 
 
-/* Maximum number of vertices... */
-#ifdef BIG_GFX
-#  define MAX_ISO_VERTS 2400000    /* in an isosurface */
-#else
-#  define MAX_ISO_VERTS 650000     /* in an isosurface */
-#endif
-
-
-#define MAX_CONT_VERTS (MAXROWS*MAXCOLUMNS)   /* in a contour line slice */
-#define MAX_WIND_VERTS (4*MAXROWS*MAXCOLUMNS) /* in a wind vector slice */
-#define MAX_TRAJ_VERTS 5000                   /* in a wind trajectory */
 
 
 static	void compute_iso_colors(
@@ -98,7 +87,7 @@ static	void compute_iso_colors(
 	float max,
 	int	time,
 	int	cvctxtime,
-	int_2	*verts,
+	int_vert2	*verts,
 	uint_1	*color_indexes,
 	int	n) 
 {
@@ -151,7 +140,7 @@ static	void compute_iso_colors(
  *         cvowner - the vis5d_ctx index the colorvar belongs to
  *         colorvar - the coloring variable
  */
-static void color_isosurface( Context ctx,int_2 *verts ,int time, int isovar, int cvowner, int colorvar )
+static void color_isosurface( Context ctx,int_vert2 *verts ,int time, int isovar, int cvowner, int colorvar )
 {
    uint_1 *color_indexes;
    uint_1 *deci_color_indexes;
@@ -256,12 +245,12 @@ static void calc_isosurface( Context ctx, int time, int var,
    /* other vars */
    float *grid;
    int ctxtime;
-   int_2 *cverts;
+   int_vert2 *cverts;
    int_1 *cnorms;
    Display_Context dtx;
    uint_index *index;
 	int			deci_numverts;
-	int_2			*deci_cverts;
+	int_vert2		*deci_cverts;
 	int_1			*deci_cnorms;
 
    dtx = ctx->dpy_ctx;
@@ -341,7 +330,7 @@ static void calc_isosurface( Context ctx, int time, int var,
       /*************************** Compress data ***************************/
 
       if (numverts>0 && numindexes>0) {
-         int vbytes, nbytes, bytes;
+         PTRINT vbytes, nbytes, bytes;
 
 #ifdef HAVE_MIXKIT
 
@@ -357,9 +346,9 @@ static void calc_isosurface( Context ctx, int time, int var,
 	  const			char *s;
 
 
-	  int deci_vbytes, deci_nbytes;
+	  PTRINT deci_vbytes, deci_nbytes;
 
-	  int	n = (dtx->MaxTMesh + fudge) * 3 * sizeof(float);
+	  PTRINT n = (PTRINT)(dtx->MaxTMesh + fudge) * 3L * (PTRINT)sizeof(float);
 
 	  printf("Entering Decimate\n");
 
@@ -386,8 +375,8 @@ static void calc_isosurface( Context ctx, int time, int var,
 							 );
 
 	  /* allocate memory to store compressed vertices */
-	  deci_vbytes = 3*deci_numverts*sizeof(int_2);
-	  deci_cverts = (int_2 *) allocate_type(ctx,deci_vbytes,CVX_TYPE);
+	  deci_vbytes = 3L*(PTRINT)deci_numverts*(PTRINT)sizeof(int_vert2);
+	  deci_cverts = (int_vert2 *) allocate_type(ctx,deci_vbytes,CVX_TYPE);
 	  /* convert (r,c,l) coords to compressed (x,y,z) */
 	  grid_to_compXYZ(
 							ctx, time, var, deci_numverts, deci_vr, deci_vc,
@@ -395,7 +384,7 @@ static void calc_isosurface( Context ctx, int time, int var,
 							);
 	  
 	  /* allocate memory to store compressed normals */
-	  deci_nbytes = 3*deci_numverts*sizeof(int_1);
+	  deci_nbytes = 3L*(PTRINT)deci_numverts*(PTRINT)sizeof(int_1);
 	  deci_cnorms = (int_1 *) allocate_type(ctx,deci_nbytes,CNX_TYPE);
 	  
 	  /*
@@ -422,8 +411,8 @@ static void calc_isosurface( Context ctx, int time, int var,
 	}
 #endif	
 	/* allocate memory to store compressed vertices */
-	vbytes = 3*numverts*sizeof(int_2);
-	cverts = (int_2 *) allocate_type( ctx, vbytes, CVX_TYPE );
+	vbytes = 3L*(PTRINT)numverts*(PTRINT)sizeof(int_vert2);
+	cverts = (int_vert2 *) allocate_type( ctx, vbytes, CVX_TYPE );
 	/* convert (r,c,l) coords to compressed (x,y,z) */
 	if (ctx->GridSameAsGridPRIME){
 	  gridPRIME_to_compXYZPRIME( dtx, time, var, numverts, vr,vc,vl, (void*) cverts );
@@ -434,7 +423,7 @@ static void calc_isosurface( Context ctx, int time, int var,
 										  vr2, vc2, vl2, (void*) cverts );
 	}
 	/* allocate memory to store compressed normals */
-	nbytes = 3*numverts*sizeof(int_1);
+	nbytes = 3L*(PTRINT)numverts*(PTRINT)sizeof(int_1);
 	cnorms = (int_1 *) allocate_type( ctx, nbytes, CNX_TYPE );
 	/* cvt normals from floats in [-1,1] to 1-byte ints in [-125,125] */
 	
@@ -446,7 +435,7 @@ static void calc_isosurface( Context ctx, int time, int var,
 	}
 	
 	/* allocate memory to store index array */
-	bytes = numindexes * sizeof(uint_index);
+	bytes = (PTRINT)numindexes * (PTRINT)sizeof(uint_index);
 	index = (uint_index *) allocate_type( ctx, bytes, PTS_TYPE );
 	memcpy( index, vpts, numindexes * sizeof(uint_index) );
 #ifndef BIG_GFX
@@ -520,7 +509,8 @@ static int fit_vecs_to_topo (Context ctx, int num, int max,
                                   float *vr, float *vc, float *vl)
 {
 
-    int         i, j, k, n_bytes, n_out, n_new;
+    int         i, j, k, n_out, n_new;
+    PTRINT n_bytes;
     float       *vr_out, *vc_out, *vl_out;
     float       xyz[2][3], *xyz_new;
     float       xmin, ymin, xmax, ymax, xfac, yfac, xtmp, ytmp;
@@ -531,10 +521,10 @@ static int fit_vecs_to_topo (Context ctx, int num, int max,
     if (dtx->topo->TopoVertex == NULL) return num;
     if (num <= 0) return 0;
 
-    xyz_new = allocate (ctx, (dtx->Nr * dtx->Nc * 3 * 3));
+    xyz_new = allocate (ctx, ((PTRINT)dtx->Nr * (PTRINT)dtx->Nc * 3L * 3L));
     if (xyz_new == NULL) return 0;
 
-    n_bytes = max * sizeof (float);
+    n_bytes = (PTRINT)max * (PTRINT)sizeof (float);
     vr_out  = allocate (ctx, n_bytes);
     vc_out  = allocate (ctx, n_bytes);
     vl_out  = allocate (ctx, n_bytes);
@@ -627,7 +617,7 @@ static float *extract_sfc_slice (Context ctx, int time, int var,
     float thelat, thelon, thehgt;
     int nothing;
 
-    slice_data = (float *) allocate_type (ctx, nrows * ncols * sizeof (float),
+    slice_data = (float *) allocate_type (ctx, (PTRINT)nrows * (PTRINT)ncols * (PTRINT)sizeof (float),
                                           HSLICE_TYPE);
     if (slice_data == NULL) return NULL;
 
@@ -716,7 +706,7 @@ static float* extract_hslice( Context ctx, float *grid, int var,
    float *slice;
 
    /* allocate buffer to put 2-D slice of data */
-   slice = (float *) allocate_type( ctx, nr * nc * sizeof(float), HSLICE_TYPE );
+   slice = (float *) allocate_type( ctx, (PTRINT)nr * (PTRINT)nc * (PTRINT)sizeof(float), HSLICE_TYPE );
    if (!slice) {
       return NULL;
    }
@@ -859,7 +849,7 @@ static float* extract_hslicePRIME( Context ctx, float *grid, int time, int var,
 
    dtx = ctx->dpy_ctx;
    /* allocate buffer to put 2-D slice of data */
-   slice = (float *) allocate_type( ctx, nr * nc * sizeof(float), HSLICE_TYPE );
+   slice = (float *) allocate_type( ctx, (PTRINT)nr * (PTRINT)nc * (PTRINT)sizeof(float), HSLICE_TYPE );
    if (!slice) {
       return NULL;
    }
@@ -1336,7 +1326,7 @@ static float *extract_vslice( Context ctx, float *grid,
    float *slice;
 
    /* allocate slice array */
-   slice = (float *) allocate_type( ctx, rows * cols * sizeof(float), VSLICE_TYPE );
+   slice = (float *) allocate_type( ctx, (PTRINT)rows * (PTRINT)cols * (PTRINT)sizeof(float), VSLICE_TYPE );
    if (!slice)
       return NULL;
 
@@ -1465,7 +1455,7 @@ static float *extract_vslicePRIME( Context ctx, float *grid, int time, int var,
 
    dtx = ctx->dpy_ctx;
    /* allocate slice array */
-   slice = (float *) allocate_type( ctx, rows * cols * sizeof(float), VSLICE_TYPE );
+   slice = (float *) allocate_type( ctx, (PTRINT)rows * (PTRINT)cols * (PTRINT)sizeof(float), VSLICE_TYPE );
    if (!slice)
       return NULL;
 
@@ -1628,7 +1618,7 @@ static int make_horizontal_rectangle( Context ctx, int time, int var,
    n = 0;
 
    if (curved==0) {
-      v = (float *) allocate_type( ctx, 5 * 3 * sizeof(float), MHRECT_TYPE );
+      v = (float *) allocate_type( ctx, 5L * 3L * (PTRINT)sizeof(float), MHRECT_TYPE );
       if (v) {
          n = 5;
          v[0*3+0] = 0.0;
@@ -1650,8 +1640,8 @@ static int make_horizontal_rectangle( Context ctx, int time, int var,
    }
    else {
       /* curved box */
-      v = (float *) allocate_type( ctx, (2*ctx->dpy_ctx->Nr + 2*ctx->dpy_ctx->Nc - 3)
-                                   * 3 * sizeof(float),
+      v = (float *) allocate_type( ctx, (2L*(PTRINT)ctx->dpy_ctx->Nr + 2L*(PTRINT)ctx->dpy_ctx->Nc - 3L)
+                                   * 3L * (PTRINT)sizeof(float),
                                    MHRECT_TYPE );
       if (v) {
          /* north edge */
@@ -1710,7 +1700,7 @@ static int make_vertical_rectangle( Context ctx, int time, int var,
    n = 0;
 
    if (curved==0) {
-      v = (float *) allocate_type( ctx, 5 * 3 * sizeof(float), MVRECT_TYPE );
+      v = (float *) allocate_type( ctx, 5L * 3L * (PTRINT)sizeof(float), MVRECT_TYPE );
       if (v) {
          n = 5;
          v[0*3+0] = r1;
@@ -1751,8 +1741,8 @@ static int make_vertical_rectangle( Context ctx, int time, int var,
    }
    else {
       /* curved box */
-      v = (float *) allocate_type( ctx, (2*ctx->dpy_ctx->Nl + 2*segs - 3)
-                                   * 3 * sizeof(float),
+      v = (float *) allocate_type( ctx, (2L*(PTRINT)ctx->dpy_ctx->Nl + 2L*(PTRINT)segs - 3L)
+                                   * 3L * (PTRINT)sizeof(float),
                                    MVRECT_TYPE );
       if (v) {
          float r, c, dr, dc;
@@ -1816,8 +1806,8 @@ static void calc_textplot( Irregular_Context itx, int time, int threadnum )
    struct textplot *tp = &itx->TextPlotTable[time];
 
 
-   int bytes;
-   int_2 *cverts;
+   PTRINT bytes;
+   int_vert2 *cverts;
    float *lat, *lon, *alt;
    float *xs, *ys, *zs;
    float *vx, *vy, *vz;
@@ -1885,7 +1875,7 @@ static void calc_textplot( Irregular_Context itx, int time, int threadnum )
       numdata = (double *) malloc(sizeof(double)*numtouse);
    }
    else if (itx->Variable[itx->TextPlotVar]->VarType == CHARACTER_VAR){
-      chardata = (char *) malloc(sizeof(char)*numtouse*
+      chardata = (char *) malloc(sizeof(char)*(PTRINT)numtouse*
                           itx->Variable[itx->TextPlotVar]->CharVarLength);
    }
    else{
@@ -1930,8 +1920,8 @@ static void calc_textplot( Irregular_Context itx, int time, int threadnum )
    /**********************************************/
    if (numv){
       int c;
-      bytes = 3*numv*sizeof(int_2);
-      cverts = (int_2 *) i_allocate_type( itx, bytes, CVX1H_TYPE );
+      bytes = 3*numv*sizeof(int_vert2);
+      cverts = (int_vert2 *) i_allocate_type( itx, bytes, CVX1H_TYPE );
       if (itx->Variable[itx->TextPlotVar]->TextPlotColorStatus == VIS5D_ON){
          colors = (uint_1 *) i_allocate(itx, numv/2*sizeof(uint_1) );
          for (c = 0; c < numv/2; c++){
@@ -2020,9 +2010,10 @@ static void calc_hslice( Context ctx, int time, int var,
    struct hslice *slice = ctx->Variable[var]->HSliceTable[time];
    float *vr1, *vc1, *vr2, *vc2, *vr3, *vc3, *vl;
    float *grid, *slicedata;
-   int num1, num2, num3, maxnum, bytes, i;
+   int num1, num2, num3, maxnum, i;
+   PTRINT bytes;
    float base;
-   int_2 *cverts1, *cverts2, *cverts3;
+   int_vert2 *cverts1, *cverts2, *cverts3;
    float *boxverts;
    int numboxverts;
    Display_Context dtx;
@@ -2040,8 +2031,8 @@ static void calc_hslice( Context ctx, int time, int var,
           && slice->lowlimit==low && slice->highlimit==high) {
          /* special case: just translate existing slice! */
          float z = gridlevelPRIME_to_zPRIME( dtx, time, var, levelPRIME );
-         int_2 compz = (int_2) (z * VERTEX_SCALE);
-         int_2 *zptr;
+         int_vert2 compz = (int_vert2) (z * VERTEX_SCALE);
+         int_vert2 *zptr;
          int n;
          /* translate verts1 */
          n = slice->num1;
@@ -2171,7 +2162,7 @@ static void calc_hslice( Context ctx, int time, int var,
 
 	if(labels)
 	  free(labels);
-	labels = (char *) malloc(10*sizeof(char)*(max_cont_verts/2));
+    labels = (char *) malloc(10L*(PTRINT)sizeof(char)*(PTRINT)max_cont_verts/2L);
 #endif
 
    contour_ok =
@@ -2220,8 +2211,8 @@ static void calc_hslice( Context ctx, int time, int var,
 
 
    if (num1) {
-      bytes = 3*num1*sizeof(int_2);
-      cverts1 = (int_2 *) allocate_type( ctx, bytes, CVX1H_TYPE );
+      bytes = 3L*(PTRINT)num1*(PTRINT)sizeof(int_vert2);
+      cverts1 = (int_vert2 *) allocate_type( ctx, bytes, CVX1H_TYPE );
       if (cverts1) {
          gridPRIME_to_compXYZPRIME( dtx, time, var, num1, vr1, vc1, vl, (void*)cverts1 );
       }
@@ -2240,8 +2231,8 @@ static void calc_hslice( Context ctx, int time, int var,
 
 
    if (num2) {
-      bytes = 3*num2*sizeof(int_2);
-      cverts2 = (int_2 *) allocate_type( ctx, bytes, CVX2H_TYPE );
+      bytes = 3L*(PTRINT)num2*(PTRINT)sizeof(int_vert2);
+      cverts2 = (int_vert2 *) allocate_type( ctx, bytes, CVX2H_TYPE );
       if (cverts2) {
          gridPRIME_to_compXYZPRIME( dtx, time, var, num2, vr2, vc2, vl, (void*)cverts2 );
       }
@@ -2259,8 +2250,8 @@ static void calc_hslice( Context ctx, int time, int var,
    }
 
    if (num3) {
-      bytes = 3*num3*sizeof(int_2);
-      cverts3 = (int_2 *) allocate_type( ctx, bytes, CVX3H_TYPE );
+      bytes = 3L*(PTRINT)num3*(PTRINT)sizeof(int_vert2);
+      cverts3 = (int_vert2 *) allocate_type( ctx, bytes, CVX3H_TYPE );
       if (cverts3) {
          gridPRIME_to_compXYZPRIME( dtx, time, var, num3, vr3, vc3, vl, (void*)cverts3 );
       }
@@ -2347,9 +2338,10 @@ static void calc_vslice( Context ctx, int time, int var,
   int cols, rows;
   char *labels = NULL;
   int i;
-  int num1, num2, num3, bytes;
+  int num1, num2, num3;
+  PTRINT bytes;
   float dr, dc, r, base;
-  int_2 *cverts1, *cverts2, *cverts3;
+  int_vert2 *cverts1, *cverts2, *cverts3;
   float *boxverts;
   int numboxverts;
   Display_Context dtx;
@@ -2452,7 +2444,7 @@ static void calc_vslice( Context ctx, int time, int var,
 	labels = vslice->labels ;
 	if(labels)
 	  free(labels);
-	labels = (char *) malloc(10*sizeof(char)*(max_cont_verts/2));
+    labels = (char *) malloc(10L*(PTRINT)sizeof(char)*(PTRINT)max_cont_verts/2L);
 #endif
 
    contour_ok =	contour( ctx, slice, rows, cols, interval, low, high, base,
@@ -2517,8 +2509,8 @@ static void calc_vslice( Context ctx, int time, int var,
    recent( ctx, VSLICE, var );
 
    if (num1) {
-      bytes = 3*num1*sizeof(int_2);
-      cverts1 = (int_2 *) allocate_type( ctx, bytes, CVX1V_TYPE );
+      bytes = 3L*(PTRINT)num1*(PTRINT)sizeof(int_vert2);
+      cverts1 = (int_vert2 *) allocate_type( ctx, bytes, CVX1V_TYPE );
       if (cverts1) {
          gridPRIME_to_compXYZPRIME( dtx, time, var, num1, vr1, vc1, vl1,
                           (void*) cverts1 );
@@ -2532,8 +2524,8 @@ static void calc_vslice( Context ctx, int time, int var,
    }
 
    if (num2) {
-      bytes = 3*num2*sizeof(int_2);
-      cverts2 = (int_2 *) allocate_type( ctx, bytes, CVX2V_TYPE );
+      bytes = 3L*(PTRINT)num2*(PTRINT)sizeof(int_vert2);
+      cverts2 = (int_vert2 *) allocate_type( ctx, bytes, CVX2V_TYPE );
       if (cverts2) {
          gridPRIME_to_compXYZPRIME( dtx, time, var, num2, vr2, vc2, vl2,
                           (void*) cverts2 );
@@ -2547,8 +2539,8 @@ static void calc_vslice( Context ctx, int time, int var,
    }
 
    if (num3) {
-      bytes = 3*num3*sizeof(int_2);
-      cverts3 = (int_2 *) allocate_type( ctx, bytes, CVZ3V_TYPE );
+      bytes = 3L*(PTRINT)num3*(PTRINT)sizeof(int_vert2);
+      cverts3 = (int_vert2 *) allocate_type( ctx, bytes, CVZ3V_TYPE );
       if (cverts3) {
          gridPRIME_to_compXYZPRIME( dtx, time, var, num3, vr3, vc3, vl3,
                           (void*) cverts3 );
@@ -2702,10 +2694,10 @@ static void calc_chslice( Context ctx, int time, int var,
 {
    struct chslice *slice = ctx->Variable[var]->CHSliceTable[time];
    float *vr, *vc, *vl;
-   int_2 *cverts;
+   int_vert2 *cverts;
    float *grid, *slicedata, scale;
    uint_1 *indexes;
-   int vbytes, ibytes;
+   PTRINT vbytes, ibytes;
    int slice_rows, slice_cols;
    float density = 1.0;  /* Make this a parameter someday */
    Display_Context dtx;
@@ -2722,9 +2714,9 @@ static void calc_chslice( Context ctx, int time, int var,
       if (slice->valid && !ctx->dpy_ctx->CurvedBox) {
          /* special case: just translate existing slice! */
          float z = gridlevelPRIME_to_zPRIME( dtx, time, var, level );
-         int_2 compz = (int_2) (z * VERTEX_SCALE);
+         int_vert2 compz = (int_vert2) (z * VERTEX_SCALE);
          int nrnc = dtx->Nr * dtx->Nc;
-         int_2 *zptr = slice->verts + 2;
+         int_vert2 *zptr = slice->verts + 2;
          int i;
          for (i=0;i<nrnc;i++) {
             *zptr = compz;
@@ -2761,9 +2753,9 @@ static void calc_chslice( Context ctx, int time, int var,
    slice_cols = dtx->Nc * density;
 
    /* allocate space for vertices and color indexes */
-   vbytes = slice_rows * slice_cols * sizeof(int_2) * 3;
-   cverts = (int_2 *) allocate_type( ctx, vbytes, VXH_TYPE );
-   ibytes = slice_rows * slice_cols * sizeof(uint_1);
+   vbytes = (PTRINT)slice_rows * (PTRINT)slice_cols * (PTRINT)sizeof(int_vert2) * 3L;
+   cverts = (int_vert2 *) allocate_type( ctx, vbytes, VXH_TYPE );
+   ibytes = (PTRINT)slice_rows * (PTRINT)slice_cols * (PTRINT)sizeof(uint_1);
    indexes = (uint_1 *) allocate_type( ctx, ibytes, INDEXESH_TYPE );
    if (!cverts || !indexes) {
       if (cverts) deallocate(ctx, cverts, vbytes );
@@ -2771,9 +2763,9 @@ static void calc_chslice( Context ctx, int time, int var,
       return;
    }
 
-   vr = (float *) malloc( MAXROWS*MAXCOLUMNS*sizeof(float));
-   vc = (float *) malloc( MAXROWS*MAXCOLUMNS*sizeof(float));
-   vl = (float *) malloc( MAXROWS*MAXCOLUMNS*sizeof(float));
+   vr = (float *) malloc( (PTRINT)MAXROWS*(PTRINT)MAXCOLUMNS*(PTRINT)sizeof(float));
+   vc = (float *) malloc( (PTRINT)MAXROWS*(PTRINT)MAXCOLUMNS*(PTRINT)sizeof(float));
+   vl = (float *) malloc( (PTRINT)MAXROWS*(PTRINT)MAXCOLUMNS*(PTRINT)sizeof(float));
    if (!vr || !vc || !vl){
       printf(" You do not have enough memory to create chslices.\n");
       if (vr){
@@ -2915,13 +2907,13 @@ static void calc_cvslice( Context ctx, int time, int var,
 {
    float *vr, *vc, *vl;
    float *grid, *slice;
-   int_2 *cverts;
+   int_vert2 *cverts;
    uint_1 *indexes;
    int cols, rows, i, j, n;
    float scale, r, c, dr, dc;
    float mr, mc, ml;
    float x, y, z;
-   int  vbytes, ibytes;
+   PTRINT  vbytes, ibytes;
    Display_Context dtx;
 
    /* WLH 15 Oct 8 */
@@ -2951,9 +2943,9 @@ static void calc_cvslice( Context ctx, int time, int var,
    }
    
    /* allocate space for vertices and color indexes */
-   vbytes = rows * cols * sizeof(int_2) * 3;
-   ibytes = rows*cols*sizeof(uint_1);
-   cverts = (int_2 *) allocate_type( ctx, vbytes, VXV_TYPE );
+   vbytes = (PTRINT)rows * (PTRINT)cols * (PTRINT)sizeof(int_vert2) * 3L;
+   ibytes = (PTRINT)rows*(PTRINT)cols*(PTRINT)sizeof(uint_1);
+   cverts = (int_vert2 *) allocate_type( ctx, vbytes, VXV_TYPE );
    indexes = (uint_1 *) allocate_type( ctx, ibytes, INDEXESV_TYPE );
    if (!cverts || !indexes) {
       if (cverts) deallocate(ctx, cverts, vbytes );
@@ -2962,13 +2954,13 @@ static void calc_cvslice( Context ctx, int time, int var,
    }
 
 #if MAXROWS>MAXCOLUMNS
-   vr = (float *) malloc( MAXROWS*MAXLEVELS*sizeof(float));
-   vc = (float *) malloc( MAXROWS*MAXLEVELS*sizeof(float));
-   vl = (float *) malloc( MAXROWS*MAXLEVELS*sizeof(float));
+   vr = (float *) malloc( (PTRINT)MAXROWS*(PTRINT)MAXLEVELS*(PTRINT)sizeof(float));
+   vc = (float *) malloc( (PTRINT)MAXROWS*(PTRINT)MAXLEVELS*(PTRINT)sizeof(float));
+   vl = (float *) malloc( (PTRINT)MAXROWS*(PTRINT)MAXLEVELS*(PTRINT)sizeof(float));
 #else
-   vr = (float *) malloc( MAXCOLUMNS*MAXLEVELS*sizeof(float));
-   vc = (float *) malloc( MAXCOLUMNS*MAXLEVELS*sizeof(float));
-   vl = (float *) malloc( MAXCOLUMNS*MAXLEVELS*sizeof(float));
+   vr = (float *) malloc( (PTRINT)MAXCOLUMNS*(PTRINT)MAXLEVELS*(PTRINT)sizeof(float));
+   vc = (float *) malloc( (PTRINT)MAXCOLUMNS*(PTRINT)MAXLEVELS*(PTRINT)sizeof(float));
+   vl = (float *) malloc( (PTRINT)MAXCOLUMNS*(PTRINT)MAXLEVELS*(PTRINT)sizeof(float));
 #endif
    if (!vr || !vc || !vl){
       printf(" You do not have enough memory to create cvslices.\n");
@@ -3349,7 +3341,7 @@ static void calc_hwindslice( Display_Context dtx, int displaytime, int ws,
    float *grid, *ugrid, *vgrid, *wgrid;
    int row, col, drow, dcol, vcount;
    float *vr, *vc, *vl;
-   int_2 *cverts;
+   int_vert2 *cverts;
    int uvar, vvar, wvar;
    float *boxverts;
    int numboxverts;
@@ -3435,9 +3427,9 @@ static void calc_hwindslice( Display_Context dtx, int displaytime, int ws,
       release_grid( ctx, time, wvar, grid );
    }
 
-   vr = (float *) malloc(sizeof(float)*MAX_WIND_VERTS);
-   vc = (float *) malloc(sizeof(float)*MAX_WIND_VERTS);
-   vl = (float *) malloc(sizeof(float)*MAX_WIND_VERTS);
+   vr = (float *) malloc(sizeof(float)*(PTRINT)MAX_WIND_VERTS);
+   vc = (float *) malloc(sizeof(float)*(PTRINT)MAX_WIND_VERTS);
+   vl = (float *) malloc(sizeof(float)*(PTRINT)MAX_WIND_VERTS);
    if (!vr || !vc || !vl){
       printf(" You do not have enough memory to create hwinds.\n");
       if (vr){
@@ -3458,8 +3450,8 @@ static void calc_hwindslice( Display_Context dtx, int displaytime, int ws,
    }
 
    /* Density: */
-   if (density>1.0 || density<0.0)
-     density = 1.0;
+   if (density>MAXWINDDENSITY || density<MINWINDDENSITY)
+     density = MAXWINDDENSITY;
    drow = (int) (1.0 / density);
    dcol = (int) (1.0 / density);
 
@@ -3668,8 +3660,8 @@ static void calc_hwindslice( Display_Context dtx, int displaytime, int ws,
 
  
    if (vcount>0) {
-      int bytes = 3*vcount*sizeof(int_2);
-      cverts = (int_2 *) allocate_type( ctx, bytes, WINDXH_TYPE );
+      PTRINT bytes = 3L*(PTRINT)vcount*(PTRINT)sizeof(int_vert2);
+      cverts = (int_vert2 *) allocate_type( ctx, bytes, WINDXH_TYPE );
       if (!cverts) {
          deallocate( ctx, cverts, bytes);
          cverts = NULL;
@@ -3729,7 +3721,7 @@ static void calc_hwindslicePRIME( Display_Context dtx, int displaytime, int ws,
 
    int row, col, drow, dcol, vcount;
    float *vr, *vc, *vl;   
-   int_2 *cverts;
+   int_vert2 *cverts;
    int uvar, vvar, wvar;
    float *boxverts;
    int numboxverts;
@@ -3810,9 +3802,9 @@ static void calc_hwindslicePRIME( Display_Context dtx, int displaytime, int ws,
       release_grid( ctx, time, wvar, grid );
    }
 
-   vr = (float *) malloc(sizeof(float)*MAX_WIND_VERTS);
-   vc = (float *) malloc(sizeof(float)*MAX_WIND_VERTS);
-   vl = (float *) malloc(sizeof(float)*MAX_WIND_VERTS);
+   vr = (float *) malloc(sizeof(float)*(PTRINT)MAX_WIND_VERTS);
+   vc = (float *) malloc(sizeof(float)*(PTRINT)MAX_WIND_VERTS);
+   vl = (float *) malloc(sizeof(float)*(PTRINT)MAX_WIND_VERTS);
    if (!vr || !vc || !vl){
       printf(" You do not have enough memory to create hwinds.\n");
       if (vr){
@@ -3833,8 +3825,8 @@ static void calc_hwindslicePRIME( Display_Context dtx, int displaytime, int ws,
    }
 
    /* Density: */
-   if (density>1.0 || density<0.0)
-     density = 1.0;
+   if (density>MAXWINDDENSITY || density<MINWINDDENSITY)
+     density = MAXWINDDENSITY;
    drow = (int) (1.0 / density);
    dcol = (int) (1.0 / density);
 
@@ -4067,8 +4059,8 @@ static void calc_hwindslicePRIME( Display_Context dtx, int displaytime, int ws,
 
 
    if (vcount>0) {
-      int bytes = 3*vcount*sizeof(int_2);
-      cverts = (int_2 *) allocate_type( ctx, bytes, WINDXH_TYPE );
+      PTRINT bytes = 3L*(PTRINT)vcount*(PTRINT)sizeof(int_vert2);
+      cverts = (int_vert2 *) allocate_type( ctx, bytes, WINDXH_TYPE );
       if (!cverts) {
          deallocate( ctx, cverts, bytes);
          cverts = NULL;
@@ -4126,7 +4118,7 @@ static void calc_vclip( Display_Context dtx, int num, float r1,
  
    n = 0;
    if (dtx->CurvedBox==0){
-      v = (float *) malloc(5 * 3 * sizeof(float));
+      v = (float *) malloc(5L * 3L * (PTRINT)sizeof(float));
       if (!v){
          printf("error in calc_vclip\n");
          exit(1);
@@ -4150,7 +4142,7 @@ static void calc_vclip( Display_Context dtx, int num, float r1,
    }
    else{
       float r, c, dr, dc;
-      v = (float *) malloc((2*dtx->Nl + 2*dtx->Nc - 3)* 3 * sizeof(float));
+      v = (float *) malloc((2L*(PTRINT)dtx->Nl + 2L*(PTRINT)dtx->Nc - 3L)* 3L * (PTRINT)sizeof(float));
       if (!v){
          printf("error in calc_vclip\n");
          exit(1);
@@ -4238,8 +4230,8 @@ static void calc_hclip( Display_Context dtx, int num, float level)
       v[4*3+2] = level;
    }
    else{
-      v = (float *) malloc((2*dtx->Nr + 2*dtx->Nc - 3)
-                                   * 3 * sizeof(float));
+      v = (float *) malloc((2L*(PTRINT)dtx->Nr + 2L*(PTRINT)dtx->Nc - 3L)
+                                   * 3L * (PTRINT)sizeof(float));
       if (!v){
          printf("error in calc_vclip\n");
          exit(1);
@@ -4310,7 +4302,7 @@ static void calc_vwindslice( Display_Context dtx, int displaytime, int ws,
    float *vr, *vc, *vl;
 
    int vcount;
-   int_2 *cverts;
+   int_vert2 *cverts;
    int uvar, vvar, wvar;
    float dr, dc;
    int numboxverts;
@@ -4356,8 +4348,8 @@ static void calc_vwindslice( Display_Context dtx, int displaytime, int ws,
    }*/
 
    /* Density: */
-   if (density>1.0 || density<0.0)
-     density = 1.0;
+   if (density>MAXWINDDENSITY || density<MINWINDDENSITY)
+     density = MAXWINDDENSITY;
 
    /* size of 2-D slice */
    rows = ctx->Nl[uvar];
@@ -4586,8 +4578,8 @@ static void calc_vwindslice( Display_Context dtx, int displaytime, int ws,
    /*************************** Compress *******************************/
 
    if (vcount>0) {
-      int bytes = 3*vcount*sizeof(int_2);
-      cverts = (int_2 *) allocate_type( ctx, bytes, WINDXV_TYPE );
+      PTRINT bytes = 3L*(PTRINT)vcount*(PTRINT)sizeof(int_vert2);
+      cverts = (int_vert2 *) allocate_type( ctx, bytes, WINDXV_TYPE );
       if (!cverts) {
          deallocate( ctx, cverts, bytes);
          cverts = NULL;
@@ -4653,7 +4645,7 @@ static void calc_vwindslicePRIME( Display_Context dtx, int displaytime, int ws,
    float *vr, *vc, *vl;
 
    int vcount;
-   int_2 *cverts;
+   int_vert2 *cverts;
    int uvar, vvar, wvar;
    float dr, dc;
    int numboxverts;
@@ -4701,8 +4693,8 @@ static void calc_vwindslicePRIME( Display_Context dtx, int displaytime, int ws,
    }*/
 
    /* Density: */
-   if (density>1.0 || density<0.0)
-     density = 1.0;
+   if (density>MAXWINDDENSITY || density<MINWINDDENSITY)
+     density = MAXWINDDENSITY;
 
    /* size of 2-D slice */
    rows = dtx->Nl;
@@ -4964,8 +4956,8 @@ static void calc_vwindslicePRIME( Display_Context dtx, int displaytime, int ws,
    /*************************** Compress *******************************/
 
    if (vcount>0) {
-      int bytes = 3*vcount*sizeof(int_2);
-      cverts = (int_2 *) allocate_type( ctx, bytes, WINDXV_TYPE );
+      PTRINT bytes = 3L*(PTRINT)vcount*(PTRINT)sizeof(int_vert2);
+      cverts = (int_vert2 *) allocate_type( ctx, bytes, WINDXV_TYPE );
       if (!cverts) {
          deallocate( ctx, cverts, bytes);
          cverts = NULL;
@@ -5042,7 +5034,7 @@ static void calc_hstreamslice(Display_Context dtx, int displaytime, int ws,
    int nr, nc, ir, ic;
 
    float *vr, *vc, *vl;   
-   int_2 *cverts;
+   int_vert2 *cverts;
    int uvar, vvar;
    float *boxverts;
    int numboxverts;
@@ -5164,8 +5156,8 @@ static void calc_hstreamslice(Display_Context dtx, int displaytime, int ws,
 
 
    if (num > 0) {
-      int bytes = 3 * num * sizeof(int_2);
-      cverts = (int_2 *) allocate_type( ctx, bytes, STREAM1_TYPE );
+      PTRINT bytes = 3L * (PTRINT)num * (PTRINT)sizeof(int_vert2);
+      cverts = (int_vert2 *) allocate_type( ctx, bytes, STREAM1_TYPE );
       if (cverts) {
          gridPRIME_to_compXYZPRIME( dtx, time, uvar, num, vr, vc, vl, (void*)cverts );
       }
@@ -5226,7 +5218,7 @@ static void calc_hstreamslicePRIME(Display_Context dtx, int displaytime, int ws,
 
    float *vr, *vc, *vl;         
    float *vr2, *vc2, *vl2;
-   int_2 *cverts;
+   int_vert2 *cverts;
    int uvar, vvar;
    float *boxverts;
    int numboxverts;
@@ -5362,8 +5354,8 @@ static void calc_hstreamslicePRIME(Display_Context dtx, int displaytime, int ws,
    }
 
    if (num > 0) {
-      int bytes = 3 * num * sizeof(int_2);
-      cverts = (int_2 *) allocate_type( ctx, bytes, STREAM1_TYPE );
+      PTRINT bytes = 3L * (PTRINT)num * (PTRINT)sizeof(int_vert2);
+      cverts = (int_vert2 *) allocate_type( ctx, bytes, STREAM1_TYPE );
       if (cverts) {
          grid_to_gridPRIME( ctx, time, uvar, num,vr,vc,vl,vr2, vc2, vl2);
          gridPRIME_to_compXYZPRIME( dtx, time, uvar, num, vr2, vc2, vl2, (void*)cverts );
@@ -5439,7 +5431,7 @@ static void calc_vstreamslice( Display_Context dtx, int displaytime, int ws,
    int ir, ic, rows, cols;
 
    float *vr, *vc, *vl;
-   int_2 *cverts;
+   int_vert2 *cverts;
    int uvar, vvar, wvar;
    float *boxverts;
    int numboxverts;
@@ -5589,8 +5581,8 @@ static void calc_vstreamslice( Display_Context dtx, int displaytime, int ws,
     */
 
    if (num > 0) {
-      int bytes = 3 * num * sizeof(int_2);
-      cverts = (int_2 *) allocate_type( ctx, bytes, STREAM1_TYPE );
+      PTRINT bytes = 3L * (PTRINT)num * (PTRINT)sizeof(int_vert2);
+      cverts = (int_vert2 *) allocate_type( ctx, bytes, STREAM1_TYPE );
       if (cverts) {
          gridPRIME_to_compXYZPRIME( dtx, time, uvar, num, vr, vc, vl, (void*)cverts );
       }
@@ -5655,7 +5647,7 @@ static void calc_vstreamslicePRIME( Display_Context dtx, int displaytime, int ws
    int ir, ic, rows, cols;
 
    float *vr, *vc, *vl;      
-   int_2 *cverts;
+   int_vert2 *cverts;
    int uvar, vvar, wvar;
    float *boxverts;
    int numboxverts;
@@ -5871,8 +5863,8 @@ printf("vgrid[ir(%d) * cols(%d) + ic(%d)] = %f\n", ir, cols, ic, vgrid[ir * cols
     */
 
    if (num > 0) {
-      int bytes = 3 * num * sizeof(int_2);
-      cverts = (int_2 *) allocate_type( ctx, bytes, STREAM1_TYPE );
+      PTRINT bytes = 3L * (PTRINT)num * (PTRINT)sizeof(int_vert2);
+      cverts = (int_vert2 *) allocate_type( ctx, bytes, STREAM1_TYPE );
       if (cverts) {
          gridPRIME_to_compXYZPRIME( dtx, time, uvar, num, vr, vc, vl, (void*)cverts );
       }
@@ -6072,8 +6064,8 @@ static void calc_traj( Display_Context dtx, float row, float col, float lev,
    float r,c,l;
    float *vr, *vc, *vl, *vx, *vy, *vz, *nx, *ny, *nz;
    int *tt;
-   int vbytes, nbytes;
-   int_2 *cverts;
+   PTRINT vbytes, nbytes;
+   int_vert2 *cverts;
    int_1 *cnorms;
    struct traj *t;
    int time;
@@ -6083,8 +6075,10 @@ static void calc_traj( Display_Context dtx, float row, float col, float lev,
       printf("error in getting ctx in calc_traj\n");
    }
    time = dtx->TimeStep[dtime].ownerstimestep[return_ctx_index_pos(dtx, dtx->TrajUowner)];
+
    if (dtx->NumTraj>=MAXTRAJ) {
       /* out of trajectory space */
+     printf("OUT OF TRAJECTORY SPACE, MAXTRAJ=%d \n",MAXTRAJ);
       return;
    }
 
@@ -6159,16 +6153,30 @@ static void calc_traj( Display_Context dtx, float row, float col, float lev,
       }
       return;
    }
- 
+   /*CHANGED -- calling trace1 instead of trace */
    if (ctx->GridSameAsGridPRIME){
+     if(TRACEVERSION==TRACEAS){
+       len = trace1( ctx, row, col, lev, time, (int) (step_mult * ctx->TrajStep),
+                  MAX_TRAJ_VERTS, vr, vc, vl, tt );
+     }
+     else{
       len = trace( ctx, row, col, lev, time, (int) (step_mult * ctx->TrajStep),
                   MAX_TRAJ_VERTS, vr, vc, vl, tt );
+   }
+      //   printf("after trace1, len= %d \n",len);
    }
    else{
       vis5d_gridPRIME_to_grid( ctx->context_index, dtime, ctx->dpy_ctx->TrajU,
                                row, col, lev, &r, &c, &l);
+
+      if(TRACEVERSION==TRACEAS){
+	len = trace1( ctx, r, c, l, time, (int) (step_mult * ctx->TrajStep),
+		      MAX_TRAJ_VERTS, vr, vc, vl, tt );
+      }
+      else{
       len = trace( ctx, r, c, l, time, (int) (step_mult * ctx->TrajStep),
                   MAX_TRAJ_VERTS, vr, vc, vl, tt );
+   }
    }
 
  
@@ -6215,14 +6223,14 @@ static void calc_traj( Display_Context dtx, float row, float col, float lev,
 
 
    /****************************** Compress ***************************/
-   vbytes = 3 * len * sizeof(int_2);
-   cverts = (int_2 *) allocate_type( ctx, vbytes, TRAJX_TYPE );
+   vbytes = 3L * (PTRINT)len * (PTRINT)sizeof(int_vert2);
+   cverts = (int_vert2 *) allocate_type( ctx, vbytes, TRAJX_TYPE );
    if (cverts) {
-      /* convert floats to int_2 */
+      /* convert floats to int_vert2 */
       for (i=0;i<len;i++) {
-         cverts[i*3+0] = (int_2) (vx[i] * VERTEX_SCALE);
-         cverts[i*3+1] = (int_2) (vy[i] * VERTEX_SCALE);
-         cverts[i*3+2] = (int_2) (vz[i] * VERTEX_SCALE);
+         cverts[i*3+0] = (int_vert2) (vx[i] * VERTEX_SCALE);
+         cverts[i*3+1] = (int_vert2) (vy[i] * VERTEX_SCALE);
+         cverts[i*3+2] = (int_vert2) (vz[i] * VERTEX_SCALE);
       }
    }
    else {
@@ -6230,7 +6238,7 @@ static void calc_traj( Display_Context dtx, float row, float col, float lev,
    }
    /* JPE changed from (ribbon & len>0) whose intention is unclear at best */
    if (ribbon && (len > 0)) {
-      nbytes = 3 * len * sizeof(int_1);
+      nbytes = 3L * (PTRINT)len * (PTRINT)sizeof(int_1);
       cnorms = (int_1 *) allocate_type( ctx, nbytes, TRAJXR_TYPE );
       if (!cnorms) {
          deallocate( ctx, cverts, vbytes );
@@ -6277,10 +6285,19 @@ static void calc_traj( Display_Context dtx, float row, float col, float lev,
    t->length = len;
    t->verts = cverts;
    t->norms = cnorms;
-   t->start = (uint_2 *) allocate_type( ctx,
-                                 ctx->NumTimes * sizeof(uint_2), START_TYPE );
-   t->len = (uint_2 *) allocate_type( ctx,
-                                 ctx->NumTimes * sizeof(uint_2), LEN_TYPE );
+   t->start = (uint_vert2 *) allocate_type( ctx,
+                                 ctx->NumTimes * sizeof(uint_vert2), START_TYPE );
+   t->len = (uint_vert2 *) allocate_type( ctx,
+                                 ctx->NumTimes * sizeof(uint_vert2), LEN_TYPE );
+
+
+   // JCM:
+   // check that can fit trajectories into struct traj
+   if(pow(sizeof(uint_vert2),2*8)<MAXTRAJCOUNT || pow(sizeof(uint_vert2),2*8)<MAX_TRAJ_VERTS || pow(sizeof(uint_vert2),2*8)<len ){
+     fprintf(stderr,"Cannot fit number of trajectories into struct traj\n");
+     exit(1);
+   }
+
 
    /* calculate start and len array values */
    if (len>0) {
@@ -6288,33 +6305,45 @@ static void calc_traj( Display_Context dtx, float row, float col, float lev,
       for (i=0;i<ctx->NumTimes;i++) {
          int t0, t1, j, startj;
 
-         t0 = ctx->Elapsed[i] - tlen;
+       t0 = ctx->Elapsed[i]; /* - tlen; CHANGED -- this way doesn't plot 2 streamlines/timestep*/
          t1 = ctx->Elapsed[i];
+       /*	 printf("calc_traj1( %d %d %d %d %d )\n", ctx->Elapsed[i], (int)(ctx->TrajLength), len, t0, t1 ); */
 
          /* find segment of traj extending in time from [t0,t1] */
          j = 0;
-/* WLH 20 Oct 98
+       /* WLH 20 Oct 98
          while (tt[j]<t0 && j<len)
-*/
+       */
          /* WLH 20 Oct 98 */
-         while (j<len && tt[j]<t0)
+       while (j<len && tt[j]<t0) j++;
 
-           j++;
+       //       fprintf(stderr,"j=%d len=%d t0=%d\n",j,len,t0);
          if (j>=len) {
             t->start[i] = 0;
             t->len[i] = 0;
          }
          else {
             t->start[i] = startj = j;
-            while (tt[j]<=t1 && j<len)
-              j++;
-            if (j-startj<=1)
-              t->len[i] = 0;
-            else
+	 while (tt[j]<=t1 && j<len) j++;
+	 if (j-startj<=1) t->len[i] = 0;
+	 else{
               t->len[i] = j - startj;
          }
+	 //	 printf("len=%d j=%d startj=%d t1=%d t->len[%d]=%d\n",len,j,startj,t1,i,(int)(t->len[i]));
+
+	 if(t->len[i]){
+	   t->len[i]--; /* to avoid last point being plotted  ADDED*/
+	 }
+	    	    
+	 //	printf("calc_traj2(%d %d len=%d tt=%d t0=%d t1=%d start=%d len=%d)\n",i,j,len,tt[j],t0, t1,t->start[i],t->len[i] );
+	    
+
       }
    }
+   }
+
+   //   fprintf(stderr,"final len=%d t->length=%d t->start[0]=%d t->len[0]=%d\n",len,t->length,t->start[0],t->len[0]);
+
 
    t->group = id;
    t->kind = ribbon;
@@ -6369,7 +6398,7 @@ static void recolor_topography( Context ctx, int time )
       if (ctx->dpy_ctx->topo->TopoIndexes[time]) {
          /* free the vertex color indexes */
          /* YO 10-5-97 potential old stuff
-         int bytes = ctx->qrows * ctx->qcols * sizeof(uint_1);
+         PTRINT bytes = ctx->qrows * ctx->qcols * sizeof(uint_1);
          deallocate( ctx, ctx->topo->TopoIndexes[time], bytes );
          ctx->topo->TopoIndexes[time] = NULL; */
 
@@ -6405,7 +6434,7 @@ static void recolor_topography( Context ctx, int time )
          free(ctx->dpy_ctx->topo->TopoIndexes[time]);
          ctx->dpy_ctx->topo->TopoIndexes[time] = NULL;
       }
-      indexes = malloc( ctx->dpy_ctx->topo->qrows * ctx->dpy_ctx->topo->qcols * sizeof(uint_1) );
+      indexes = malloc( (PTRINT)ctx->dpy_ctx->topo->qrows * (PTRINT)ctx->dpy_ctx->topo->qcols * (PTRINT)sizeof(uint_1) );
       if (!indexes){
          printf("You do not have enough memory to color topography.\n");
          return;
@@ -6528,24 +6557,10 @@ int do_one_task( int threadnum )
 
 
    get_qentry( &ctx, &itx, &type, &i1, &i2, &i3, &f1, &f2, &f3, &f4, &f5 );
-
+   if (Debug) printf("got entry: %d\n", type );
    time = i1;
    var = i2;
-	if(Debug)  printf("do_one_task task type=%d time=%d var=%d\n", type , time, var);
-
-	if((ctx && time>=ctx->NumTimes)){
-	  /* JPE: time is supposed to be ctx time but if two datasets of overlapping time
-		  are associated with the same display, requests are made for graphics
-        beyond the final time of the dataset which ends before display NumTimes 
-        (the last timestep of the display).  
-        I haven't yet found where this invalid request is being made,
-		  so for now I just say that the work has been done but don't do anything.
-	  */
-		  
-	  if(Debug) printf("WARNING: invalid request to do_one_task time %d exceeds NumTimes %d\n",time,ctx->NumTimes);
-	  return 1;
-   }
-
+   if (Debug)  printf("\ntask type=%d\n", type );
    switch (type) {
       case TASK_ISOSURFACE:
          /* compute an isosurface. */
@@ -6576,6 +6591,7 @@ int do_one_task( int threadnum )
 #endif /* HAVE_LIBNETCDF */
       case TASK_HSLICE:
          /* calculate a horizontal contour line slice. */
+		  
 		  calc_hslice( ctx, time, var, ctx->Variable[var]->HSliceRequest->Interval,
 							ctx->Variable[var]->HSliceRequest->LowLimit, ctx->Variable[var]->HSliceRequest->HighLimit,
 							ctx->Variable[var]->HSliceRequest->Level, threadnum );
@@ -6779,10 +6795,7 @@ void set_hslice_pos(Context ctx, int var, hslice_request *request, float level)
 		int factor=1;
 		float diff;
 		diff = request->HighLimit - request->LowLimit;
-                if(diff<=0.0){
-		  request->LowLimit = 0.0;
-		  request->HighLimit = 1.0;
-		}else if(diff>100){
+		if(diff>100){
 		  while(diff>100){
 			 factor++;
 			 diff /= factor;
@@ -6797,7 +6810,6 @@ void set_hslice_pos(Context ctx, int var, hslice_request *request, float level)
 		  while(diff<10){
 			 factor++;
 			 diff *= factor;
-			 printf("%d %f\n",factor,diff);
 		  }
 
 		  /*  sets the first and last contours outside the bounds of the data

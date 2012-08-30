@@ -1,0 +1,535 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<HTML
+><HEAD
+><TITLE
+>Controlling vis5d</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="Vis5D Documentation"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Using Vis5D to Visualize Your Data"
+HREF="ch06.html"><LINK
+REL="PREVIOUS"
+TITLE="The Control Panel"
+HREF="ch06sec2.html"><LINK
+REL="NEXT"
+TITLE="Viewing Modes"
+HREF="ch06sec4.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Vis5D Documentation</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="ch06sec2.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Using Vis5D to Visualize Your Data</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="ch06sec4.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="CH06SEC3"
+>Controlling vis5d</A
+></H1
+><P
+>     The topmost group of buttons in the control panel operate the main
+functions of vis5d.  Some will be discussed in more detail later.</P
+><P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN2054"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+BGCOLOR="#E0E0E0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>ANIMATE </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>This toggle button turns animation on or off. Use the left or
+               middle mouse buttons for forward animation and the right mouse
+               button for reverse animation.  Does not appear when viewing data
+               sets with one time step.  To make the animation slower or faster,
+               hit the S and F key on the keyboard while the mouse cursor is
+               inside the 3-D viewing window. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>STEP </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>This button has three possible uses depending on which 
+                mouse button is pressed:
+                Left Button - Step ahead one time step
+                Middle Button - Go to first time step.
+                Right Button - Backward one time step.
+                This button does not appear when viewing data sets with one time
+                step. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>NEW VAR </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>                Used to duplicate physical variables or invoke external 
+                analysis functions. This is explained further in 
+                <A
+HREF="ch06sec13.html"
+>section 6.13</A
+>. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>EXIT </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Exit the program.  A window will appear to ask you to 
+                verify your decision. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>TEXTURE </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>                 Toggles display of texture maps on/off if they are loaded.
+                 See <A
+HREF="ch06sec15.html"
+>section 6.15</A
+> for more 
+                 information. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>TOP </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Depending on which mouse button is pressed:                
+                 Left or Middle:  Reset the 3-D window to the default top-view.
+                 Right:  Set the 3-D window to a bottom-view. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>SOUTH </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Depending on which mouse button is pressed:
+                 Left or Middle: Set 3-D window to a south-view.
+                 Right:  Set 3-D window to a north-view. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>WEST </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Depending on which mouse button is pressed:
+                 Left or Middle:  Set 3-D window to a west-view.
+                 Right:  Set 3-D window to an east-view. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>TOPO </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Toggle the display of topography.  This button will not appear if
+               the topography file was not found.  Click on TOPO with the right
+               mouse button to edit the topography color. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>MAP </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Toggle the display of map lines.  This button will not appear if
+               the map file was not found.  Click on MAP with the right mouse
+               button to edit the color of the map lines. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>BOX </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Toggle the display of the 3-D box. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>CLOCK </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Toggle the display of the clock. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>SAVE </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>                Save current graphics and colors.  
+                After you've setup a variety of isosurfaces, slice, 
+                wind trajectories and colors it is useful to be able 
+                to save them and restore them the next time the data
+                set is visualized.  You'll be prompted for a filename.  
+                The file format, as of Vis5D 4.2 is a Tcl script.
+                See <A
+HREF="ch06sec16.html"
+>section 6.16</A
+> for
+                more information.  Using the right mouse button when 
+                clicking on this button will allow the current vis5d 
+                data set to be saved to a file in the v5d format.  
+                See <A
+HREF="ch06sec21.html"
+>section 6.21</A
+> . </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>RESTORE </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Restore the information save with the SAVE button.  
+                See <A
+HREF="ch06sec16.html"
+>section 6.16</A
+>
+                for more information. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>GRID #s </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Normally the bounds of the data set in latitude, longitude and
+               kilometers are displayed along the edges of the box.  Use this
+               button to display the numbers in grid coordinates instead. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>CONT #s </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>The numbers which are drawn on contour line slices can be toggled
+               on or off with this button. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>[ANIM-REC] </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>This button works just like ANIMATE but allows fast
+               animations on system with slow 3-D rendering.  After each time
+               step is rendered the image is saved in memory.  When the
+               animation loop repeats the images are quickly copied from memory
+               to the 3-D window resulting in a faster animation. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>REVERSE </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Normally, the 3-D box and clock are drawn in white on a black
+               background.  This option reverses that and draws a black box and
+               clock on a white background.  This is useful for making paper
+               print outs. </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>SAVE PIC </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Used to save the image in the 3-D or sounding window to a file.
+               When the 'Sounding' mode is chosen from the radio widgets the
+               sounding window  will be saved.  If any other mode such as
+               'Normal' or 'Slice' is chosen the 3-D window (including all
+               displays if multiple displays exist) will be saved.  Depending on
+               what system you're using a number of different picture file
+               formats are supported.  On SGI systems be sure you have the
+               'tops', 'frombin', and 'togif' program installed from your IRIX
+               CD-ROM.  When using OpenGL on SGIs the 'fromxwd' program is also
+               needed.  Unfortunately there is a bug in this program which often
+               causes it to fail.  Included with vis5d however is a patched
+               version of fromxwd.  An alternate way of insuring more save
+               formats is to download ImageMagick's 'convert' program. See
+               <A
+HREF="ch06sec14.html"
+>section 6.14</A
+> . </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>PERSPEC </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>                Toggle between perspective and orthogonal viewing 
+                projections.
+		 </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>SCRIPT </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>                Used to run Vis5D Tcl scripts.  
+                When you click on this button a file request will appear 
+                in which you can select the Tcl script to run.  
+                For more information see 
+                <A
+HREF="ch06sec16.html"
+>section 6.16</A
+> . </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>INTERP </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Starts the Vis5D interactive interpreter.  
+                In your shell window you may then enter Tcl commands.  
+                Vis5D will be suspended while the interpreter is active.
+                Type 'exit' to exit the interpreter. For more information 
+                see <A
+HREF="ch06sec16.html"
+>section 6.16</A
+> . </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>UVW VARS </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>                Opens a window in which you can specify the names of the
+                variables to use for computing trajectories and wind slices.
+                </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>LEGENDS </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>                Toggles the display of colorbar legends in the 3-D window. 
+                </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>IMPORT </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>                Invokes the import utility program for bringing new data sets
+                into a Vis5D session.  For more information see 
+                <A
+HREF="ch07.html#CH07SEC1"
+>section 7.1</A
+> and
+                <A
+HREF="ch07sec2.html"
+>section 7.2</A
+> . </TD
+></TR
+><TR
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>DISPLAY </TD
+><TD
+ALIGN="LEFT"
+VALIGN="TOP"
+>Opens a window which allows you manipulate 
+                the assignment of data sets to display windows and 
+                change various values associated with display windows.  
+                For more information see 
+                <A
+HREF="ch06sec20.html"
+>section 6.20</A
+> . </TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="ch06sec2.html"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="ch06sec4.html"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>The Control Panel</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="ch06.html"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Viewing Modes</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>
