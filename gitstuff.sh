@@ -89,6 +89,14 @@ rm -Rf .git/svn/
 # things to add:
 git add contrib/CVS/ contrib/SimonBaas/CVS/ contrib/epa/CVS/ contrib/gemvis/CVS/ contrib/gemvis/source/CVS/ contrib/grads/CVS/ contrib/grib/CVS/ contrib/grib/src/CVS/ contrib/hdftovis/CVS/ contrib/uw-meteor/CVS/ contrib/witte/CVS/ convert/CVS/ doc/html/ doc/script52.html doc/vis5d.pdf jonconfigure.sh m4/ChangeLog m4/Makefile.am m4/isc-posix.m4 pixmaps/CVS/ po/es.gmo po/pt_BR.gmo scripts/CVS/ scripts/earl.tcl src/binio.origkinda.c src/volume.backup.c toadd.sh toremove.sh toremovenew.sh userfuncs/CVS/
 
+COMMENT="patch applied on top of 326e84b7df of https://github.com/drafnel/Vis5d where the patch was formed as a diff between http://sourceforge.net/projects/vis5d/files/latest/download of vis5d+-1.3.0-beta.tar.gz and 14 major svn edits made by Anatoly Spitkovsky and mostly Jonathan McKinney.  Those 14 major edits allow for greater than 4GB memory use, better stereo control, better trajectory control, and higher limits on static constants for objects."
+
+git commit -a -m "$COMMENT"
+
+git commit --amend -a -m "$COMMENT"
+
+
+
 
 ### to clean-up do:
 rm -rf harm_vis5dplus/
