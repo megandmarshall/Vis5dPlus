@@ -102,7 +102,7 @@
 #endif
  */
 // JCM:
-#define BIG_GFX
+#define BIG_GFX 1
 
 
 /*

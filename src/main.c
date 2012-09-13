@@ -974,6 +974,20 @@ main( int argc, char *argv[] )
    /* these variables help keep track of new variables during scripting */
    int number_of_vars_before, number_of_vars_after; 
 
+
+
+   // output some static constant values
+   if(1==1){
+     fprintf(stderr,"BIG_GFX=%d\n",BIG_GFX);
+     fprintf(stderr,"MAX_ISO_VERTS=%d\n",MAX_ISO_VERTS);
+   }
+
+
+
+
+
+
+
    /* WLH 5 Oct 98 */
    setbuf(stdout,NULL);
    setbuf(stderr,NULL);

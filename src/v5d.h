@@ -26,6 +26,9 @@
  *
  */
 
+// JCM
+#include "vis5d.h"
+
 #ifndef V5D_H
 #define V5D_H
 
@@ -138,7 +141,8 @@ typedef unsigned short V5Dushort;   /* Must be 2 byte, except for cray */
   // was in work.c:
 /* Maximum number of vertices... */
 #ifdef BIG_GFX
-#  define MAX_ISO_VERTS 2400000    /* in an isosurface */
+  //#  define MAX_ISO_VERTS 2400000    /* in an isosurface */
+#  define MAX_ISO_VERTS 24000000    /* in an isosurface */
 #else
 #  define MAX_ISO_VERTS 650000     /* in an isosurface */
 #endif

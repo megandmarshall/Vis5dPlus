@@ -324,8 +324,10 @@ static void calc_isosurface( Context ctx, int time, int var,
 
       recent( ctx, ISOSURF, var );
 
-      if (numindexes>MAX_ISO_VERTS)
+      if (numindexes>MAX_ISO_VERTS){
+        fprintf(stderr,"limited numindexes=%d to MAX_ISO_VERTS=%d\n",numindexes,MAX_ISO_VERTS);
          numindexes = MAX_ISO_VERTS;
+      }
 
       /*************************** Compress data ***************************/
 
