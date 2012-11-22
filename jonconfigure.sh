@@ -1,5 +1,17 @@
 #!/bin/bash
 
+# Nautilus
+#if [ "$HOSTNAME" == "conseil" ]
+#then
+if [ $CUE_HOST_PROMPT = nautilus ]; then
+    cp .bashrc.gcc .bashrc 
+    # then relogin.  Can't swap or unload, doesn't work for some reason.
+
+    cd /lustre/medusa/jmckinne/harmgit.verylatest/Vis5dPlus/
+
+fi
+
+
 DOLATESTAUTOMAKE=1
 
 if [ $DOLATESTAUTOMAKE -eq 1 ]
@@ -86,6 +98,13 @@ then
     #./configure --enable-threads --prefix=/u/ki/jmckinne/
     #FINALDIR=/home/$USER/vis5dalt/
     FINALDIR=/home/$USER/
+    # Nautilus:
+    if [ $CUE_HOST_PROMPT = nautilus ]; then
+    #    if [ "$HOSTNAME" == "conseil" ]
+    #then
+        FINALDIR=/nics/b/home/$USER/
+    fi
+    #
     ./configure --enable-threads --prefix=$FINALDIR
     # -enable-gtk
     ### NO: cp po/Makefile.in po/Makefile # because Makefile.in.in from external source
@@ -95,10 +114,13 @@ then
     make
     make install
     chown -R $USER $FINALDIR/lib/
-    chgrp -R $USER $FINALDIR/lib/
     chown -R $USER $FINALDIR/bin/
+    chgrp -R $USER $FINALDIR/lib/
     chgrp -R $USER $FINALDIR/bin/
-    
+    if [ $CUE_HOST_PROMPT = nautilus ]; then
+        chgrp -R tug1111 $FINALDIR/lib/
+        chgrp -R tug1111 $FINALDIR/bin/
+    fi    
     # if modifying glade/gtk stuff (interactive during make):
     # ./configure --enable-threads --prefix=/home/$USER/ --enable-maintainer-mode     
 fi
