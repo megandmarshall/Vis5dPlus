@@ -37,6 +37,12 @@
 extern "C" {
 #endif				/* __cplusplus */
 
+// JCM 8/28/12
+// define memory size so can go beyond 4GB barrier
+//#define PTRINT int
+#define PTRINT long int
+
+
 /*
  * A numeric version number which we can test for in utility programs which
  * use the v5d functions.  For example, we can do tests like this:
@@ -63,7 +69,7 @@ typedef unsigned short V5Dushort;   /* Must be 2 byte, except for cray */
 
 // Maximum memory to ever use in bytes:
 //#define MAXMEMAVAILABLE 1024*1024*1024 // old value
-#define MAXMEMAVAILABLE 2*1024*1024*1024
+#define MAXMEMAVAILABLE 8*1024*1024*1024
 
   // whether to make left-handed vis5d+ coord system look like right-handed when showing plot axes
 #define SWITCHXAXES 1 // for Jon
@@ -373,10 +379,10 @@ typedef struct {
         unsigned int FileFormat; /* COMP5D file version or 0 if .v5d */
         int FileDesc;            /* Unix file descriptor */
         char Mode;               /* 'r' = read, 'w' = write */
-        int CurPos;              /* current position of file pointer */
-        int FirstGridPos;        /* position of first grid in file */
-        int GridSize[MAXVARS];   /* size of each grid */
-        int SumGridSizes;        /* sum of GridSize[0..NumVars-1] */
+        PTRINT CurPos;              /* current position of file pointer */
+        PTRINT FirstGridPos;        /* position of first grid in file */
+        PTRINT GridSize[MAXVARS];   /* size of each grid */
+        PTRINT SumGridSizes;        /* sum of GridSize[0..NumVars-1] */
 } v5dstruct;
 
 

@@ -254,10 +254,10 @@ then
     ./configure --enable-threads --prefix=/home/$USER/
     make
     make install
-    chown -R jmckinne /home/jmckinne/lib/
-    chgrp -R jmckinne /home/jmckinne/lib/
-    chown -R jmckinne /home/jmckinne/bin/
-    chgrp -R jmckinne /home/jmckinne/bin/
+    chown -R $USER /home/$USER/lib/
+    chgrp -R $USER /home/$USER/lib/
+    chown -R $USER /home/$USER/bin/
+    chgrp -R $USER /home/$USER/bin/
     
     
     # note that toremove.sh removes too much (e.g. po/pt_BR.*)

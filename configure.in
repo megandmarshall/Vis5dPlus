@@ -124,7 +124,7 @@ AC_CHECK_FUNCS(strcasecmp strncasecmp strdup)
 # Find X11 libs and flags:
 AC_PATH_X
 AC_PATH_XTRA
-CFLAGS="$CFLAGS $X_CFLAGS"
+CFLAGS="$CFLAGS $X_CFLAGS  -floop-parallelize-all"
 XLIBS="$X_LIBS $X_PRE_LIBS -lXext -lX11 $X_EXTRA_LIBS"
 AC_SUBST(XLIBS)
 

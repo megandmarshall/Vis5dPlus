@@ -105,19 +105,19 @@
 #define VWIND_TYPE 67
 #define VERTDATA_TYPE 68
 
-extern int init_irregular_memory( Irregular_Context itx, int bytes );
+extern int init_irregular_memory( Irregular_Context itx, PTRINT bytes );
 
-extern int i_init_shared_memory( Irregular_Context itx, void *start, int bytes );
+extern int i_init_shared_memory( Irregular_Context itx, void *start, PTRINT bytes );
 
 extern int i_reinit_memory( Irregular_Context itx );
 
-extern void *i_allocate( Irregular_Context itx, int bytes );
+extern void *i_allocate( Irregular_Context itx, PTRINT bytes );
 
-extern void *i_allocate_type( Irregular_Context itx, int bytes, int type );
+extern void *i_allocate_type( Irregular_Context itx, PTRINT bytes, int type );
 
-extern void *i_pallocate( Irregular_Context itx, int bytes );
+extern void *i_pallocate( Irregular_Context itx, PTRINT bytes );
 
-extern void i_deallocate( Irregular_Context itx, void *addr, int bytes );
+extern void i_deallocate( Irregular_Context itx, void *addr, PTRINT bytes );
 
 extern int i_mem_available( Irregular_Context itx );
 

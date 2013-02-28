@@ -50,10 +50,6 @@
 #  define NULL 0
 #endif
 
-// JCM 8/28/12
-// define memory size so can go beyond 4GB barrier
-//#define PTRINT int
-#define PTRINT long int
 
 /*** Data types ***/
 #if SIZEOF_SIGNED_CHAR == 1

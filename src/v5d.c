@@ -81,6 +81,7 @@
 #include "binio.h"
 #include "v5d.h"
 #include "vis5d.h"
+#include "globals.h"
 
 #ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>
@@ -374,7 +375,7 @@ void v5dPrintStruct( const v5dstruct *v )
    else {
       printf("Compression:  %d bytes per gridpoint.\n", v->CompressMode);
    }
-   printf("header size=%d\n", v->FirstGridPos);
+   printf("header size=%ld\n", v->FirstGridPos);
    printf("sizeof(v5dstruct)=%d\n", (int) sizeof(v5dstruct) );
    printf("\n");
 
@@ -506,18 +507,18 @@ void v5dPrintStruct( const v5dstruct *v )
  *         time, var - which timestep and variable.
  * Return:  file offset in bytes
  */
-static int grid_position( const v5dstruct *v, int time, int var )
+static PTRINT grid_position( const v5dstruct *v, int time, int var )
 {
-   int pos, i;
+   PTRINT pos, i;
 
    assert( time >= 0 );
    assert( var >= 0 );
    assert( time < v->NumTimes );
    assert( var < v->NumVars );
 
-   pos = v->FirstGridPos + time * v->SumGridSizes;
+   pos = (PTRINT)v->FirstGridPos + (PTRINT)time * (PTRINT)v->SumGridSizes;
    for (i=0;i<var;i++) {
-      pos += v->GridSize[i];
+      pos += (PTRINT)v->GridSize[i];
    }
 
    return pos;
@@ -546,7 +547,7 @@ static void compute_ga_gb( int nr, int nc, int nl,
    /*
     * Compute ga, gb values for whole grid.
     */
-   int i, lev, allmissing, num;
+   PTRINT i, lev, allmissing, num;
    float min, max, a, b;
 
    min = 1.0e30;
@@ -588,7 +589,7 @@ static void compute_ga_gb( int nr, int nc, int nl,
    float levmin[MAXLEVELS], levmax[MAXLEVELS];
    float d[MAXLEVELS], dmax;
    float ival, mval;
-   int j, k, lev, nrnc;
+   PTRINT j, k, lev, nrnc;
 
    nrnc = nr * nc;
 
@@ -624,7 +625,7 @@ static void compute_ga_gb( int nr, int nc, int nl,
    /* within delt of 0.0 to delt, and recalculate mins and maxes */
    {
       float delt;
-      int nrncnl = nrnc * nl;
+      PTRINT nrncnl = nrnc * nl;
 
       delt = (gridmax - gridmin)/100000.0;
       if ( ABS(gridmin) < delt && gridmin!=0.0 && compressmode != 4 ) {
@@ -759,8 +760,8 @@ void v5dCompressGrid( int nr, int nc, int nl, int compressmode,
                       void *compdata, float ga[], float gb[],
                       float *minval, float *maxval )
 {
-   int nrnc = nr * nc;
-   int nrncnl = nr * nc * nl;
+   PTRINT nrnc = nr * nc;
+   PTRINT nrncnl = nr * nc * nl;
    V5Dubyte *compdata1 = (V5Dubyte *) compdata;
    V5Dushort *compdata2 = (V5Dushort *) compdata;
 
@@ -769,7 +770,7 @@ void v5dCompressGrid( int nr, int nc, int nl, int compressmode,
 
    /* compress the data */
    if (compressmode==1) {
-      int i, lev, p;
+      PTRINT i, lev, p;
       p = 0;
       for (lev=0;lev<nl;lev++) {
          float one_over_a, b;
@@ -804,7 +805,7 @@ void v5dCompressGrid( int nr, int nc, int nl, int compressmode,
    }
 
    else if (compressmode == 2) {
-      int i, lev, p;
+      PTRINT i, lev, p;
       p = 0;
       for (lev=0;lev<nl;lev++) {
          float one_over_a, b;
@@ -888,13 +889,13 @@ void v5dDecompressGrid( int nr, int nc, int nl, int compressmode,
                         void *compdata, float ga[], float gb[],
                         float data[] )
 {
-   int nrnc = nr * nc;
-   int nrncnl = nr * nc * nl;
+   PTRINT nrnc = nr * nc;
+   PTRINT nrncnl = nr * nc * nl;
    V5Dubyte *compdata1 = (V5Dubyte *) compdata;
    V5Dushort *compdata2 = (V5Dushort *) compdata;
 
    if (compressmode == 1) {
-      int p, i, lev;
+      PTRINT p, i, lev;
       p = 0;
       for (lev=0;lev<nl;lev++) {
          float a = ga[lev];
@@ -902,7 +903,7 @@ void v5dDecompressGrid( int nr, int nc, int nl, int compressmode,
 
          /* WLH 2-2-95 */
          float d, aa;
-         int id;
+         PTRINT id;
          if (a > 0.0000000001) {
            d = b / a;
            id = floor(d);
@@ -938,7 +939,7 @@ void v5dDecompressGrid( int nr, int nc, int nl, int compressmode,
    }
 
    else if (compressmode == 2) {
-      int p, i, lev;
+      PTRINT p, i, lev;
       p = 0;
       for (lev=0;lev<nl;lev++) {
          float a = ga[lev];
@@ -946,7 +947,7 @@ void v5dDecompressGrid( int nr, int nc, int nl, int compressmode,
 #ifdef _CRAY
          /* this is tricky because sizeof(V5Dushort)==8, not 2 */
          for (i=0;i<nrnc;i++,p++) {
-            int compvalue;
+            PTRINT compvalue;
             compvalue = (compdata1[p*2] << 8) | compdata1[p*2+1];
             if (compvalue==65535) {
                data[p] = MISSING;
@@ -992,7 +993,7 @@ void v5dDecompressGrid( int nr, int nc, int nl, int compressmode,
  */
 int v5dSizeofGrid( const v5dstruct *v, int time, int var )
 {
-   return v->Nr * v->Nc * v->Nl[var] * v->CompressMode;
+  return (PTRINT)v->Nr * (PTRINT)v->Nc * (PTRINT)v->Nl[var] * (PTRINT)v->CompressMode;
 }
 
 
@@ -1003,8 +1004,8 @@ int v5dSizeofGrid( const v5dstruct *v, int time, int var )
  */
 void v5dInitStruct( v5dstruct *v )
 {
-   int i;
-   int len;
+   PTRINT i;
+   PTRINT len;
 
    /* set everything to zero */
    memset( v, 0, sizeof(v5dstruct) );
@@ -1390,7 +1391,7 @@ static int read_comp_header( int f, v5dstruct *v )
       /* Older COMP5D format */
       int gridtimes, gridparms;
       int i, j, it, iv, nl;
-      int gridsize;
+      PTRINT gridsize;
       float hgttop, hgtinc;
       /*char *compgrid;*/
 
@@ -1405,7 +1406,7 @@ static int read_comp_header( int f, v5dstruct *v )
          gridparms = 30;
       }
 
-      v->FirstGridPos = 12*4 + 8*gridtimes + 4*gridparms;
+      v->FirstGridPos = (PTRINT)12*4 + (PTRINT)8*gridtimes + (PTRINT)4*gridparms;
 
       read_int4( f, &v->NumTimes );
       read_int4( f, &v->NumVars );
@@ -1456,11 +1457,11 @@ static int read_comp_header( int f, v5dstruct *v )
          v->VarName[i][4] = 0;
       }
 
-      gridsize = ( (v->Nr * v->Nc * nl + 3) / 4) * 4;
+      gridsize = ( ((PTRINT)v->Nr * (PTRINT)v->Nc * (PTRINT)nl + (PTRINT)3) / (PTRINT)4) * (PTRINT)4;
       for (i=0;i<v->NumVars;i++) {
-         v->GridSize[i] = 8 + gridsize;
+         v->GridSize[i] = (PTRINT)8 + gridsize;
       }
-      v->SumGridSizes = (8+gridsize) * v->NumVars;
+      v->SumGridSizes = ((PTRINT)8+(PTRINT)gridsize) * (PTRINT)v->NumVars;
 
       /* read the grids and their ga,gb values to find min and max values */
 
@@ -1498,7 +1499,8 @@ static int read_comp_header( int f, v5dstruct *v )
    }
    else if (id==0x80808082 || id==0x80808083) {
       /* Newer COMP5D format */
-      int gridtimes, gridsize;
+ 	  int gridtimes;
+ 	  PTRINT gridsize;
       int it, iv, nl, i, j;
       float delta;
 
@@ -1576,21 +1578,21 @@ static int read_comp_header( int f, v5dstruct *v )
 
       /* calculate grid storage sizes */
       if (id==0x80808082) {
-         gridsize = nl*2*4 + ( (v->Nr * v->Nc * nl + 3) / 4) * 4;
+         gridsize = (PTRINT)nl*2*4 + ( ((PTRINT)v->Nr * (PTRINT)v->Nc * (PTRINT)nl + (PTRINT)3) / (PTRINT)4) * (PTRINT)4;
       }
       else {
          /* McIDAS grid and file numbers present */
-         gridsize = 8 + nl*2*4 + ( (v->Nr * v->Nc * nl + 3) / 4) * 4;
+         gridsize = (PTRINT)8 + (PTRINT)nl*2*4 + ( ((PTRINT)v->Nr * (PTRINT)v->Nc * (PTRINT)nl + (PTRINT)3) / (PTRINT)4) * (PTRINT)4;
       }
       for (i=0;i<v->NumVars;i++) {
          v->GridSize[i] = gridsize;
       }
-      v->SumGridSizes = gridsize * v->NumVars;
+      v->SumGridSizes = (PTRINT)gridsize * (PTRINT)v->NumVars;
 
       /* read McIDAS numbers??? */
 
       /* size (in bytes) of all header info */
-      v->FirstGridPos = 9*4 + v->Nl[0]*4 + v->NumVars*16 + gridtimes*16;
+      v->FirstGridPos = (PTRINT)9*4 + (PTRINT)v->Nl[0]*4 + (PTRINT)v->NumVars*16 + (PTRINT)gridtimes*16;
 
    }
 
@@ -1610,7 +1612,7 @@ static int read_comp_header( int f, v5dstruct *v )
 static int read_comp_grid( v5dstruct *v, int time, int var,
                            float *ga, float *gb, void *compdata )
 {
-   unsigned int pos;
+   unsigned PTRINT pos;
    V5Dubyte bias;
    int i, n, nl;
    int f;
@@ -1620,7 +1622,12 @@ static int read_comp_grid( v5dstruct *v, int time, int var,
 
    /* move to position in file */
    pos = grid_position( v, time, var );
-   lseek( f, pos, SEEK_SET );
+   if(lseek( f, pos, SEEK_SET)<0){
+      /* lseek failed, return error */
+      printf("Error in read_comp_grid: seek failed, disk full?\n");
+      return 0;
+   }
+
 
    if (v->FileFormat==0x80808083) {
       /* read McIDAS grid and file numbers */
@@ -2050,8 +2057,8 @@ static int read_v5d_header( v5dstruct *v )
    /* compute grid sizes */
    v->SumGridSizes = 0;
    for (var=0;var<v->NumVars;var++) {
-      v->GridSize[var] = 8 * v->Nl[var] + v5dSizeofGrid( v, 0, var );
-      v->SumGridSizes += v->GridSize[var];
+      v->GridSize[var] = (PTRINT)8 * (PTRINT)v->Nl[var] + (PTRINT)v5dSizeofGrid( v, 0, var );
+      v->SumGridSizes += (PTRINT)v->GridSize[var];
    }
 
    return 1;
@@ -2112,7 +2119,7 @@ v5dstruct *v5dOpenFile( const char *filename, v5dstruct *v )
 int v5dReadCompressedGrid( v5dstruct *v, int time, int var,
                            float *ga, float *gb, void *compdata )
 {
-   int pos, n, k;
+   PTRINT pos, n, k;
 
    if (time<0 || time>=v->NumTimes) {
       printf("Error in v5dReadCompressedGrid: bad timestep argument (%d)\n",
@@ -2132,7 +2139,11 @@ int v5dReadCompressedGrid( v5dstruct *v, int time, int var,
 
    /* move to position in file */
    pos = grid_position( v, time, var );
-   lseek( v->FileDesc, pos, SEEK_SET );
+   if(lseek( v->FileDesc, pos, SEEK_SET)<0){
+      /* lseek failed, return error */
+      printf("Error in read_comp_grid: seek failed, disk full?\n");
+      return 0;
+   }
 
    /* read ga, gb arrays */
    read_float4_array( v->FileDesc, ga, v->Nl[var] );
@@ -2180,7 +2191,7 @@ int v5dReadGrid( v5dstruct *v, int time, int var, float data[] )
 {
    float ga[MAXLEVELS], gb[MAXLEVELS];
    void *compdata;
-   int bytes;
+   PTRINT bytes;
 
    if (time<0 || time>=v->NumTimes) {
       printf("Error in v5dReadGrid: bad timestep argument (%d)\n", time);
@@ -2193,17 +2204,17 @@ int v5dReadGrid( v5dstruct *v, int time, int var, float data[] )
 
    /* allocate compdata buffer */
    if (v->CompressMode==1) {
-      bytes = v->Nr * v->Nc * v->Nl[var] * sizeof(unsigned char);
+      bytes = (PTRINT)v->Nr * (PTRINT)v->Nc * (PTRINT)v->Nl[var] * (PTRINT)sizeof(unsigned char);
    }
    else if (v->CompressMode==2) {
-      bytes = v->Nr * v->Nc * v->Nl[var] * sizeof(unsigned short);
+      bytes = (PTRINT)v->Nr * (PTRINT)v->Nc * (PTRINT)v->Nl[var] * (PTRINT)sizeof(unsigned short);
    }
    else if (v->CompressMode==4) {
-      bytes = v->Nr * v->Nc * v->Nl[var] * sizeof(float);
+      bytes = (PTRINT)v->Nr * (PTRINT)v->Nc * (PTRINT)v->Nl[var] * (PTRINT)sizeof(float);
    }
    compdata = (void *) malloc( bytes );
    if (!compdata) {
-      printf("Error in v5dReadGrid: out of memory (needed %d bytes)\n", bytes);
+      printf("Error in v5dReadGrid: out of memory (needed %ld bytes)\n", bytes);
       return 0;
    }
 
@@ -2243,7 +2254,7 @@ static int write_tag( v5dstruct *v, int tag, int length, int newfile )
 
    if (write_int4( v->FileDesc, tag )==0)  return 0;
    if (write_int4( v->FileDesc, length )==0)  return 0;
-   v->CurPos += 8 + length;
+   v->CurPos += (PTRINT) (8 + length);
    return 1;
 }
 
@@ -2259,7 +2270,8 @@ static int write_tag( v5dstruct *v, int tag, int length, int newfile )
  */
 static int write_v5d_header( v5dstruct *v )
 {
-   int var, time, filler, maxnl;
+   int var, time, maxnl;
+   PTRINT filler;
    int f;
    int newfile;
 
@@ -2284,8 +2296,8 @@ static int write_v5d_header( v5dstruct *v )
    /* compute grid sizes */
    v->SumGridSizes = 0;
    for (var=0;var<v->NumVars;var++) {
-      v->GridSize[var] = 8 * v->Nl[var] + v5dSizeofGrid( v, 0, var );
-      v->SumGridSizes += v->GridSize[var];
+      v->GridSize[var] = (PTRINT)8 * (PTRINT)v->Nl[var] + (PTRINT)v5dSizeofGrid( v, 0, var );
+      v->SumGridSizes += (PTRINT)v->GridSize[var];
    }
 
    /* set file pointer to start of file */
@@ -2498,7 +2510,7 @@ int v5dWriteCompressedGrid( const v5dstruct *v, int time, int var,
                             const float *ga, const float *gb,
                             const void *compdata )
 {
-   int pos, n, k;
+  PTRINT pos, n, k;
 
    /* simple error checks */
    if (v->Mode!='w') {
@@ -2519,7 +2531,7 @@ int v5dWriteCompressedGrid( const v5dstruct *v, int time, int var,
 
    /* move to position in file */
    pos = grid_position( v, time, var );
-   if (lseek( v->FileDesc, pos, SEEK_SET )<0) {
+   if(lseek( v->FileDesc, pos, SEEK_SET )<0) {
       /* lseek failed, return error */
       printf("Error in v5dWrite[Compressed]Grid: seek failed, disk full?\n");
       return 0;
@@ -2577,7 +2589,7 @@ int v5dWriteGrid( v5dstruct *v, int time, int var, const float data[] )
 {
    float ga[MAXLEVELS], gb[MAXLEVELS];
    void *compdata;
-   int n, bytes;
+   PTRINT n, bytes;
    float min, max;
 
    if (v->Mode!='w') {
@@ -2596,17 +2608,17 @@ int v5dWriteGrid( v5dstruct *v, int time, int var, const float data[] )
 
    /* allocate compdata buffer */
    if (v->CompressMode==1) {
-      bytes = v->Nr * v->Nc * v->Nl[var] * sizeof(unsigned char);
+      bytes = (PTRINT)v->Nr * (PTRINT)v->Nc * (PTRINT)v->Nl[var] * (PTRINT)sizeof(unsigned char);
    }
    else if (v->CompressMode==2) {
-      bytes = v->Nr * v->Nc * v->Nl[var] * sizeof(unsigned short);
+      bytes = (PTRINT)v->Nr * (PTRINT)v->Nc * (PTRINT)v->Nl[var] * (PTRINT)sizeof(unsigned short);
    }
    else if (v->CompressMode==4) {
-      bytes = v->Nr * v->Nc * v->Nl[var] * sizeof(float);
+      bytes = (PTRINT)v->Nr * (PTRINT)v->Nc * (PTRINT)v->Nl[var] * (PTRINT)sizeof(float);
    }
    compdata = (void *) malloc( bytes );
    if (!compdata) {
-      printf("Error in v5dWriteGrid: out of memory (needed %d bytes)\n",
+      printf("Error in v5dWriteGrid: out of memory (needed %ld bytes)\n",
              bytes );
       return 0;
    }
@@ -2685,7 +2697,7 @@ int v5dCreateStruct(v5dstruct *v, int numtimes, int numvars,
                int vertical,
                const float vert_args[] )
 {
-   int var, time, maxnl, i;
+   PTRINT var, time, maxnl, i;
 
 
    v->NumTimes = numtimes;
