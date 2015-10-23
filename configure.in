@@ -130,7 +130,7 @@ AC_SUBST(XLIBS)
 
 ##########################################################################
 # Find 3D graphics libs:
-GLLIBS=""
+GLLIBS="-L/usr/lib/ -lGLU -lGL"
 
 # First, look for OpenGL or Mesa:
 if test "$with_mesa" != "yes"; then
