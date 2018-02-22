@@ -53,12 +53,12 @@
 
 
 struct mem {
-   PTRINT       size;
+   int        size;
    struct mem *prev;
    struct mem *next;
    short int        free, magic;
 #ifdef DEBUG_MEM
-   PTRINT type;
+   int type;
 #endif
 };
 
@@ -86,7 +86,7 @@ static void i_check_memory( Irregular_Context itx );
  */
 static void *i_alloc( Irregular_Context itx, int b, int permanent, int type )
 {
-   PTRINT bytes;
+   int bytes;
    struct mem *pos, *new;
 
 #ifdef DEBUG_MEM
@@ -145,7 +145,7 @@ static void *i_alloc( Irregular_Context itx, int b, int permanent, int type )
    if (pos==NULL) {
       /* Find first fit */
 #ifdef DEBUG_MEM
-	  PTRINT tries = 0;
+      int tries = 0;
 #endif
       for (pos=itx->head; pos; pos=pos->next) {
          if (pos->free && pos->size == bytes) {
@@ -230,7 +230,7 @@ static void *i_alloc( Irregular_Context itx, int b, int permanent, int type )
  */
 static void i_dealloc( Irregular_Context itx, void *addr, int b )
 {
-   PTRINT bytes;
+   int bytes;
    struct mem *pos, *pred, *succ;
 
 #ifdef DEBUG_MEM
@@ -401,7 +401,7 @@ static void i_dump_memory( Irregular_Context itx )
  *         bytes - size of the memory pool.
  * Return:  1 = success, 0 = error
  */
-int init_irregular_memory( Irregular_Context itx, PTRINT bytes )
+int init_irregular_memory( Irregular_Context itx, int bytes )
 {
    struct mem *m;
 
@@ -449,7 +449,7 @@ int init_irregular_memory( Irregular_Context itx, PTRINT bytes )
  *         bytes - size of the memory pool.
  * Return:  1 = success, 0 = error
  */
-int i_init_shared_memory( Irregular_Context itx, void *start, PTRINT bytes )
+int i_init_shared_memory( Irregular_Context itx, void *start, int bytes )
 {
    struct mem *m;
 
@@ -528,7 +528,7 @@ int i_mem_available( Irregular_Context itx )
  *         bytes - how many bytes to allocate
  * Return:  address of memory block or NULL if out of memory.
  */
-void *i_allocate( Irregular_Context itx, PTRINT bytes )
+void *i_allocate( Irregular_Context itx, int bytes )
 {
    assert( bytes>=0 );
 
@@ -538,7 +538,7 @@ void *i_allocate( Irregular_Context itx, PTRINT bytes )
    }
    else {
       void *addr;
-      PTRINT ma, d;
+      int ma, d;
 
       do {
          LOCK_ON( itx->memlock );
@@ -576,7 +576,7 @@ void *i_allocate( Irregular_Context itx, PTRINT bytes )
  *         type - type of block (see list in memory.h)
  * Return:  address of memory block or NULL if out of memory.
  */
-void *i_allocate_type( Irregular_Context itx, PTRINT bytes, int type )
+void *i_allocate_type( Irregular_Context itx, int bytes, int type )
 {
    assert( bytes>=0 );
 
@@ -586,7 +586,7 @@ void *i_allocate_type( Irregular_Context itx, PTRINT bytes, int type )
    }
    else {
       void *addr;
-      PTRINT ma, d;
+      int ma, d;
 
       do {
          LOCK_ON( itx->memlock );
@@ -622,7 +622,7 @@ void *i_allocate_type( Irregular_Context itx, PTRINT bytes, int type )
  * Input:  itx - the vis5d context
  *         bytes - number of bytes to allocate
  */
-void *i_pallocate( Irregular_Context itx, PTRINT bytes )
+void *i_pallocate( Irregular_Context itx, int bytes )
 {
    if (itx->memory_limit==0) {
       /* just malloc */
@@ -630,7 +630,7 @@ void *i_pallocate( Irregular_Context itx, PTRINT bytes )
    }
    else {
       void *addr;
-      PTRINT ma, d;
+      int ma, d;
 
       do {
          LOCK_ON( itx->memlock );
@@ -667,7 +667,7 @@ void *i_pallocate( Irregular_Context itx, PTRINT bytes )
  *         addr - address of block (if NULL, nothing happens)
  *         bytes - size of block (if <= zero, bytes is ignored)
  */
-void i_deallocate( Irregular_Context itx, void *addr, PTRINT bytes )
+void i_deallocate( Irregular_Context itx, void *addr, int bytes )
 {
    LOCK_ON( itx->memlock );
    if (addr) {

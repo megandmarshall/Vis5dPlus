@@ -61,16 +61,7 @@
 
 
 #if defined(HAVE_LIBTCL) && defined(HAVE_TCL_H)
-#define USE_INTERP_RESULT 1
-// https://archives.gentoo.org/gentoo-dev/message/ff536c36505782434677571bbd4a2c66
-// http://www.tcl.tk/cgi-bin/tct/tip/330.html
-// Tcl8 deprecates result unless set above define.
-// Tcl9 has no Tcl_Interp->result, so will have to modify code if using Tcl9
-
 #  include "tclheader.h"
-
-
-
 #else
 
 /*
@@ -95,8 +86,9 @@
 
 typedef void *ClientData;
 
+
 typedef struct {
-  char            *result;      /* result string */
+   char            *result;      /* result string */
    struct private  *p;           /* private interpreter data */
 } Tcl_Interp;
 

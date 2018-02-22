@@ -124,13 +124,13 @@ AC_CHECK_FUNCS(strcasecmp strncasecmp strdup)
 # Find X11 libs and flags:
 AC_PATH_X
 AC_PATH_XTRA
-CFLAGS="$CFLAGS $X_CFLAGS  -floop-parallelize-all"
+CFLAGS="$CFLAGS $X_CFLAGS"
 XLIBS="$X_LIBS $X_PRE_LIBS -lXext -lX11 $X_EXTRA_LIBS"
 AC_SUBST(XLIBS)
 
 ##########################################################################
 # Find 3D graphics libs:
-GLLIBS="-L/usr/lib/ -lGLU -lGL"
+GLLIBS=""
 
 # First, look for OpenGL or Mesa:
 if test "$with_mesa" != "yes"; then

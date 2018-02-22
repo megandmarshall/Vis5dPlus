@@ -101,10 +101,9 @@ static char inv_vcscr[256];
 
 int *read_int_block( f, len )
 FILE *f;
-long int *len;
+int *len;
 {
-   int words, bits, ch, val, i, j, k;
-   long int count, bytes;
+   int words, bits, ch, val, i, j, k, count, bytes;
    float a, b;
    char line[80];
    int *buffer;

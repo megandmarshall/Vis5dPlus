@@ -1,14 +1,9 @@
 #!/bin/bash
 
-
-# FOR UBUNTU:
-# Have to change GLLIBS="" to GLLIBS="/usr/lib/" in configure.in
-
-# FOR Nautilus
-export CUE_HOST_PROMPT="nobody"
+# Nautilus
 #if [ "$HOSTNAME" == "conseil" ]
 #then
-if [ "$CUE_HOST_PROMPT" = "nautilus" ]; then
+if [ $CUE_HOST_PROMPT = nautilus ]; then
     cp .bashrc.gcc .bashrc 
     # then relogin.  Can't swap or unload, doesn't work for some reason.
 
@@ -104,7 +99,7 @@ then
     #FINALDIR=/home/$USER/vis5dalt/
     FINALDIR=/home/$USER/
     # Nautilus:
-    if [ "$CUE_HOST_PROMPT" = "nautilus" ]; then
+    if [ $CUE_HOST_PROMPT = nautilus ]; then
     #    if [ "$HOSTNAME" == "conseil" ]
     #then
         FINALDIR=/nics/b/home/$USER/
@@ -122,8 +117,7 @@ then
     chown -R $USER $FINALDIR/bin/
     chgrp -R $USER $FINALDIR/lib/
     chgrp -R $USER $FINALDIR/bin/
-    #
-    if [ "$CUE_HOST_PROMPT" = "nautilus" ]; then
+    if [ $CUE_HOST_PROMPT = nautilus ]; then
         chgrp -R tug1111 $FINALDIR/lib/
         chgrp -R tug1111 $FINALDIR/bin/
     fi    
@@ -260,10 +254,10 @@ then
     ./configure --enable-threads --prefix=/home/$USER/
     make
     make install
-    chown -R $USER /home/$USER/lib/
-    chgrp -R $USER /home/$USER/lib/
-    chown -R $USER /home/$USER/bin/
-    chgrp -R $USER /home/$USER/bin/
+    chown -R jmckinne /home/jmckinne/lib/
+    chgrp -R jmckinne /home/jmckinne/lib/
+    chown -R jmckinne /home/jmckinne/bin/
+    chgrp -R jmckinne /home/jmckinne/bin/
     
     
     # note that toremove.sh removes too much (e.g. po/pt_BR.*)
